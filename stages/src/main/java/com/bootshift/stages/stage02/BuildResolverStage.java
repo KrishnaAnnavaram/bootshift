@@ -1,8 +1,7 @@
 package com.bootshift.stages.stage02;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.bootshift.adapters.build.GradleBuildAdapter;
-import com.bootshift.adapters.build.MavenBuildAdapter;
+import com.bootshift.adapters.build.BuildSystemResolver;
 import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
@@ -10,6 +9,7 @@ import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
+import com.bootshift.ports.build.BuildModelCodec;
 import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
@@ -87,23 +87,15 @@ public final class BuildResolverStage implements Stage {
         }
         Path evidenceSink = context.run().runWorkspace().resolve("build-evidence");
 
-        MavenBuildAdapter maven = new MavenBuildAdapter();
-        GradleBuildAdapter gradle = new GradleBuildAdapter();
-
-        List<BuildSystemPort.BuildModel> models = new ArrayList<>();
-        if (maven.supports(root)) {
-            models.add(maven.resolve(root, evidenceSink));
-        }
-        if (gradle.supports(root)) {
-            models.add(gradle.resolve(root, evidenceSink));
-        }
-        if (models.isEmpty()) {
+        BuildSystemResolver resolver = new BuildSystemResolver();
+        BuildSystemPort.Kind detected = resolver.detect(root);
+        if (detected == BuildSystemPort.Kind.UNKNOWN) {
             return StageResult.failure(OUTPUT_DIR, ExitCode.STRUCTURED_REFUSAL,
                     "No Maven or Gradle build was found under " + root,
                     List.of("Expected a pom.xml, build.gradle or per-service module directories"));
         }
 
-        BuildSystemPort.BuildModel merged = merge(models);
+        BuildSystemPort.BuildModel merged = resolver.resolve(root, evidenceSink);
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
 
         long unresolved = merged.dependencies().stream()
@@ -111,7 +103,8 @@ public final class BuildResolverStage implements Stage {
                 .count();
 
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
-                .stat("build_systems", models.size())
+                .stat("build_systems", resolver.bindings(root).size())
+                .stat("detected_kind", detected.name())
                 .stat("modules", merged.modules().size())
                 .stat("dependencies", merged.dependencies().size())
                 .stat("unresolved_dependencies", unresolved)
@@ -122,23 +115,26 @@ public final class BuildResolverStage implements Stage {
                     "The build tool could not be invoked, so the dependency graph is descriptor-derived",
                     merged.degradedReason()));
         }
+        if (detected == BuildSystemPort.Kind.MIXED) {
+            envelope.gap(new Envelope.Gap("GAP-BUILD-002", "BUILD_SYSTEM",
+                    "This repository contains both a Maven and a Gradle build",
+                    "The composite is represented explicitly as MIXED and each module carries the "
+                            + "provider that owns it; it is never flattened to a single build system"));
+        }
         if (unresolved > 0) {
             envelope.gap(new Envelope.Gap("GAP-BUILD-001", "DEPENDENCY_RESOLUTION",
                     unresolved + " dependency coordinate(s) were not resolved by the build tool",
                     "Version-space and impact analysis for those coordinates is unreliable"));
         }
 
-        ObjectNode buildModel = Json.obj();
-        buildModel.put("kind", merged.kind().name());
-        buildModel.put("tool_version", merged.toolVersion());
-        buildModel.put("tool_invocation", merged.toolInvocation());
-        buildModel.put("wrapper_used", merged.wrapperUsed());
-        buildModel.put("authoritative", merged.authoritative());
-        buildModel.put("degraded_reason", merged.degradedReason());
-        buildModel.set("toolchains", Json.toTree(merged.toolchains()));
-        buildModel.set("modules", Json.toTree(merged.modules()));
+        // One serialized contract, written by the codec. Every later stage rehydrates through the
+        // same codec instead of rebuilding a partial copy that silently loses managed versions,
+        // plugins, repositories, resolution issues and toolchain details.
+        ObjectNode buildModel = BuildModelCodec.encode(merged);
         buildModel.set("java_versions", Json.toTree(javaVersions(merged)));
         buildModel.set("frameworks", Json.toTree(detectFrameworks(merged)));
+        buildModel.put("detected_kind", detected.name());
+        buildModel.put("build_model_fingerprint", BuildModelCodec.fingerprint(merged));
         ObjectNode buildArtifact = StageSupport.compose(envelope, buildModel);
         StageSupport.validate(context, writer, "build/build-model.schema.json",
                 "build-model.json", buildArtifact);
@@ -206,38 +202,6 @@ public final class BuildResolverStage implements Stage {
                         + merged.managedVersions().size() + " managed version(s)"
                         + (merged.authoritative() ? "" : " [NOT AUTHORITATIVE]"),
                 messages, artifacts, hash);
-    }
-
-    private BuildSystemPort.BuildModel merge(List<BuildSystemPort.BuildModel> models) {
-        if (models.size() == 1) {
-            return models.get(0);
-        }
-        List<BuildSystemPort.ModuleModel> modules = new ArrayList<>();
-        List<BuildSystemPort.ResolvedDependency> dependencies = new ArrayList<>();
-        List<BuildSystemPort.ResolvedPlugin> plugins = new ArrayList<>();
-        List<BuildSystemPort.ManagedVersion> managed = new ArrayList<>();
-        List<BuildSystemPort.RepositoryRef> repositories = new ArrayList<>();
-        List<BuildSystemPort.ResolutionIssue> issues = new ArrayList<>();
-        Map<String, String> toolchains = new LinkedHashMap<>();
-        boolean authoritative = true;
-        StringBuilder degraded = new StringBuilder();
-        for (BuildSystemPort.BuildModel model : models) {
-            modules.addAll(model.modules());
-            dependencies.addAll(model.dependencies());
-            plugins.addAll(model.plugins());
-            managed.addAll(model.managedVersions());
-            repositories.addAll(model.repositories());
-            issues.addAll(model.issues());
-            toolchains.putAll(model.toolchains());
-            authoritative = authoritative && model.authoritative();
-            if (model.degradedReason() != null) {
-                degraded.append(model.kind()).append(": ").append(model.degradedReason()).append(' ');
-            }
-        }
-        return new BuildSystemPort.BuildModel(BuildSystemPort.Kind.MAVEN, models.get(0).toolVersion(),
-                models.get(0).toolInvocation(), models.get(0).wrapperUsed(), modules, dependencies,
-                plugins, managed, repositories, issues, toolchains, authoritative,
-                degraded.length() == 0 ? null : degraded.toString().trim());
     }
 
     private Map<String, String> javaVersions(BuildSystemPort.BuildModel model) {

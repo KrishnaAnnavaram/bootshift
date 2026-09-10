@@ -4,15 +4,21 @@ import com.bootshift.adapters.transform.ConfigurationPropertyTransformer;
 import com.bootshift.adapters.transform.JakartaNamespaceTransformer;
 import com.bootshift.adapters.transform.RemovedAnnotationTransformer;
 import com.bootshift.adapters.transform.MavenPomTransformer;
-import com.bootshift.adapters.transform.OpenRewriteCoreProbe;
+import com.bootshift.adapters.transform.OpenRewriteCoreProvider;
+import com.bootshift.core.policy.LicensePolicy;
 import com.bootshift.adapters.transform.TestFrameworkTransformer;
 import com.bootshift.ports.transformation.TransformationPort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Deterministic transformer tests (spec section 57: recipe and idempotency tests).
@@ -162,7 +168,11 @@ class TransformerTest {
 
         assertThat(capabilities).isNotEmpty();
         assertThat(capabilities).allSatisfy(capability -> {
-            assertThat(capability.licenseSpdx()).isEqualTo("Apache-2.0");
+            // Harness-owned code is MIT, matching the repository LICENSE. This deliberately differs
+            // from OpenRewrite's Apache-2.0 and from every application dependency's own licence:
+            // the four classifications are kept separate and are never harmonised.
+            assertThat(capability.licenseSpdx()).isEqualTo("MIT");
+            assertThat(capability.licenseEvidenceRef()).isEqualTo("harness-owned");
             assertThat(capability.deterministic()).isTrue();
             assertThat(capability.status()).isEqualTo("AVAILABLE");
         });
@@ -325,25 +335,132 @@ class TransformerTest {
 
     @Test
     @DisplayName("OpenRewrite capability is discovered, not assumed")
-    void openRewriteIsProbed() {
-        OpenRewriteCoreProbe probe = new OpenRewriteCoreProbe();
-        List<TransformationPort.Capability> capabilities = probe.capabilities("2.7.12", "3.5.16");
+    void openRewriteCapabilityReflectsReality() {
+        OpenRewriteCoreProvider provider = new OpenRewriteCoreProvider();
+        List<TransformationPort.Capability> capabilities = provider.capabilities("2.7.12", "3.5.16");
 
-        assertThat(capabilities).hasSize(1);
-        TransformationPort.Capability capability = capabilities.get(0);
-        // Whichever way the probe resolves, the status must reflect reality rather than a guess.
-        assertThat(capability.status()).isIn("AVAILABLE", "UNAVAILABLE", "BLOCKED_BY_LICENSE_POLICY");
-        if (!probe.coreAvailable()) {
-            assertThat(capability.status()).isEqualTo("UNAVAILABLE");
-            assertThat(capability.confidence()).isZero();
-            assertThat(capability.notes()).contains("counted as residual");
+        assertThat(capabilities).isNotEmpty();
+        for (TransformationPort.Capability capability : capabilities) {
+            assertThat(capability.status()).isIn("AVAILABLE", "UNAVAILABLE", "LICENSE_BLOCK");
+        }
+        if (!provider.coreAvailable()) {
+            assertThat(capabilities).hasSize(1);
+            assertThat(capabilities.get(0).status()).isEqualTo("UNAVAILABLE");
+            assertThat(capabilities.get(0).confidence()).isZero();
         }
     }
 
     @Test
-    @DisplayName("no source-available Spring recipe estate is on the classpath")
+    @DisplayName("a declared AVAILABLE OpenRewrite capability can actually apply its recipe")
+    void openRewriteCapabilityIsBackedByAnImplementation() {
+        // The predecessor of this provider declared capabilities and then returned no changes when
+        // asked to apply anything, so the registry claimed coverage the transformation stage could
+        // not deliver. A capability that says AVAILABLE has to correspond to a recipe that runs.
+        OpenRewriteCoreProvider provider = new OpenRewriteCoreProvider();
+        for (TransformationPort.Capability capability : provider.capabilities("2.7.12", "3.5.16")) {
+            if (!"AVAILABLE".equals(capability.status())) {
+                continue;
+            }
+            boolean backed = List.of(
+                    OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE,
+                    OpenRewriteCoreProvider.RECIPE_REMOVE_ANNOTATION,
+                    OpenRewriteCoreProvider.RECIPE_CHANGE_PARENT_POM,
+                    OpenRewriteCoreProvider.RECIPE_CHANGE_MAVEN_PROPERTY)
+                    .stream()
+                    .anyMatch(recipe -> provider.capabilityFor(recipe, "2.7.12", "3.5.16")
+                            .map(c -> c.capabilityId().equals(capability.capabilityId()))
+                            .orElse(false));
+            assertThat(backed)
+                    .as("capability %s claims AVAILABLE but no recipe maps to it",
+                            capability.capabilityId())
+                    .isTrue();
+        }
+    }
+
+    @Test
+    @DisplayName("OpenRewrite rewrites the jakarta namespace without touching comments or literals")
+    void openRewriteChangePackageIsSemantic(@TempDir Path workspace) throws Exception {
+        OpenRewriteCoreProvider provider = new OpenRewriteCoreProvider();
+        assumeTrue(provider.coreAvailable() && provider.javaModuleAvailable(),
+                "OpenRewrite java module is not on the classpath");
+
+        Path source = workspace.resolve("src/main/java/com/example/Order.java");
+        Files.createDirectories(source.getParent());
+        Files.writeString(source, """
+                package com.example;
+
+                import javax.persistence.Entity;
+                import javax.sql.DataSource;
+
+                // This comment mentions javax.persistence and must not be rewritten.
+                @Entity
+                public class Order {
+                    String note = "javax.persistence stays inside this literal";
+                    DataSource dataSource;
+                }
+                """);
+
+        Map<String, String> parameters = new java.util.LinkedHashMap<>();
+        parameters.put("oldPackageName", "javax.persistence");
+        parameters.put("newPackageName", "jakarta.persistence");
+        parameters.put("recursive", "true");
+        TransformationPort.TransformationOutcome outcome = provider.apply(
+                OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE,
+                new TransformationPort.TransformationRequest(workspace, "EDGE-TEST", "2.7.18",
+                        "3.0.13", List.of("src/main/java/com/example/Order.java"), parameters));
+
+        assertThat(outcome.success()).isTrue();
+        assertThat(outcome.changes()).hasSize(1);
+        String rewritten = outcome.changes().get(0).newContent();
+
+        assertThat(rewritten).contains("import jakarta.persistence.Entity;");
+        // javax.sql is a JDK package that never relocated. Rewriting it is the classic way to turn a
+        // working application into one that does not compile for reasons unrelated to the migration.
+        assertThat(rewritten).contains("import javax.sql.DataSource;");
+        // A textual rewrite would have hit both of these.
+        assertThat(rewritten).contains("comment mentions javax.persistence");
+        assertThat(rewritten).contains("\"javax.persistence stays inside this literal\"");
+
+        // Provenance: engine, recipe and both hashes, so the change is traceable to the tool.
+        Map<String, String> attributes = outcome.changes().get(0).attributes();
+        assertThat(attributes).containsKeys("engine", "engine_version", "recipe_class",
+                "license", "input_hash", "output_hash", "edge_id");
+        assertThat(attributes.get("engine")).isEqualTo("openrewrite");
+        assertThat(attributes.get("license")).isEqualTo("Apache-2.0");
+        assertThat(attributes.get("edge_id")).isEqualTo("EDGE-TEST");
+
+        // And it wrote nothing: the gateway is still the only writer.
+        assertThat(Files.readString(source)).contains("import javax.persistence.Entity;");
+    }
+
+    @Test
+    @DisplayName("OpenRewrite refuses to run when a forbidden recipe estate is present")
+    void openRewriteRefusesUnderLicenseBlock() {
+        // The presence check is injected rather than faked with a substitute classloader: a
+        // classloader cannot return a class under a different name, so the refusal branch would
+        // never be reached and this behaviour would be asserted only by its own absence.
+        OpenRewriteCoreProvider blocked = OpenRewriteCoreProvider.withSimulatedForbiddenEstate();
+
+        assertThat(blocked.forbiddenEstatePresent()).isTrue();
+        assertThat(blocked.capabilities("2.7.12", "3.5.16").get(0).status()).isEqualTo("LICENSE_BLOCK");
+        assertThat(blocked.handles(OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE)).isFalse();
+
+        TransformationPort.TransformationOutcome outcome = blocked.apply(
+                OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE,
+                new TransformationPort.TransformationRequest(Path.of("."), "EDGE-TEST", "2.7.18",
+                        "3.0.13", List.of(), Map.of()));
+        assertThat(outcome.success()).isFalse();
+        assertThat(outcome.changes()).isEmpty();
+        assertThat(outcome.messages().toString()).contains("LICENSE_BLOCK");
+    }
+
+    @Test
+    @DisplayName("no source-available Spring recipe estate is on the real classpath")
     void forbiddenEstateIsAbsent() {
-        assertThat(new OpenRewriteCoreProbe().forbiddenEstatePresent()).isFalse();
+        assertThat(new OpenRewriteCoreProvider().forbiddenEstatePresent()).isFalse();
+        // The list is owned by LicensePolicy so the provider, the architecture test and the
+        // dependency test cannot drift into three different answers.
+        assertThat(LicensePolicy.forbiddenRecipePackages()).contains("org.openrewrite.java.spring");
     }
 
     @Test

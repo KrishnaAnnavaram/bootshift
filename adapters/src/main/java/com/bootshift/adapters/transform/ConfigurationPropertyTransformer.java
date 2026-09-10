@@ -63,7 +63,7 @@ public final class ConfigurationPropertyTransformer implements TransformationPor
     public List<Capability> capabilities(String sourceVersion, String targetVersion) {
         return List.of(new Capability(
                 "CAP-CONFIG-PROPERTY", PROVIDER, "bootshift-config-property-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", sourceVersion, targetVersion,
+                "MIT", "harness-owned", sourceVersion, targetVersion,
                 List.of("PROPERTY_RENAMED", "PROPERTY_REMOVED", "PROPERTY_SILENTLY_IGNORED"),
                 List.of(),
                 true, true, "SINGLE_EDGE", rules.isEmpty() ? 0.0 : 1.0,
@@ -160,49 +160,79 @@ public final class ConfigurationPropertyTransformer implements TransformationPor
     }
 
     /**
-     * Migrates flow-style and nested YAML by rebuilding the dotted key of each leaf and matching it
-     * against the rules. Only leaf keys whose full dotted path matches are rewritten.
+     * Migrates YAML using a real structural parse rather than an indentation assumption.
+     *
+     * <p>The previous implementation computed nesting as {@code indent / 2}. YAML does not require
+     * two-space indentation, so a four-space file produced dotted keys at the wrong depth and every
+     * rule silently matched nothing while the run reported the properties as migrated. Nested
+     * sequences, quoted keys, values containing colons and multi-document profile files all made it
+     * worse.
+     *
+     * <p>The structure now comes from a YAML parser, which also reports the line each key occupies.
+     * Only those lines are edited, so comments, blank lines and formatting elsewhere survive.
+     *
+     * <p>A file that does not parse is left completely alone and reported. Falling back to line
+     * scanning would mean editing a file whose structure the harness does not actually understand.
      */
     public static Result migrateYaml(String content, List<PropertyRule> rules) {
         List<String> applied = new ArrayList<>();
+        YamlPropertyModel model = YamlPropertyModel.parse(content);
+        if (!model.parsed()) {
+            return new Result(content, applied);
+        }
+
+        Map<String, PropertyRule> byKey = new LinkedHashMap<>();
+        rules.forEach(rule -> byKey.put(rule.from(), rule));
+
         String[] lines = content.split("\n", -1);
-        StringBuilder out = new StringBuilder();
-        List<String> stack = new ArrayList<>();
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            String rewritten = line;
-            String trimmed = line.trim();
-            if (!trimmed.isEmpty() && !trimmed.startsWith("#") && trimmed.contains(":")) {
-                int indent = line.length() - line.stripLeading().length();
-                int depth = indent / 2;
-                while (stack.size() > depth) {
-                    stack.remove(stack.size() - 1);
-                }
-                String key = trimmed.substring(0, trimmed.indexOf(':')).trim();
-                boolean leaf = !trimmed.endsWith(":");
-                stack.add(key);
-                String dotted = String.join(".", stack);
-                if (leaf) {
-                    for (PropertyRule rule : rules) {
-                        if (!dotted.equals(rule.from())) {
-                            continue;
-                        }
-                        if ("REMOVE".equals(rule.action()) || rule.to() == null || rule.to().isBlank()) {
-                            rewritten = " ".repeat(indent) + "# [bootshift] removed " + dotted + ": "
-                                    + (rule.reason() == null ? "no replacement" : rule.reason())
-                                    + "\n" + " ".repeat(indent) + "#" + trimmed;
-                        } else {
-                            // Flatten to the replacement dotted key at the same indentation.
-                            String value = trimmed.substring(trimmed.indexOf(':') + 1).trim();
-                            rewritten = " ".repeat(indent) + rule.to() + ": " + value;
-                        }
-                        applied.add(rule.from());
-                        break;
-                    }
-                    stack.remove(stack.size() - 1);
-                }
+        // Edits keyed by line so two rules cannot both claim the same physical line.
+        Map<Integer, String> replacements = new LinkedHashMap<>();
+
+        for (YamlPropertyModel.Leaf leaf : model.leaves()) {
+            PropertyRule rule = byKey.get(leaf.dottedKey());
+            if (rule == null || leaf.keyLine() < 0 || leaf.keyLine() >= lines.length) {
+                continue;
             }
-            out.append(rewritten);
+            if (replacements.containsKey(leaf.keyLine())) {
+                continue;
+            }
+            String line = lines[leaf.keyLine()];
+            String indent = " ".repeat(Math.max(0, leaf.indent()));
+
+            if ("REMOVE".equals(rule.action()) || rule.to() == null || rule.to().isBlank()) {
+                // Removing a bound property is a behavioural event, not a formatting change: the
+                // application stops seeing a value it was configured with. Commenting it out is the
+                // most conservative edit available, and it is flagged so the runtime comparison
+                // treats it as something to check rather than something already known safe.
+                if (leaf.block() || leaf.sequence() || leaf.valueEndLine() != leaf.keyLine()) {
+                    // A multi-line value cannot be commented out by touching one line without
+                    // risking a malformed document, so it is left and reported as residual.
+                    continue;
+                }
+                replacements.put(leaf.keyLine(), indent + "# [bootshift] removed "
+                        + leaf.dottedKey() + ": "
+                        + (rule.reason() == null ? "no documented replacement" : rule.reason())
+                        + System.lineSeparator() + indent + "# " + line.trim());
+                applied.add(rule.from());
+                continue;
+            }
+
+            // Rename. The replacement is written as a dotted key at the original indentation, which
+            // Spring binds identically to the nested form and which cannot collide with a sibling
+            // branch the way re-nesting could.
+            String rewritten = YamlPropertyModel.rewriteKeyLine(line, leaf.dottedKey(), rule.to());
+            if (!rewritten.equals(line)) {
+                replacements.put(leaf.keyLine(), rewritten);
+                applied.add(rule.from());
+            }
+        }
+
+        if (replacements.isEmpty()) {
+            return new Result(content, applied);
+        }
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            out.append(replacements.getOrDefault(i, lines[i]));
             if (i < lines.length - 1) {
                 out.append('\n');
             }

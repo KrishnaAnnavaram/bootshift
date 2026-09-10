@@ -43,6 +43,17 @@ public final class HarnessPolicy {
     private boolean allowEolLandingTarget;
     private int minimumSupportHorizonMonths = 6;
 
+    // ---- Java target selection (R25) ----
+    /**
+     * How the application's Java target is chosen for an edge. LTS_PREFERRED is the default because
+     * the alternative - taking the numerically highest installed JDK - lands production code on a
+     * release with a six-month support window as a side effect of what happened to be installed.
+     */
+    private String javaTargetPreference = "LTS_PREFERRED";
+
+    /** Refuse to land on a non-LTS Java release unless explicitly permitted. */
+    private boolean allowNonLtsJavaLanding;
+
     // ---- transformation reconciliation (R26) ----
     private boolean allowCheckpointCollapse = true;
 
@@ -81,6 +92,7 @@ public final class HarnessPolicy {
         policy.unknownInternalComponentAction = "WARN";
         policy.minimumSupportHorizonMonths = 0;
         policy.graphAttributionFloor = 0.50;
+        policy.allowNonLtsJavaLanding = true;
         return policy;
     }
 
@@ -106,6 +118,9 @@ public final class HarnessPolicy {
         policy.minimumSupportHorizonMonths =
                 node.path("minimum_support_horizon_months").asInt(policy.minimumSupportHorizonMonths);
         policy.allowCheckpointCollapse = node.path("allow_checkpoint_collapse").asBoolean(policy.allowCheckpointCollapse);
+        policy.javaTargetPreference = node.path("java_target_preference").asText(policy.javaTargetPreference);
+        policy.allowNonLtsJavaLanding =
+                node.path("allow_non_lts_java_landing").asBoolean(policy.allowNonLtsJavaLanding);
         policy.unknownInternalComponentAction =
                 node.path("unknown_internal_component_action").asText(policy.unknownInternalComponentAction);
         policy.aiAllowedInProduction = node.path("ai_allowed_in_production").asBoolean(policy.aiAllowedInProduction);
@@ -171,6 +186,14 @@ public final class HarnessPolicy {
 
     public boolean allowCheckpointCollapse() {
         return allowCheckpointCollapse;
+    }
+
+    public String javaTargetPreference() {
+        return javaTargetPreference;
+    }
+
+    public boolean allowNonLtsJavaLanding() {
+        return allowNonLtsJavaLanding;
     }
 
     public String unknownInternalComponentAction() {
@@ -258,6 +281,8 @@ public final class HarnessPolicy {
         node.put("allow_eol_landing_target", allowEolLandingTarget);
         node.put("minimum_support_horizon_months", minimumSupportHorizonMonths);
         node.put("allow_checkpoint_collapse", allowCheckpointCollapse);
+        node.put("java_target_preference", javaTargetPreference);
+        node.put("allow_non_lts_java_landing", allowNonLtsJavaLanding);
         node.put("unknown_internal_component_action", unknownInternalComponentAction);
         node.put("ai_allowed_in_production", aiAllowedInProduction);
         node.put("ai_max_total_attempts", aiMaxTotalAttempts);

@@ -1,7 +1,9 @@
 package com.bootshift.tests.architecture;
 
 import com.tngtech.archunit.base.DescribedPredicate;
+import com.bootshift.core.policy.LicensePolicy;
 import com.tngtech.archunit.core.domain.JavaCall;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Enforces the ports-and-adapters boundaries (spec section 5).
@@ -133,15 +136,139 @@ class ArchitectureTest {
     void stagesUseContextForSharedPorts() {
         // StageContext and RunFactory are the composition root: wiring a concrete adapter is their
         // job. Any other stage reaching for the state adapter directly would defeat the port.
+        //
+        // This rule named "com.bootshift.nexus.adapters.state" - a package that does not exist in
+        // this repository and never has. It matched nothing, so it passed unconditionally while
+        // appearing to protect the boundary. The real package is com.bootshift.adapters.state.
         ArchRule rule = noClasses()
                 .that().resideInAPackage("com.bootshift.stages..")
                 .and().haveSimpleNameNotEndingWith("StageContext")
                 .and().haveSimpleNameNotEndingWith("RunFactory")
                 .should().dependOnClassesThat()
-                .haveNameMatching("com\\.bootshift\\.nexus\\.adapters\\.state\\..*")
+                .resideInAPackage("com.bootshift.adapters.state..")
                 .because("run state persistence is reached through StageContext so the backing store "
                         + "can be swapped without touching a stage");
         rule.check(harness);
+    }
+
+    @Test
+    @DisplayName("the state adapter package the rule guards actually exists")
+    void stateAdapterPackageExists() {
+        // Guards the guard. A package expression that matches nothing is a rule that cannot fail,
+        // and the previous one had been passing over a typo for the life of the repository.
+        assertThat(harness.stream()
+                .anyMatch(c -> c.getPackageName().startsWith("com.bootshift.adapters.state")))
+                .as("com.bootshift.adapters.state must exist for the composition-root rule to bite")
+                .isTrue();
+        assertThat(harness.stream()
+                .anyMatch(c -> c.getPackageName().startsWith("com.bootshift.nexus")))
+                .as("com.bootshift.nexus does not exist; no rule may be written against it")
+                .isFalse();
+    }
+
+    @Test
+    @DisplayName("the forbidden recipe estate list has exactly one definition")
+    void forbiddenRecipePolicyHasOneSourceOfTruth() {
+        // LicensePolicy owns the list. The OpenRewrite provider probes against it and this test
+        // asserts against it, so the three cannot drift apart into three different answers.
+        assertThat(LicensePolicy.forbiddenRecipePackages())
+                .contains("org.openrewrite.java.spring", "io.moderne");
+        assertThat(LicensePolicy.forbiddenRecipeMarkerClasses()).isNotEmpty();
+        assertThat(LicensePolicy.isForbiddenRecipeClass(
+                "org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0")).isTrue();
+        assertThat(LicensePolicy.isForbiddenRecipeClass("org.openrewrite.java.ChangePackage"))
+                .isFalse();
+
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.bootshift..")
+                .should().dependOnClassesThat(new DescribedPredicate<JavaClass>(
+                        "a forbidden source-available recipe estate") {
+                    @Override
+                    public boolean test(JavaClass target) {
+                        return LicensePolicy.isForbiddenRecipeClass(target.getFullName());
+                    }
+                })
+                .because("the strict-OSS profile may not load a source-available Spring recipe "
+                        + "estate, and the list of what that means lives in LicensePolicy (R8, R9)");
+        rule.check(harness);
+    }
+
+    @Test
+    @DisplayName("untrusted process execution goes through the execution adapter")
+    void processExecutionIsCentralised() {
+        // Repository code - Maven plugins, Gradle scripts, annotation processors, tests - is
+        // untrusted. ProcessRunner is where the allowlist, the timeout, the output cap and the
+        // sanitized environment live, so a component that builds its own ProcessBuilder has none of
+        // them and nothing would say so.
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.bootshift..")
+                .and().resideOutsideOfPackage("com.bootshift.adapters.exec..")
+                .should().dependOnClassesThat()
+                .haveFullyQualifiedName("java.lang.ProcessBuilder")
+                .because("process execution is bounded by ProcessRunner; a private ProcessBuilder "
+                        + "escapes the allowlist, the timeout and the output cap");
+        rule.check(harness);
+    }
+
+    @Test
+    @DisplayName("Runtime.exec is never called")
+    void runtimeExecIsNeverCalled() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.bootshift..")
+                .should().callMethodWhere(new DescribedPredicate<JavaCall<?>>(
+                        "Runtime.exec") {
+                    @Override
+                    public boolean test(JavaCall<?> call) {
+                        return call.getTargetOwner().getName().equals("java.lang.Runtime")
+                                && call.getTarget().getName().equals("exec");
+                    }
+                })
+                .because("Runtime.exec parses a command string, which is exactly the parsing step an "
+                        + "argument could escape from");
+        rule.check(harness);
+    }
+
+    @Test
+    @DisplayName("only the mutation gateway may be the writer of application source")
+    void gatewayIsTheOnlyMutationPort() {
+        // MutationPort has one implementation on purpose. A second one would be a second writer,
+        // and R13 is the claim that there is exactly one.
+        long implementations = harness.stream()
+                .filter(c -> c.getInterfaces().stream()
+                        .anyMatch(i -> i.getName().equals("com.bootshift.ports.mutation.MutationPort")))
+                .count();
+        assertThat(implementations)
+                .as("exactly one MutationPort implementation may exist (R13)")
+                .isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("stages reach ports through StageContext rather than constructing state adapters")
+    void stagesDoNotConstructEvidenceOrStateAdapters() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.bootshift.stages..")
+                .and().haveSimpleNameNotEndingWith("StageContext")
+                .and().haveSimpleNameNotEndingWith("RunFactory")
+                .should().dependOnClassesThat()
+                .resideInAnyPackage("com.bootshift.adapters.evidence..",
+                        "com.bootshift.adapters.telemetry..")
+                .because("the evidence store and telemetry are reached through StageContext so a "
+                        + "different backend does not require touching a stage");
+        rule.check(harness);
+    }
+
+    @Test
+    @DisplayName("the harness must not read the application source tree as code")
+    void harnessDoesNotCompileAgainstApplicationSource() {
+        // ./src is input data. A harness class that imported an application type would mean the
+        // harness had been compiled against the very thing it is supposed to analyse without
+        // assuming anything about.
+        assertThat(harness.stream()
+                .flatMap(c -> c.getDirectDependenciesFromSelf().stream())
+                .map(d -> d.getTargetClass().getPackageName())
+                .anyMatch(pkg -> pkg.startsWith("com.aura.vihanga")))
+                .as("the harness must never depend on a type from the application under ./src")
+                .isFalse();
     }
 
     @Test

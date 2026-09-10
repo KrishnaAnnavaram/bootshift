@@ -23,6 +23,7 @@ import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.ports.mutation.MutationPort;
 import com.bootshift.ports.transformation.TransformationPort;
 import com.bootshift.stages.EdgeSupport;
+import com.bootshift.stages.EdgeToolchain;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -128,14 +129,13 @@ public final class BuildRepairStage implements Stage {
         Path workspace = context.run().migrationWorkspace();
         Path logs = context.run().runWorkspace().resolve("repair-logs").resolve(safe(edgeId));
 
-        // The target state may require a different JDK than the source state did.
-        ToolchainProbe toolchainProbe = new ToolchainProbe();
-        List<ToolchainProbe.Jdk> jdks = toolchainProbe.discover();
-        int requiredJava = requiredJavaFor(edgePlan);
-        String javaHome = toolchainProbe.select(requiredJava, jdks)
-                .map(jdk -> jdk.home().toString()).orElse(null);
-
-        MavenBuildAdapter maven = new MavenBuildAdapter();
+        // The toolchain this edge froze, resolved to a concrete JDK and then verified by asking the
+        // binary what it is. Re-deriving a JDK here is what let the plan say one thing and the
+        // compile happen on another.
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain.Verification toolchainVerification = toolchain.verify();
+        String javaHome = toolchain.resolved().javaHome();
+        int requiredJava = toolchain.resolved().frozenMajor();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId).mutating(true);
 
@@ -163,10 +163,9 @@ public final class BuildRepairStage implements Stage {
                 Map<String, String> options = new LinkedHashMap<>();
                 options.put("bootshift.logSink",
                         logs.resolve("round" + round + "-" + safe(module.moduleId()) + ".log").toString());
-                if (javaHome != null) {
-                    options.put("bootshift.javaHome", javaHome);
-                }
-                BuildSystemPort.ExecutionResult result = maven.compile(workspace, moduleRoot, options);
+                options.putAll(toolchain.buildOptions(null));
+                BuildSystemPort.ExecutionResult result = toolchain.providerFor(module, moduleRoot)
+                        .compile(workspace, moduleRoot, options);
                 if (!result.success()) {
                     failedModules++;
                     List<String> output = new ArrayList<>(result.stdoutTail());
@@ -301,6 +300,7 @@ public final class BuildRepairStage implements Stage {
         buildReport.put("compiled", compiled);
         buildReport.put("rounds", rounds.size());
         buildReport.put("selected_jdk", javaHome);
+        buildReport.set("toolchain", toolchain.toNode(toolchainVerification));
         buildReport.put("required_java_major", requiredJava);
         buildReport.set("round_details", Json.toTree(rounds));
         ObjectNode buildArtifact = StageSupport.compose(envelope
@@ -349,7 +349,8 @@ public final class BuildRepairStage implements Stage {
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
                         diagnosticsArtifact));
 
-        String hash = StageSupport.publish(context, writer);
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.COMPILED, "published");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

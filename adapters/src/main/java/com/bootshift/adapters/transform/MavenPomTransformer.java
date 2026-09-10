@@ -14,7 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Harness-owned, Apache-2.0-clean Maven descriptor transformer.
+ * Harness-owned Maven descriptor transformer. Bootshift itself is MIT; that classification is kept
+ * separate from OpenRewrite's Apache-2.0 and from the application's own dependency licenses.
  *
  * <p>Deliberately narrow: parent version changes, property changes, managed BOM version changes and
  * explicit dependency coordinate changes. These are the transformations that are cheap to implement,
@@ -50,14 +51,14 @@ public final class MavenPomTransformer implements TransformationPort {
         List<Capability> capabilities = new ArrayList<>();
         capabilities.add(new Capability(
                 "CAP-MAVEN-PARENT-VERSION", PROVIDER, "bootshift-maven-pom-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", "*", "*",
+                "MIT", "harness-owned", "*", "*",
                 List.of("MANAGED_VERSION_CHANGED", "BASELINE_REQUIREMENT", "COMPATIBILITY_REQUIREMENT"),
                 List.of(),
                 true, true, "SINGLE_EDGE", 1.0, "AVAILABLE",
                 "Changes the spring-boot-starter-parent version and related properties."));
         capabilities.add(new Capability(
                 "CAP-MAVEN-DEPENDENCY", PROVIDER, "bootshift-maven-pom-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", "*", "*",
+                "MIT", "harness-owned", "*", "*",
                 List.of("ARTIFACT_RELOCATED", "ARTIFACT_REMOVED"),
                 List.of(),
                 true, true, "SINGLE_EDGE", 1.0, "AVAILABLE",
@@ -68,6 +69,24 @@ public final class MavenPomTransformer implements TransformationPort {
     @Override
     public boolean handles(String recipeId) {
         return RECIPES.contains(recipeId);
+    }
+
+    @Override
+    public java.util.Optional<Capability> capabilityFor(String recipeId, String sourceVersion,
+                                                        String targetVersion) {
+        if (!handles(recipeId)) {
+            return java.util.Optional.empty();
+        }
+        String capabilityId = switch (recipeId) {
+            case RECIPE_PARENT_VERSION, RECIPE_PROPERTY, RECIPE_MANAGED_VERSION ->
+                    "CAP-MAVEN-PARENT-VERSION";
+            case RECIPE_DEPENDENCY_COORDINATE, RECIPE_ADD_DEPENDENCY, RECIPE_REMOVE_DEPENDENCY ->
+                    "CAP-MAVEN-DEPENDENCY";
+            default -> null;
+        };
+        return capabilities(sourceVersion, targetVersion).stream()
+                .filter(c -> c.capabilityId().equals(capabilityId))
+                .findFirst();
     }
 
     @Override

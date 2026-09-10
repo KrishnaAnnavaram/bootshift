@@ -43,4 +43,18 @@ public interface CodeModelPort {
      * from dependencies; when empty, external types resolve to UNRESOLVED and are labelled so.
      */
     AnalysisResult analyze(Path moduleRoot, List<Path> sourceRoots, List<Path> classpath);
+
+    /**
+     * Parses at the language level the module actually declares.
+     *
+     * <p>Parsing every repository at the newest level the parser supports is not a harmless default.
+     * A construct the module's real level does not permit parses anyway, and a construct removed
+     * after that level is silently accepted, so the graph describes a language the module is not
+     * written in. The default delegates for adapters that cannot honour a level, which then say so
+     * through {@link AnalysisResult#issues()}.
+     */
+    default AnalysisResult analyze(Path moduleRoot, List<Path> sourceRoots, List<Path> classpath,
+                                   int javaRelease) {
+        return analyze(moduleRoot, sourceRoots, classpath);
+    }
 }

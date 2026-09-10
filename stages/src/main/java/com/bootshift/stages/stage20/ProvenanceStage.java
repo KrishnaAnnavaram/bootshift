@@ -165,6 +165,9 @@ public final class ProvenanceStage implements Stage {
                 "document-registry.json");
         JsonNode contracts = StageSupport.optionalUpstream(context, "10-characterization",
                 "characterization-contracts.json");
+        JsonNode edgePlan = StageSupport.optionalUpstream(context, "11-plan", "edge-plan.json");
+        JsonNode scenarios = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-scenarios.json");
         JsonNode differential = StageSupport.optionalUpstream(context, "17-differential",
                 "differential-report.json");
         JsonNode approvals = StageSupport.optionalUpstream(context, "18-approval",
@@ -239,6 +242,54 @@ public final class ProvenanceStage implements Stage {
             }
         }
 
+        // Migration edges. Without these the provenance graph has no notion of WHERE in the
+        // migration something happened, so a change, a scenario and a difference belonging to
+        // different edges are indistinguishable from three things that happened together.
+        if (edgePlan != null) {
+            for (JsonNode edge : edgePlan.path("edges")) {
+                String edgeId = edge.path("edge_id").asText();
+                graph.node(edgeId, ProvenanceGraph.Kind.EDGE,
+                        edge.path("source_state").asText() + " -> "
+                                + edge.path("target_state").asText(),
+                        Map.of("edge_class", edge.path("edge_class").asText(),
+                                "validation_depth", edge.path("frozen_validation_depth").asText(),
+                                "mandatory", String.valueOf(edge.path("mandatory_checkpoint").asBoolean()),
+                                "edge_java", edge.path("edge_java").asText("")));
+                graph.link(runId, ProvenanceGraph.Relation.PRODUCED, edgeId, "frozen migration plan");
+                // The facts and impacts that are in force on THIS edge, not on the run.
+                edge.path("knowledge_refs").forEach(ref ->
+                        graph.link(ref.asText(), ProvenanceGraph.Relation.AUTHORIZES, edgeId,
+                                "fact in force on this edge"));
+                edge.path("impact_refs").forEach(ref ->
+                        graph.link(ref.asText(), ProvenanceGraph.Relation.REQUIRES_VALIDATION, edgeId,
+                                "impact scoped to this edge"));
+                edge.path("characterization_refs").forEach(ref ->
+                        graph.link(edgeId, ProvenanceGraph.Relation.REQUIRES_VALIDATION, ref.asText(),
+                                "scenario required by this edge"));
+            }
+        }
+
+        // Executable scenarios, with the state that says whether they are actually an oracle.
+        if (scenarios != null) {
+            for (JsonNode scenario : scenarios.path("scenarios")) {
+                String id = scenario.path("scenario_id").asText();
+                graph.node(id, ProvenanceGraph.Kind.SCENARIO,
+                        scenario.path("target").asText(scenario.path("dimension").asText()),
+                        Map.of("dimension", scenario.path("dimension").asText(),
+                                "state", scenario.path("state").asText(),
+                                "is_oracle", String.valueOf(scenario.path("is_oracle").asBoolean()),
+                                "module", scenario.path("module").asText("")));
+                String impactId = scenario.path("impact_id").asText(null);
+                if (impactId != null && !impactId.isBlank()) {
+                    graph.link(impactId, ProvenanceGraph.Relation.DISCHARGED_BY, id,
+                            "executable characterization scenario");
+                }
+                scenario.path("knowledge_refs").forEach(ref ->
+                        graph.link(ref.asText(), ProvenanceGraph.Relation.REQUIRES_VALIDATION, id,
+                                "fact requiring behavioural evidence"));
+            }
+        }
+
         // Change events and files
         for (ChangeLedger.Entry entry : ledger.entries()) {
             ChangeEvent event = entry.event();
@@ -260,6 +311,13 @@ public final class ProvenanceStage implements Stage {
             event.getImpactRefs().forEach(ref ->
                     graph.link(ref, ProvenanceGraph.Relation.AUTHORIZES, id, "impact finding"));
             graph.link(runId, ProvenanceGraph.Relation.PRODUCED, id, "migration run");
+            // The edge a change belongs to. A change ledger with no edge binding cannot answer
+            // "what did this checkpoint actually do?", which is the question a reviewer asks when
+            // one edge in a multi-edge migration goes wrong.
+            if (event.getEdgeId() != null && graph.find(event.getEdgeId()).isPresent()) {
+                graph.link(event.getEdgeId(), ProvenanceGraph.Relation.PRODUCED, id,
+                        "change applied on this edge");
+            }
         }
 
         // Test cases
@@ -285,11 +343,34 @@ public final class ProvenanceStage implements Stage {
             }
         }
 
-        // Differences
-        if (differential != null) {
+        // Differences, aggregated across EVERY edge rather than only the one that published last.
+        List<JsonNode> allComparisons = edgePlan == null ? new ArrayList<>()
+                : com.bootshift.stages.stage19.EdgeEvidenceAggregator.allComparisons(context, edgePlan);
+        if (allComparisons.isEmpty() && differential != null) {
+            differential.path("comparisons").forEach(allComparisons::add);
+        }
+        {
             int index = 0;
-            for (JsonNode comparison : differential.path("comparisons")) {
+            for (JsonNode comparison : allComparisons) {
                 String id = "DIFF-" + (++index);
+                String comparisonEdge = comparison.path("edge_id").asText(null);
+                if (comparisonEdge != null && graph.find(comparisonEdge).isPresent()) {
+                    graph.node(id, ProvenanceGraph.Kind.DIFFERENCE,
+                            comparison.path("dimension").asText() + " on "
+                                    + comparison.path("module").asText(),
+                            Map.of("classification", comparison.path("classification").asText(),
+                                    "edge_id", comparisonEdge,
+                                    "scenario_id", comparison.path("scenario_id").asText(""),
+                                    "comparison_unit", comparison.path("comparison_unit").asText("MODULE")));
+                    graph.link(comparisonEdge, ProvenanceGraph.Relation.PRODUCED, id,
+                            "comparison performed on this edge");
+                    String scenarioId = comparison.path("scenario_id").asText(null);
+                    if (scenarioId != null && !scenarioId.isBlank()
+                            && graph.find(scenarioId).isPresent()) {
+                        graph.link(scenarioId, ProvenanceGraph.Relation.COMPARED_AS, id,
+                                "OLD versus NEW execution of this scenario");
+                    }
+                }
                 graph.node(id, ProvenanceGraph.Kind.DIFFERENCE,
                         comparison.path("dimension").asText() + " on "
                                 + comparison.path("module").asText(),
@@ -474,7 +555,10 @@ public final class ProvenanceStage implements Stage {
                 answer.put("count", rows.size());
             }
             case WHICH_VALIDATIONS_WERE_NOT_EXECUTED -> {
-                JsonNode differential = StageSupport.optionalUpstream(context, "17-differential",
+                JsonNode edgePlan = StageSupport.optionalUpstream(context, "11-plan", "edge-plan.json");
+        JsonNode scenarios = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-scenarios.json");
+        JsonNode differential = StageSupport.optionalUpstream(context, "17-differential",
                         "differential-report.json");
                 ArrayNode rows = Json.arr();
                 if (differential != null) {
@@ -531,7 +615,10 @@ public final class ProvenanceStage implements Stage {
                 answer.set("claims", rows);
             }
             case WHICH_DIMENSIONS_WERE_NOT_COMPARED -> {
-                JsonNode differential = StageSupport.optionalUpstream(context, "17-differential",
+                JsonNode edgePlan = StageSupport.optionalUpstream(context, "11-plan", "edge-plan.json");
+        JsonNode scenarios = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-scenarios.json");
+        JsonNode differential = StageSupport.optionalUpstream(context, "17-differential",
                         "differential-report.json");
                 java.util.Set<String> notCompared = new java.util.LinkedHashSet<>();
                 if (differential != null) {

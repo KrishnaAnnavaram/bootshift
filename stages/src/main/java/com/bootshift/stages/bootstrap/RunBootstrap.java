@@ -61,7 +61,25 @@ public final class RunBootstrap {
             new HarnessComponent("org.junit.jupiter:junit-jupiter", "5.10.3", "EPL-2.0", "harness tests"),
             new HarnessComponent("org.assertj:assertj-core", "3.26.3", "Apache-2.0", "harness tests"),
             new HarnessComponent("com.tngtech.archunit:archunit-junit5", "1.3.0",
-                    "Apache-2.0", "architecture enforcement"));
+                    "Apache-2.0", "architecture enforcement"),
+            // OpenRewrite. Only the Apache-2.0 engine modules; the source-available Spring recipe
+            // estate is on the forbidden-artifact list and is additionally refused at runtime by the
+            // provider itself. Listing these here is what makes the gate cover what the harness
+            // actually loads rather than what it loaded when the list was last edited.
+            new HarnessComponent("org.openrewrite:rewrite-core", "8.90.4",
+                    "Apache-2.0", "transformation engine"),
+            new HarnessComponent("org.openrewrite:rewrite-java", "8.90.4",
+                    "Apache-2.0", "type-aware Java transformation"),
+            new HarnessComponent("org.openrewrite:rewrite-java-21", "8.90.4",
+                    "Apache-2.0", "Java 21 language support for the transformation engine"),
+            new HarnessComponent("org.openrewrite:rewrite-maven", "8.90.4",
+                    "Apache-2.0", "structural Maven descriptor transformation"),
+            new HarnessComponent("org.openrewrite:rewrite-yaml", "8.90.4",
+                    "Apache-2.0", "YAML transformation"),
+            new HarnessComponent("org.openrewrite:rewrite-properties", "8.90.4",
+                    "Apache-2.0", "properties transformation"),
+            new HarnessComponent("org.yaml:snakeyaml", "2.2",
+                    "Apache-2.0", "structural YAML parsing for configuration migration"));
 
     /** Shared with every derived snapshot so workspace content hashes are directly comparable. */
     public static final List<String> SNAPSHOT_EXCLUDES = GitScmAdapter.DEFAULT_EXCLUDES;
@@ -92,7 +110,23 @@ public final class RunBootstrap {
             findings.add(licensePolicy.evaluate(component.coordinate(), component.version(),
                     component.license(), "harness-bill-of-materials"));
         }
-        List<LicensePolicy.Finding> blocking = LicensePolicy.blocking(findings);
+        List<LicensePolicy.Finding> blocking = new ArrayList<>(LicensePolicy.blocking(findings));
+
+        // A coordinate list says what the build declares. It cannot see a forbidden estate that
+        // arrived transitively or was dropped onto the classpath, so the gate also asks the runtime.
+        List<String> forbiddenLoadable = new ArrayList<>();
+        for (String marker : LicensePolicy.forbiddenRecipeMarkerClasses()) {
+            try {
+                Class.forName(marker, false, RunBootstrap.class.getClassLoader());
+                forbiddenLoadable.add(marker);
+            } catch (ClassNotFoundException | LinkageError e) {
+                // Absent, which is the required state.
+            }
+        }
+        forbiddenLoadable.forEach(marker -> blocking.add(new LicensePolicy.Finding(
+                marker, null, "Source-Available", LicensePolicy.Verdict.BLOCKED,
+                "A forbidden source-available recipe estate is loadable at runtime even though no "
+                        + "declared coordinate names it", "runtime-classpath-probe")));
 
         // 3-6. workspaces, snapshots, provenance
         Path runWorkspace = context.run().runWorkspace();
@@ -156,6 +190,14 @@ public final class RunBootstrap {
         license.set("denylist", Json.toTree(List.copyOf(licensePolicy.denylist())));
         license.set("forbidden_artifacts", Json.toTree(List.copyOf(licensePolicy.forbiddenArtifacts())));
         license.set("findings", Json.toTree(findings));
+        license.set("forbidden_recipe_packages",
+                Json.toTree(LicensePolicy.forbiddenRecipePackages()));
+        license.set("forbidden_estates_loadable_at_runtime", Json.toTree(forbiddenLoadable));
+        license.put("runtime_probe", "The declared coordinate list cannot see an estate that arrived "
+                + "transitively, so the classpath is probed as well.");
+        license.put("license_scope_note", "Bootshift is MIT. OpenRewrite is Apache-2.0. Each recipe "
+                + "module and every application dependency carries its own classification. These are "
+                + "never harmonised with one another.");
         payload.set("oss_license_gate", license);
         payload.set("messages", Json.toTree(messages));
 

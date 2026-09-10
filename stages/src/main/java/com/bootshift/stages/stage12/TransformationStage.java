@@ -8,7 +8,7 @@ import com.bootshift.adapters.transform.ConfigurationPropertyTransformer;
 import com.bootshift.adapters.transform.JakartaNamespaceTransformer;
 import com.bootshift.adapters.transform.MavenPomTransformer;
 import com.bootshift.adapters.transform.RemovedAnnotationTransformer;
-import com.bootshift.adapters.transform.OpenRewriteCoreProbe;
+import com.bootshift.adapters.transform.OpenRewriteCoreProvider;
 import com.bootshift.adapters.transform.TestFrameworkTransformer;
 import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
@@ -128,7 +128,7 @@ public final class TransformationStage implements Stage {
                 new RemovedAnnotationTransformer(),
                 ConfigurationPropertyTransformer.fromRuleFile(context.migrationRules()
                         .resolve("generated-properties/property-migration-rules.json")),
-                new OpenRewriteCoreProbe());
+                new OpenRewriteCoreProvider());
         Map<String, TransformationPort> providers = providersFor(edgePlan, candidates);
 
         Set<String> authorizedFileIds = new LinkedHashSet<>();
@@ -169,6 +169,8 @@ public final class TransformationStage implements Stage {
             ObjectNode result = Json.obj();
             result.put("recipe_id", recipeId);
             result.put("provider", provider == null ? null : provider.providerName());
+            result.put("why", transformation.path("why").asText(null));
+            result.set("parameters", transformation.path("parameters"));
             if (provider == null) {
                 result.put("status", "NO_PROVIDER");
                 result.put("detail", "No registered transformer handles " + recipeId
@@ -178,12 +180,19 @@ public final class TransformationStage implements Stage {
                 continue;
             }
 
+            // Parameters the planner froze for THIS scheduled entry win over the stage's own
+            // defaults: the plan derived them from verified facts, and the stage improvising them
+            // at apply time is how a recipe ends up running with a value nobody authorized.
+            Map<String, String> parameters =
+                    parametersFor(recipeId, edgePlan, target, knowledgeRefs, impactRefs);
+            transformation.path("parameters").fields().forEachRemaining(entry ->
+                    parameters.put(entry.getKey(), entry.getValue().asText()));
             TransformationPort.TransformationRequest request =
                     new TransformationPort.TransformationRequest(workspace, edgeId,
                             edgePlan.path("source_state").asText(),
                             edgePlan.path("target_state").asText(),
                             targetPathsFor(recipeId, registry),
-                            parametersFor(recipeId, edgePlan, target, knowledgeRefs, impactRefs));
+                            parameters);
 
             TransformationPort.TransformationOutcome outcome = provider.apply(recipeId, request);
             result.put("status", outcome.success() ? "APPLIED" : "PARTIAL");
@@ -291,7 +300,8 @@ public final class TransformationStage implements Stage {
         writer.write("proposed-changes.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId), proposals));
 
-        String hash = StageSupport.publish(context, writer);
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.TRANSFORMED, "published");
         context.stateMachine().transition(RunState.EDGE_TRANSFORMED,
                 batch.applied() + " change(s) applied on " + edgeId);
         context.runStateStore().updateState(context.run().runId(), RunState.EDGE_TRANSFORMED,
@@ -364,8 +374,13 @@ public final class TransformationStage implements Stage {
                      MavenPomTransformer.RECIPE_REMOVE_DEPENDENCY ->
                         record.getRole() == com.bootshift.core.identity.FileRole.MAVEN_BUILD;
                 case JakartaNamespaceTransformer.RECIPE,
-                     RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION ->
+                     RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION,
+                     OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE,
+                     OpenRewriteCoreProvider.RECIPE_REMOVE_ANNOTATION ->
                         record.getRole().isJavaSource();
+                case OpenRewriteCoreProvider.RECIPE_CHANGE_PARENT_POM,
+                     OpenRewriteCoreProvider.RECIPE_CHANGE_MAVEN_PROPERTY ->
+                        record.getRole() == com.bootshift.core.identity.FileRole.MAVEN_BUILD;
                 case TestFrameworkTransformer.RECIPE_JUNIT4_TO_JUPITER,
                      TestFrameworkTransformer.RECIPE_MOCKBEAN ->
                         record.getRole() == com.bootshift.core.identity.FileRole.JAVA_TEST;

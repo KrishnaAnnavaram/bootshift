@@ -94,7 +94,7 @@ public final class PipelineOrchestrator {
             }
         }
         for (Stage stage : analysisStages(requestedTarget)) {
-            StageResult result = stage.execute(context);
+            StageResult result = StageExecutor.run(stage, context);
             results.add(result);
             reporter.accept(result);
             if (!result.succeeded()) {
@@ -116,9 +116,19 @@ public final class PipelineOrchestrator {
         JsonNode edgePlan = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         List<String> edgeIds = EdgeSupport.edgeIds(edgePlan);
+        EdgeIndex index = EdgeIndex.open(context).seedFromPlan(edgePlan);
+        index.persist();
+        int skipped = 0;
         for (String edgeId : edgeIds) {
+            // A resumed run must not redo an edge it already completed: rerunning a transformation
+            // over an already-transformed tree produces a no-op batch at best and a stale-base
+            // rejection at worst, and either way the ledger records work that did not happen.
+            if (index.edge(edgeId).filter(EdgeIndex.EdgeRecord::complete).isPresent()) {
+                skipped++;
+                continue;
+            }
             for (Stage stage : edgeStages(edgeId)) {
-                StageResult result = stage.execute(context);
+                StageResult result = StageExecutor.run(stage, context);
                 results.add(result);
                 reporter.accept(result);
                 if (!result.succeeded()) {
@@ -126,18 +136,33 @@ public final class PipelineOrchestrator {
                             "edge " + edgeId + " stopped at " + stage.id());
                 }
             }
-            context.stateMachine().transition(com.bootshift.core.state.RunState.EDGE_COMPLETE,
-                    "edge " + edgeId + " complete");
-            EdgeSupport.checkpoint(context, edgeId, "complete", "Edge " + edgeId + " complete");
+            completeEdge(context, edgeId);
         }
-        return new RunOutcome(results, ExitCode.SUCCESS, edgeIds.size() + " edge(s) complete");
+        return new RunOutcome(results, ExitCode.SUCCESS, edgeIds.size() + " edge(s) complete"
+                + (skipped > 0 ? " (" + skipped + " already complete and skipped)" : ""));
+    }
+
+    /**
+     * Marks an edge complete: state machine, checkpoint and edge index together.
+     *
+     * <p>Shared with the single-edge CLI route, which previously did none of these. An edge migrated
+     * with {@code migrate --edge} therefore never reached EDGE_COMPLETE, so approval refused to run
+     * and the operator had no way to finish a run they had driven one edge at a time.
+     */
+    public static void completeEdge(StageContext context, String edgeId) {
+        context.stateMachine().transition(com.bootshift.core.state.RunState.EDGE_COMPLETE,
+                "edge " + edgeId + " complete");
+        EdgeSupport.checkpoint(context, edgeId, "complete", "Edge " + edgeId + " complete");
+        EdgeIndex.open(context).markComplete(edgeId).persist();
+        context.runStateStore().updateState(context.run().runId(),
+                com.bootshift.core.state.RunState.EDGE_COMPLETE, "edge " + edgeId + " complete");
     }
 
     /** Runs approval, evidence sealing and provenance. */
     public RunOutcome runFinalization() {
         List<StageResult> results = new ArrayList<>();
         for (Stage stage : finalizationStages()) {
-            StageResult result = stage.execute(context);
+            StageResult result = StageExecutor.run(stage, context);
             results.add(result);
             reporter.accept(result);
             if (!result.succeeded()) {

@@ -15,10 +15,18 @@
     NOTE: ./src is the INPUT APPLICATION under analysis and is deliberately NOT a module of this build.
   </description>
 
+  <!--
+    The repository LICENSE file is authoritative and is MIT. This block previously declared
+    Apache-2.0, which contradicted it; the POM is the outlier and is corrected here rather than
+    relicensing the project. Third-party license classifications are unaffected: the OSS gate in
+    policies/license/license-policy.json keeps the Bootshift license, OpenRewrite's license, each
+    recipe module's license and the application dependencies' licenses strictly separate.
+  -->
   <licenses>
     <license>
-      <name>Apache-2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -45,7 +53,17 @@
     <assertj.version>3.26.3</assertj.version>
     <archunit.version>1.3.0</archunit.version>
     <jsonschema.version>1.5.1</jsonschema.version>
+    <!--
+      OpenRewrite core, java and maven modules only. All Apache-2.0. The source-available Spring
+      recipe estate (rewrite-spring and relatives) is NOT a dependency here and is additionally
+      blocked at runtime by LicensePolicy, by the OpenRewrite provider's own probe, and by an
+      architecture rule. Those three read the same list so they cannot drift apart.
+    -->
+    <openrewrite.version>8.90.4</openrewrite.version>
+    <snakeyaml.version>2.2</snakeyaml.version>
     <surefire.version>3.2.5</surefire.version>
+    <compiler.plugin.version>3.13.0</compiler.plugin.version>
+    <assembly.plugin.version>3.7.1</assembly.plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -97,6 +115,18 @@
       </dependency>
 
       <dependency>
+        <groupId>org.openrewrite</groupId>
+        <artifactId>rewrite-bom</artifactId>
+        <version>${openrewrite.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>${junit.version}</version>
@@ -134,14 +164,53 @@
   <build>
     <pluginManagement>
       <plugins>
+        <!--
+          Pinned deliberately. Unpinned, Maven supplies the default plugin version bound to whichever
+          Maven is on the machine: Maven 3.8 supplies compiler plugin 3.1, which predates the
+          `release` option and silently falls back to source/target 1.5. The build then fails on a
+          machine that differs from the author's for a reason that has nothing to do with the code.
+          A harness that insists the application's build tool is authoritative has to pin its own.
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${compiler.plugin.version}</version>
+          <configuration>
+            <release>${maven.compiler.release}</release>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${assembly.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.4.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

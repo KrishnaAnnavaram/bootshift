@@ -1422,6 +1422,49 @@ The preparatory test-infrastructure edge runs **first**, before any framework ch
 pass/fail/skip semantics are proven to survive independently. Otherwise a later regression cannot be
 distinguished from a test-runner artefact.
 
+The final edge is classed `LANDING` rather than `MINOR`: a version can be a legal transit checkpoint
+while being an illegal place to stop, and the two need different validation depth.
+
+### The boundary rule
+
+**Every** major version crossed gets its own mandatory `MAJOR_BOUNDARY` edge, and the last supported
+line of a major is reached before the next major is entered.
+
+The path builder used to jump straight to the lowest line of the *landing* major. For the 2.7 → 3.5
+migration above that happens to produce the right answer, because only one major is crossed. For a
+2.7 → 4.x migration it did not: it emitted a single boundary edge into 4.0 and produced **no Boot 3
+checkpoint at all** — skipping precisely the transition that carries the Jakarta EE relocation, the
+Spring Security 6 configuration rewrite and the Java 17 baseline.
+
+A 2.7 → 4.1 path is now:
+
+```text
+PREPARATORY → PATCH(2.7.18) → MAJOR_BOUNDARY(3.0) → MINOR(3.1…3.5)
+            → MAJOR_BOUNDARY(4.0) → LANDING(4.1)
+```
+
+The stage asserts this before it freezes anything: if the number of `MAJOR_BOUNDARY` edges is less
+than the number of majors between source and landing, the stage fails rather than publishing a path
+that skips a boundary. That check exists because the path builder is the only thing standing between
+a two-major migration and a one-hop rewrite.
+
+### Java target selection
+
+The application's Java level is **not** derived from the JDK running Bootshift. That was a fact about
+the harness process, not about the application: it made the target depend on how the operator
+launched the tool, and on a machine with a newer JDK it silently raised the compiler target on an
+edge that did not carry that change.
+
+Selection is: the JDKs actually installed, intersected with the majors the edge's target Boot line
+supports, discarding anything below the project's current level, then the policy preference — by
+default the **highest LTS**, because a non-LTS release is not a defensible production landing target
+and picking one as a side effect of what happened to be installed is how a migration acquires a
+second problem.
+
+Each edge records `edge_java`, `java_vendor`, `java_version`, `java_home`, the selection reason and
+the supporting evidence. When no installed JDK satisfies an edge, that is reported as a blind spot —
+never substituted with the harness JVM.
+
 ### Failure behavior and exit codes
 
 | Situation | Behavior | Exit |
@@ -1434,6 +1477,17 @@ distinguished from a test-runner artefact.
 ---
 
 ## 20. Agent 07 — Documentation Registry
+
+> **A component is classified by resolution evidence, not by the shape of its group id.** A coordinate
+> the build resolver fetched from a public repository is a public open-source component, whatever its
+> group is called; only a coordinate that did not resolve, or that came from a repository not
+> demonstrably public, is reported as *possibly* organization-internal — and only as possibly, because
+> a private mirror of a public library is indistinguishable from here. The registry keeps the two
+> gaps apart: `public_components_without_catalogued_document` is a gap in this harness's catalogue,
+> `possibly_internal_components` is a gap in what it can reach at all. Collapsing them made the
+> "no authoritative source" list unusable — three dozen ordinary libraries buried the handful of
+> entries that deserved a reader's attention.
+>
 
 ### Purpose
 
@@ -1747,6 +1801,38 @@ Recall below `impact_recall_floor` (default 0.80) escalates validation breadth f
 
 ## 23. Agent 10 — Characterization
 
+> **Scenarios are executable, and they are executed here.** Agent 10 produces
+> `characterization-scenarios.json` — concrete requests with a method, a path with its variables
+> substituted, the headers that make the observation meaningful, and the exact facts to capture — and
+> then runs them against the **original** application, before anything is migrated, writing
+> `characterization-old-observations.json`.
+>
+> That execution is what makes an observation an oracle. Previously the stage emitted a *description*
+> of a probe and nothing ever executed it, so every contract sat in `AWAITING_OLD_OBSERVATION` for the
+> life of the run while the report counted it as protection, and differential validation — having no
+> scenario to run — fell back to comparing Actuator metadata between the two sides.
+>
+> `AWAITING_OLD_OBSERVATION` is explicitly **not** a protected state. A scenario is accounted for only
+> when it is `FROZEN`, `MAPPED_TO_EXISTING_VERIFIED_TEST`, `UNOBSERVABLE_WITH_EXPLICIT_GAP` or
+> `HUMAN_EXCEPTION_REQUIRED`. Expected values are never derived by reading migrated code.
+>
+> **A scenario that was attempted and failed becomes a declared gap, not a pending one.**
+> `AWAITING_OLD_OBSERVATION` means "not executed yet" — a state something later could still resolve.
+> A scenario whose module was running and whose request came back unusable will never be resolved by
+> anything in the run, and leaving it pending kept it out of the declared-gap count: it protected
+> nothing, and it was not admitted as a blind spot either. It becomes
+> `UNOBSERVABLE_WITH_EXPLICIT_GAP` carrying the execution failure as its reason. Only a scenario that
+> was never attempted stays pending.
+>
+> Scenario families emitted from the endpoint graph, per endpoint: the endpoint's own contract
+> (`HTTP_API`), the same endpoint called with no credential and with an invalid one
+> (`SECURITY_AUTHORIZATION`), and its response field paths (`SERIALIZATION`). Per module that starts:
+> `CONFIGURATION_BINDING` over `/actuator/configprops` and `/actuator/env`, and `SPRING_CONTEXT` over
+> `/actuator/beans`, `/actuator/conditions`, `/actuator/mappings` and `/actuator/health`. Dimensions
+> needing provisioned datastores or brokers are emitted as
+> `UNOBSERVABLE_WITH_EXPLICIT_GAP` when the environment provider cannot supply them, so the coverage
+> statement describes the migration actually being performed rather than a smaller one.
+
 ### Purpose
 
 Protect migration-sensitive behaviour **before** it changes.
@@ -1808,6 +1894,30 @@ plus an HTTP contract for each of the 10 observed endpoints.
 ---
 
 ## 24. Agent 11 — Migration Planner
+
+> **Everything in an edge plan is computed for that edge.** Facts, impact findings, affected
+> `FILE_ID`s, affected symbols, required validation dimensions, risk, residual, deterministic
+> coverage, the Spring Cloud train, the Java target, the characterization scenarios and the approval
+> obligations are all derived per edge and never inherited from the migration as a whole.
+>
+> This used to be otherwise: the whole run's fact set, impact set and file set were copied into every
+> edge, so a patch edge claimed authority over every impacted file in the repository and carried a
+> coverage figure that described a different edge entirely.
+>
+> The mechanism is a validity interval on each migration fact. Every fact carries `component`,
+> `valid_from`, `valid_to` and a `validity_precision`, and a fact reaches an edge only when its
+> interval intersects that edge's `(from, to]` span. Precision is published rather than smoothed
+> over: `EDGE_EXACT` means the evidence names the exact version pair, `ARTIFACT_VERSION_WINDOW` means
+> the change is somewhere inside the edges on which the owning artifact's managed version actually
+> moved, and `SPAN_ONLY` means the evidence covers the whole migration and the fact cannot be
+> attributed to one edge. A fact presented as edge-exact when it is span-only is an overstated claim.
+>
+> Capability matching is per recipe. A plan entry naming `capability_id` names the capability that
+> actually implements that recipe, resolved by asking the owning provider. The planner previously
+> attached "the first AVAILABLE capability whose declared fact types overlap anything in the run",
+> which paired a Maven POM recipe with a JUnit capability — a claim a reviewer checking the plan
+> would find is simply untrue, and a coverage number computed from it means nothing. A recipe no
+> capability claims is recorded as `NO_CAPABILITY_CLAIMS_THIS_RECIPE` rather than given a substitute.
 
 ### Purpose
 
@@ -2541,6 +2651,35 @@ Reference corpus: **441 runtime graph edges** added at edge 1.
 
 ## 33. Agent 17 — Differential Validation
 
+> **The unit of comparison is the characterization scenario.** The same scenario object is executed
+> against the original application and the migrated one, captured identically, normalized by the same
+> versioned policy, and compared.
+>
+> Comparing "module plus Actuator dimension" — which is what this stage did while no scenario was ever
+> executed — compares the shape of two contexts. It cannot see that an endpoint changed status, that
+> an unauthenticated caller is now let through, or that a response lost a field. Module-level
+> comparison remains only as a fallback for dimensions no scenario covered, and is labelled as the
+> weaker evidence it is.
+>
+> **Every scenario observed on both sides is compared.** The edge plan's required dimensions say which
+> dimensions this edge must *account for*; they do not say which measurements may be *looked at*. The
+> plan's list is derived from the impact set, which is a statement about what the harness expects to
+> change — filtering the comparison by it discards observations that were already frozen against OLD
+> and already executed against NEW. A difference is blocking wherever it is found, and a comparison in
+> a dimension the plan did not anticipate is flagged `plan_required_dimension: false` and reported
+> under `dimensions_compared_beyond_plan`.
+>
+> What is captured is structural rather than literal: status, content type, header names, security
+> header values, body shape and the sorted set of body field paths. A body that genuinely changed
+> shape shows up; a body whose `timestamp` moved does not.
+>
+> A `SECURITY_AUTHORIZATION` scenario that differs without an explanation is classified `UNEXPECTED`
+> rather than `UNEXPLAINED`, because the difference **is** the authorization decision changing.
+>
+> Every comparison carries `scenario_id`, `dimension`, `old_evidence_ref`, `new_evidence_ref`, the
+> normalization policy hash, the differences, the classification, the explanation references and the
+> approval reference when one applies.
+
 ### Purpose
 
 Run identical scenarios against the original and migrated applications, and classify every
@@ -2622,6 +2761,28 @@ start on the OLD side, so there is nothing to compare against — reported as a 
 
 ## 34. Agent 18 — Approval
 
+> **Decisions live in a store, not in this stage.** Validation and approval used to be mutually
+> dependent: the differential stage needed to know whether an intentional-change decision existed, and
+> the only thing that could tell it was the approval stage — which runs *after* validation and derives
+> its gates from validation's own output. A legitimately recorded decision therefore could not
+> influence the validation it was recorded for.
+>
+> `DecisionStore` breaks that cycle. Decisions are filed from outside — by an operator, a CI step, or
+> an enterprise approval system through another adapter — into a directory outside the run workspace
+> (`BOOTSHIFT_DECISIONS_DIR`, default `~/.bootshift/decisions`). Any stage may read them. Agent 18
+> keeps its real job: discovering which gates exist, checking the decisions on file against them, and
+> reporting what is still outstanding. It never writes a decision on a human's behalf, and a decision
+> with no actor or no rationale is refused rather than loaded.
+>
+> **`integrity_hash`, not `signature`.** The field was previously called `signature`. It is an HMAC
+> over the decision's fields computed with a key held alongside the store, so it detects modification
+> and does **not** authenticate anybody — anyone who can write the file can recompute it. Calling it a
+> signature claimed a property the harness cannot provide, and a reader trusting that name would have
+> believed an approval was cryptographically attested when the actor was whatever string the caller
+> typed. Each stored decision records its `actor_authentication` as `LOCALLY_ASSERTED`,
+> `EXTERNAL_IDENTITY_PROVIDER` or `CRYPTOGRAPHICALLY_SIGNED`; an enterprise identity integration
+> replaces the store implementation, not the port, and every caller keeps working.
+
 ### Purpose
 
 Handle the judgments a machine must not self-authorize.
@@ -2692,6 +2853,45 @@ exit code 4.
 ---
 
 ## 35. Agent 19 — Evidence and Report
+
+> **Final evidence aggregates every planned edge.** It used to read
+> `output/13-build-repair/latest.json`, `output/15-test/latest.json` and so on. Each of those pointers
+> names one directory: the one the stage published most recently. In a run with eight planned edges
+> that is the eighth edge, and the report described it as though it described the migration — an edge
+> that failed to compile halfway through was simply absent from the evidence.
+>
+> An explicit **edge index** (`edge-index.json` in the run workspace) records which directory each
+> stage published into for each edge. `edge-evidence.json` then proves, per edge, that it was planned,
+> transformed, compiled, graph verified, scope verified, tested where required, run where required,
+> compared where required, that its residuals are accounted for and that a checkpoint exists.
+>
+> **Evidence levels are mechanical.** A dimension reaches `E4` when executed OLD/NEW scenario
+> comparisons exist for it across the planned edges, every comparison that ran came out `IDENTICAL` or
+> `EXPECTED`, and nothing required was left `NOT_COMPARED`. `E4` is never inferred from the
+> application starting, from the test suite passing, or from the two graphs being equal. Each of those
+> is evidence about something else.
+>
+> **Absence is never a pass.** A missing approval report means the approval stage never ran, which is
+> not the same as no gate being open; it is recorded as an evidence shortfall. A required comparison
+> that was `NOT_COMPARED` is a shortfall. A missing `final_source_tree_hash` is a shortfall, and
+> export refuses it outright.
+
+### The migration document
+
+Alongside the report, Agent 19 writes **`MIGRATION_DOCUMENT.md`** — the end-to-end account of what
+happened, generated from the artifacts on every run. The report answers "is this defensible?"; the
+document answers the question a reviewer asks first: *what actually happened?*
+
+It contains a table of contents and fifteen sections: the executive summary, how to read it, the
+architecture **before** the migration with a Mermaid topology diagram, the architecture **after** it
+with the corresponding diagram, what changed in the architecture and why, the migration path with the
+reason each checkpoint exists and the toolchain chosen for it, a stage-by-stage account of all twenty
+stages, per-edge detail, every change that was made with its authorizing facts and impacts, the
+behavioural validation outcomes, evidence levels and coverage, residuals and gaps, human decisions,
+provenance and integrity seals, and the honest limitations of that specific run.
+
+It travels with the exported bundle, so a reviewer receiving only the export can still see what was
+done rather than only whether it was defensible.
 
 ### Purpose
 
@@ -3286,9 +3486,44 @@ optional decoration: it is the only channel that can distinguish "documented as 
 published-bytecode diff over every directly-declared coordinate whose managed version moves. That keeps the harness's own
 dependency surface small and keeps the build tools authoritative (R4) rather than re-implemented.
 
-**OpenRewrite core only.** `OpenRewriteCoreProbe` verifies at runtime that only the
-Apache-2.0-licensed core modules are present. If a recipe estate under a source-available licence is
-found on the classpath, the probe raises a `LICENSE_BLOCK` rather than using it.
+**OpenRewrite core only, and it actually runs.** `OpenRewriteCoreProvider` is a real transformation
+provider, not a probe. Its predecessor asked whether `org.openrewrite.Recipe` was loadable, declared
+a capability when it was, and then returned no changes when asked to apply anything — so the
+capability registry claimed coverage the transformation stage could not deliver, which is worse than
+declaring the tool absent.
+
+The declared modules are `rewrite-core`, `rewrite-java`, `rewrite-java-21`, `rewrite-maven`,
+`rewrite-yaml` and `rewrite-properties`, all Apache-2.0, all listed in the harness bill of materials
+that Agent 00 gates. Four Bootshift recipe ids map onto concrete OpenRewrite recipes:
+
+| Bootshift recipe | OpenRewrite recipe | Used for |
+|---|---|---|
+| `openrewrite.java.change-package` | `org.openrewrite.java.ChangePackage` | the `javax` → `jakarta` relocation |
+| `openrewrite.java.remove-annotation` | `org.openrewrite.java.RemoveAnnotation` | annotations deleted at the target version |
+| `openrewrite.maven.change-parent-pom` | `org.openrewrite.maven.ChangeParentPom` | the parent POM version |
+| `openrewrite.maven.change-property` | `org.openrewrite.maven.ChangePropertyValue` | the declared Java level |
+
+Four constraints shape the integration:
+
+- **OpenRewrite is not the orchestrator.** Bootshift decides which recipe runs on which edge, from
+  verified migration facts, and hands OpenRewrite one named transformation over one explicit file set.
+- **It never writes to the migration workspace.** Sources are parsed into an in-memory model; results
+  come back as text and go through `FileMutationGateway` like everything else.
+- **It never bypasses evidence.** Each change carries the engine version, module versions, the recipe
+  class, the input and output hashes, the edge id, and the knowledge and impact references.
+- **Strict OSS is enforced, not assumed.** If a source-available Spring recipe estate is loadable, the
+  provider reports `LICENSE_BLOCK` and refuses to run *at all* — not selectively.
+
+The forbidden list has exactly one definition, in `LicensePolicy`. The provider probes against it, an
+ArchUnit rule forbids compiling against it, and Agent 00 probes the runtime classpath for it. Three
+copies of that list is how one of them silently stops matching the other two.
+
+Where OpenRewrite's Java module is available the planner schedules the namespace relocation through
+`ChangePackage` instead of the harness's own textual transformer. The difference is not cosmetic: a
+textual rewrite matches the token wherever it appears, including inside comments and string literals,
+while `ChangePackage` operates on a parsed model and rewrites declarations, imports and type
+references only. When the module is absent the harness transformer is used and the reduced precision
+is recorded in the plan.
 
 ### License enforcement
 
@@ -3797,6 +4032,24 @@ to a complete set.
 ---
 
 ## 52. CLI usage
+
+> **Export is validated by default.** `bootshift export` refuses anything but
+> `MIGRATION_COMPLETE` and explains which of unexplained differences, unexpected differences,
+> outstanding approvals, evidence shortfalls or incomplete edges is blocking it. A missing
+> `final_source_tree_hash` is a failure, not a match — previously a null recorded hash compared equal
+> to anything, so a bundle could be exported that had never been checked against the validated tree.
+> `--diagnostic` exports an incomplete run for inspection and labels the bundle `NOT VALIDATED` inside
+> `export-manifest.json`.
+>
+> The SBOM and license report are generated against the **final migrated** resolved dependency graph,
+> re-resolved from the migration workspace after the last edge and sealed as `final-build-model.json`.
+> Generating them from the Stage 02 model would describe the dependency graph the migration replaced.
+> When the migrated build cannot be resolved authoritatively the SBOM says so in its `basis` field
+> rather than quietly falling back.
+>
+> `bootshift migrate --edge <id>` and `bootshift validate --edge <id>` now reach `EDGE_COMPLETE`
+> exactly as the orchestrated route does. They previously did not, so a run driven one edge at a time
+> was left permanently short of the state approval requires, with no way to finish.
 
 ### Running everything
 

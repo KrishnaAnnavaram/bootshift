@@ -7,7 +7,7 @@ import com.bootshift.adapters.transform.ConfigurationPropertyTransformer;
 import com.bootshift.adapters.transform.JakartaNamespaceTransformer;
 import com.bootshift.adapters.transform.MavenPomTransformer;
 import com.bootshift.adapters.transform.RemovedAnnotationTransformer;
-import com.bootshift.adapters.transform.OpenRewriteCoreProbe;
+import com.bootshift.adapters.transform.OpenRewriteCoreProvider;
 import com.bootshift.adapters.transform.TestFrameworkTransformer;
 import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
@@ -19,6 +19,7 @@ import com.bootshift.core.policy.ValidationDepth;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
 import com.bootshift.ports.transformation.TransformationPort;
+import com.bootshift.stages.stage08.MigrationFact;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -138,7 +139,7 @@ public final class PlannerStage implements Stage {
                 new TestFrameworkTransformer(),
                 new RemovedAnnotationTransformer(),
                 ConfigurationPropertyTransformer.fromRuleFile(generatedRuleFile(context)),
-                new OpenRewriteCoreProbe());
+                new OpenRewriteCoreProvider());
 
         List<TransformationPort.Capability> capabilities = new ArrayList<>();
         for (TransformationPort provider : providers) {
@@ -163,6 +164,15 @@ public final class PlannerStage implements Stage {
         registryArtifact.set("handled_fact_types", Json.toTree(handledFactTypes));
         writer.write("transformation-capability-registry.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), registryArtifact));
+
+        // ---------------------------------------------------------- edge-scoped knowledge index
+        // Every fact carries the interval in which it is in force. A fact is offered to an edge only
+        // when that interval intersects the edge, which is what stops a Boot 3.0 boundary fact
+        // authorizing the 3.3 to 3.4 edge. Previously every edge received every fact in the run.
+        List<EdgeFact> allEdgeFacts = new ArrayList<>();
+        for (JsonNode fact : knowledge.path("facts")) {
+            allEdgeFacts.add(EdgeFact.of(fact));
+        }
 
         // ---------------------------------------------------------- deterministic coverage
         // Coverage is computed per FACT, not per fact type. A capability that handles JUnit 4
@@ -253,27 +263,29 @@ public final class PlannerStage implements Stage {
         writer.write("residual-report.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), residualArtifact));
 
-        // ---------------------------------------------------------- impact-driven requirements
-        Set<String> requiredDimensions = new LinkedHashSet<>();
-        Map<String, Set<String>> filesByModule = new LinkedHashMap<>();
-        Set<String> allImpactedFileIds = new LinkedHashSet<>();
-        Set<String> impactIds = new LinkedHashSet<>();
-        boolean anyHighRisk = false;
+        // ---------------------------------------------------------- impact index, keyed by fact
+        // An impact finding exists because a migration fact points at a symbol. Selecting impacts
+        // per edge therefore means selecting the impacts whose originating fact is in force on that
+        // edge - not copying every finding in the run into every edge, which is what made a patch
+        // edge claim authority over the whole repository.
+        List<ImpactFinding> allImpacts = new ArrayList<>();
         for (JsonNode finding : impact.path("findings")) {
             if ("UNAFFECTED_WITHIN_OBSERVED_COVERAGE".equals(finding.path("classification").asText())) {
                 continue;
             }
-            impactIds.add(finding.path("impact_id").asText());
-            finding.path("required_validation_dimensions").forEach(d -> requiredDimensions.add(d.asText()));
-            String fileId = finding.path("file_id").asText(null);
-            if (fileId != null && !fileId.isBlank()) {
-                allImpactedFileIds.add(fileId);
-                filesByModule.computeIfAbsent(finding.path("module").asText("."),
-                        k -> new LinkedHashSet<>()).add(fileId);
+            allImpacts.add(ImpactFinding.of(finding));
+        }
+        Set<String> requiredDimensions = new LinkedHashSet<>();
+        Set<String> allImpactedFileIds = new LinkedHashSet<>();
+        Set<String> impactIds = new LinkedHashSet<>();
+        boolean anyHighRisk = false;
+        for (ImpactFinding finding : allImpacts) {
+            impactIds.add(finding.impactId());
+            requiredDimensions.addAll(finding.dimensions());
+            if (finding.fileId() != null) {
+                allImpactedFileIds.add(finding.fileId());
             }
-            if ("HIGH".equals(finding.path("risk").asText())) {
-                anyHighRisk = true;
-            }
+            anyHighRisk = anyHighRisk || finding.highRisk();
         }
         boolean impactRecallBelowFloor = impact.path("accuracy").path("evaluated").asBoolean(false)
                 && impact.path("accuracy").path("recall").asDouble(1.0)
@@ -297,11 +309,11 @@ public final class PlannerStage implements Stage {
         int index = 0;
         for (JsonNode edge : path.path("edges")) {
             index++;
-            ObjectNode plan = planEdge(context, edge, index, capabilities, handledFactTypes,
-                    factIdsByType, deterministicCoverage, requiredDimensions, allImpactedFileIds,
-                    impactIds, anyHighRisk, impactRecallBelowFloor, contracts, reconciliationDecisions,
-                    testFileIds, cloudTrainByBootLine, javaMajorsByBootLine, installedJdks,
-                    currentJavaLevel);
+            ObjectNode plan = planEdge(context, edge, index, providers, capabilities,
+                    availableCapabilities, allEdgeFacts, allImpacts, deterministicCoverage,
+                    impactRecallBelowFloor, contracts, reconciliationDecisions, testFileIds,
+                    cloudTrainByBootLine, javaMajorsByBootLine, installedJdks, currentJavaLevel,
+                    sourceVersion, targetVersion);
             edgePlans.add(plan);
         }
 
@@ -342,7 +354,13 @@ public final class PlannerStage implements Stage {
                 "edge_id", e.path("edge_id").asText(),
                 "edge_class", e.path("edge_class").asText(),
                 "validation_depth", e.path("frozen_validation_depth").asText(),
-                "mandatory", e.path("mandatory_checkpoint").asBoolean())).toList()));
+                "mandatory", e.path("mandatory_checkpoint").asBoolean(),
+                "verified_facts", e.path("verified_fact_count").asInt(),
+                "impacted_files", e.path("affected_file_count").asInt(),
+                "deterministic_coverage", e.path("deterministic_coverage").asDouble(),
+                "edge_java", e.path("edge_java").asText())).toList()));
+        migrationPlan.put("per_edge_scoping", "Every edge carries its own facts, impacts, files, "
+                + "dimensions, residual, toolchain and scenarios. No value is shared between edges.");
         envelope.stat("deterministic_coverage", deterministicCoverage)
                 .stat("edges", edgePlans.size())
                 .stat("residual_fact_types", residual.size());
@@ -360,6 +378,9 @@ public final class PlannerStage implements Stage {
         }
 
         String hash = StageSupport.publish(context, writer);
+        // Seed the execution index from the frozen plan so every planned edge is visible to
+        // resumption and to final evidence, including edges that never run.
+        com.bootshift.stages.EdgeIndex.open(context).seedFromPlan(edgeArtifact).persist();
         context.stateMachine().transition(RunState.PLAN_FROZEN, edgePlans.size() + " edge(s) frozen");
         context.runStateStore().updateState(context.run().runId(), RunState.PLAN_FROZEN, "plan frozen");
 
@@ -381,97 +402,238 @@ public final class PlannerStage implements Stage {
 
     // ------------------------------------------------------------------ edge planning
 
+    /**
+     * One edge of the frozen plan.
+     *
+     * <p>Everything here is computed for THIS edge: the facts in force on it, the impacts those
+     * facts produced, the files those impacts name, the validation dimensions they require, the
+     * risk, the residual, the toolchain and the scenarios. The previous implementation computed all
+     * of these once for the whole migration and copied the same values into every edge, so a patch
+     * edge claimed authority over every impacted file in the repository and a coverage figure that
+     * described a different edge entirely.
+     */
     private ObjectNode planEdge(StageContext context, JsonNode edge, int index,
+                                List<TransformationPort> providers,
                                 List<TransformationPort.Capability> capabilities,
-                                Set<String> handledFactTypes,
-                                Map<String, List<String>> factIdsByType,
-                                double deterministicCoverage, Set<String> requiredDimensions,
-                                Set<String> impactedFileIds, Set<String> impactIds,
-                                boolean anyHighRisk, boolean impactRecallBelowFloor,
+                                List<TransformationPort.Capability> availableCapabilities,
+                                List<EdgeFact> allEdgeFacts, List<ImpactFinding> allImpacts,
+                                double runCoverage, boolean impactRecallBelowFloor,
                                 JsonNode contracts, List<String> reconciliationDecisions,
                                 Set<String> testFileIds, Map<String, String> cloudTrainByBootLine,
                                 Map<String, List<Integer>> javaMajorsByBootLine,
-                                List<Integer> installedJdks, String currentJava) {
+                                List<Integer> installedJdks, String currentJava,
+                                String sourceVersion, String targetVersion) {
         ObjectNode plan = Json.obj();
         String edgeId = edge.path("edgeId").asText("EDGE-" + index);
         String edgeClass = edge.path("edgeClass").asText("MINOR");
         boolean landing = edge.path("landing").asBoolean(false);
         boolean mandatory = edge.path("mandatory").asBoolean(false);
+        String edgeFrom = edge.path("fromVersion").asText();
+        String edgeTo = edge.path("toVersion").asText();
 
         plan.put("edge_id", edgeId);
         plan.put("edge_class", edgeClass);
-        plan.put("source_state", edge.path("fromVersion").asText());
-        plan.put("target_state", edge.path("toVersion").asText());
+        plan.put("source_state", edgeFrom);
+        plan.put("target_state", edgeTo);
         plan.put("landing", landing);
         plan.put("transit", !landing);
         plan.put("mandatory_checkpoint", mandatory);
         plan.put("rationale", edge.path("rationale").asText());
+        plan.put("exists_because", edge.path("existsBecause").asText(null));
+        plan.set("path_supporting_evidence", edge.path("supportingEvidence"));
 
-        // The Spring Cloud train for THIS edge, not for the landing target.
-        String edgeBootLine = lineOf(edge.path("toVersion").asText(""));
+        // ---- facts in force on THIS edge ---------------------------------------------------------
+        List<EdgeFact> edgeFacts = new ArrayList<>();
+        List<EdgeFact> edgeVerifiedFacts = new ArrayList<>();
+        int scopedByAttribution = 0;
+        int scopedByInterval = 0;
+        for (EdgeFact fact : allEdgeFacts) {
+            if (!fact.appliesTo(edgeId, edgeFrom, edgeTo)) {
+                continue;
+            }
+            if ("DECLARED_EDGE_ATTRIBUTION".equals(fact.scopingChannel())) {
+                scopedByAttribution++;
+            } else {
+                scopedByInterval++;
+            }
+            edgeFacts.add(fact);
+            if (fact.authorizes()) {
+                edgeVerifiedFacts.add(fact);
+            }
+        }
+        // How the narrowing was decided, so a reader can tell a genuinely small edge from a scoping
+        // failure. An edge whose facts all arrived by interval intersection has no direct per-edge
+        // artifact evidence behind it, and that is worth seeing in the plan.
+        ObjectNode scoping = Json.obj();
+        scoping.put("facts_considered", allEdgeFacts.size());
+        scoping.put("facts_in_force", edgeFacts.size());
+        scoping.put("scoped_by_declared_edge_attribution", scopedByAttribution);
+        scoping.put("scoped_by_validity_interval", scopedByInterval);
+        scoping.put("rule", "A fact attributed to specific edges applies to those edges only. A fact "
+                + "with no attribution falls back to intersecting its validity window with the edge "
+                + "span. Attribution is evidence of absence as well as of presence.");
+        plan.set("fact_scoping", scoping);
+        Set<String> edgeKnowledgeIds = new LinkedHashSet<>();
+        edgeVerifiedFacts.forEach(f -> edgeKnowledgeIds.add(f.knowledgeId()));
+        Map<String, Integer> factsByComponent = new java.util.TreeMap<>();
+        edgeVerifiedFacts.forEach(f -> factsByComponent.merge(f.component(), 1, Integer::sum));
+
+        // ---- impacts produced by those facts ------------------------------------------------------
+        List<ImpactFinding> edgeImpacts = new ArrayList<>();
+        for (ImpactFinding finding : allImpacts) {
+            if (finding.knowledgeId() != null && edgeKnowledgeIds.contains(finding.knowledgeId())) {
+                edgeImpacts.add(finding);
+            }
+        }
+        Set<String> edgeImpactIds = new LinkedHashSet<>();
+        Set<String> edgeFileIds = new LinkedHashSet<>();
+        Set<String> edgeSymbols = new LinkedHashSet<>();
+        Set<String> edgeDimensions = new LinkedHashSet<>();
+        boolean edgeHighRisk = false;
+        for (ImpactFinding finding : edgeImpacts) {
+            edgeImpactIds.add(finding.impactId());
+            edgeDimensions.addAll(finding.dimensions());
+            if (finding.fileId() != null) {
+                edgeFileIds.add(finding.fileId());
+            }
+            if (finding.symbol() != null) {
+                edgeSymbols.add(finding.symbol());
+            }
+            edgeHighRisk = edgeHighRisk || finding.highRisk();
+        }
+
+        plan.put("knowledge_fact_count", edgeFacts.size());
+        plan.put("verified_fact_count", edgeVerifiedFacts.size());
+        plan.set("facts_by_component", Json.toTree(factsByComponent));
+        plan.set("knowledge_refs", Json.toTree(edgeKnowledgeIds));
+        plan.set("impact_refs", Json.toTree(edgeImpactIds));
+        plan.set("affected_symbols", Json.toTree(edgeSymbols));
+        plan.put("risk", edgeHighRisk ? "HIGH" : (edgeImpacts.isEmpty() ? "LOW" : "MEDIUM"));
+        plan.put("scoping_rule", "Facts, impacts, files and dimensions are selected by intersecting "
+                + "each fact's validity interval with this edge. Nothing is inherited from the "
+                + "migration as a whole.");
+
+        // ---- the Spring Cloud train for THIS edge, not for the landing target --------------------
+        String edgeBootLine = lineOf(edgeTo);
         String edgeCloudTrain = cloudTrainByBootLine.get(edgeBootLine);
         plan.put("spring_cloud_train", edgeCloudTrain);
-        // The Java level for THIS edge: the highest an installed toolchain can provide that the
-        // edge target line supports. Carrying the landing level backwards onto a transit checkpoint
-        // would set a compiler target the intermediate Spring Boot line does not accept.
+
+        // ---- the toolchain for THIS edge ---------------------------------------------------------
         List<Integer> supportedHere = javaMajorsByBootLine.getOrDefault(edgeBootLine, List.of());
         int sourceJavaLevel = parseJavaLevel(currentJava);
-        int edgeJava = installedJdks.stream()
-                .filter(jdk -> supportedHere.isEmpty() || supportedHere.contains(jdk))
-                .filter(jdk -> jdk >= sourceJavaLevel)
-                .max(Integer::compareTo)
-                .orElse(sourceJavaLevel);
+        com.bootshift.adapters.build.JavaTargetSelector.Preference preference;
+        try {
+            preference = com.bootshift.adapters.build.JavaTargetSelector.Preference
+                    .valueOf(context.policy().javaTargetPreference());
+        } catch (IllegalArgumentException e) {
+            preference = com.bootshift.adapters.build.JavaTargetSelector.Preference.LTS_PREFERRED;
+        }
+        List<com.bootshift.adapters.build.ToolchainProbe.Jdk> jdks =
+                new com.bootshift.adapters.build.ToolchainProbe().discover();
+        com.bootshift.adapters.build.JavaTargetSelector.Selection javaSelection =
+                new com.bootshift.adapters.build.JavaTargetSelector()
+                        .select(supportedHere, sourceJavaLevel, jdks, preference);
         plan.put("current_java", currentJava);
-        plan.put("edge_java", String.valueOf(edgeJava));
-        plan.put("edge_java_note", "Highest installed JDK that Boot " + edgeBootLine
-                + " supports (" + supportedHere + ") and that is not below the project level "
-                + currentJava);
+        plan.put("edge_java", String.valueOf(javaSelection.major()));
+        plan.put("edge_java_version", javaSelection.version());
+        plan.put("edge_java_vendor", javaSelection.vendor());
+        plan.put("edge_java_home", javaSelection.home());
+        plan.put("edge_java_selection_reason", javaSelection.selectionReason());
+        plan.set("edge_java_supporting_evidence", Json.toTree(javaSelection.supportingEvidence()));
+        plan.put("edge_java_resolved", javaSelection.resolved());
+        plan.put("edge_java_is_lts", javaSelection.lts());
         plan.put("spring_cloud_train_note", edgeCloudTrain == null
                 ? "No GA Spring Cloud train targets Boot " + edgeBootLine + "; the managed-version "
                   + "transformation is omitted for this edge rather than installing a mismatched train"
                 : "Spring Cloud " + edgeCloudTrain + " is the train published for Boot " + edgeBootLine);
 
-        // ---- ordered transformations for this edge
+        // ---- ordered transformations, each bound to the capability that implements it ------------
         ArrayNode transformations = Json.arr();
-        for (String recipeId : recipesFor(edgeClass, edge)) {
+        List<String> uncoveredRecipes = new ArrayList<>();
+        boolean openRewriteJava = providers.stream()
+                .filter(pr -> pr instanceof OpenRewriteCoreProvider)
+                .map(pr -> (OpenRewriteCoreProvider) pr)
+                .anyMatch(pr -> pr.coreAvailable() && pr.javaModuleAvailable()
+                        && !pr.forbiddenEstatePresent());
+        for (ScheduledRecipe scheduled : scheduleFor(edgeClass, edge, openRewriteJava)) {
+            String recipeId = scheduled.recipeId();
             if (MavenPomTransformer.RECIPE_MANAGED_VERSION.equals(recipeId) && edgeCloudTrain == null) {
                 continue;
             }
-            TransformationPort.Capability capability = capabilities.stream()
-                    .filter(c -> c.handledFactTypes().stream().anyMatch(handledFactTypes::contains))
-                    .filter(c -> "AVAILABLE".equals(c.status()))
-                    .findFirst().orElse(null);
+            String providerName = providerFor(recipeId);
+            TransformationPort owningProvider = providers.stream()
+                    .filter(pr -> pr.handles(recipeId))
+                    .findFirst()
+                    .orElse(null);
+            TransformationPort.Capability capability = owningProvider == null ? null
+                    : owningProvider.capabilityFor(recipeId, edgeFrom, edgeTo).orElse(null);
             ObjectNode transformation = Json.obj();
             transformation.put("recipe_id", recipeId);
-            transformation.put("preferred_transformer", providerFor(recipeId));
+            transformation.put("preferred_transformer", providerName);
             transformation.put("fallback_strategy", fallbackFor(recipeId));
             transformation.put("capability_id", capability == null ? null : capability.capabilityId());
-            transformation.put("deterministic", true);
+            transformation.put("capability_provider", capability == null ? null : capability.provider());
+            transformation.put("capability_status",
+                    capability == null ? "NO_CAPABILITY_CLAIMS_THIS_RECIPE" : capability.status());
+            transformation.put("capability_license", capability == null ? null : capability.licenseSpdx());
+            transformation.put("deterministic", capability == null || capability.deterministic());
+            // Parameters come from the plan, derived from verified facts, rather than being
+            // improvised by the transformation stage at apply time.
+            transformation.set("parameters", Json.toTree(scheduled.parameters()));
+            transformation.put("why", scheduled.why());
             transformations.add(transformation);
+            if (capability == null || !"AVAILABLE".equals(capability.status())) {
+                uncoveredRecipes.add(recipeId);
+            }
         }
         plan.set("ordered_transformations", transformations);
+        plan.set("recipes_without_available_capability", Json.toTree(uncoveredRecipes));
 
-        // ---- affected scope
+        // ---- deterministic coverage for THIS edge -------------------------------------------------
+        int edgeCovered = 0;
+        Map<String, List<String>> edgeUncoveredByType = new LinkedHashMap<>();
+        for (EdgeFact fact : edgeVerifiedFacts) {
+            boolean handled = availableCapabilities.stream()
+                    .anyMatch(c -> c.covers(fact.type(), fact.subject()));
+            if (handled) {
+                edgeCovered++;
+            } else {
+                edgeUncoveredByType.computeIfAbsent(fact.type(), k -> new ArrayList<>())
+                        .add(fact.knowledgeId());
+            }
+        }
+        double edgeCoverage = edgeVerifiedFacts.isEmpty() ? 1.0
+                : Math.round((double) edgeCovered / edgeVerifiedFacts.size() * 10000.0) / 10000.0;
+        plan.put("deterministic_coverage", edgeCoverage);
+        plan.put("deterministically_covered_facts", edgeCovered);
+        ObjectNode edgeResidual = Json.obj();
+        edgeUncoveredByType.forEach((type, ids) -> {
+            ObjectNode row = Json.obj();
+            row.put("uncovered", ids.size());
+            row.set("knowledge_ids", Json.toTree(ids.size() > 25 ? ids.subList(0, 25) : ids));
+            edgeResidual.set(type, row);
+        });
+        plan.set("residual_by_fact_type", edgeResidual);
+        plan.put("expected_residual", 1.0 - edgeCoverage);
+
+        // ---- affected scope ------------------------------------------------------------------------
         //
-        // Impact findings name the files a verified migration fact points at. A preparatory
-        // test-infrastructure edge exists precisely to change files no framework fact mentions, so
-        // it additionally owns the test sources; without this the gateway would correctly reject
-        // every JUnit 4 rewrite as out of scope.
-        java.util.Set<String> edgeScope = new LinkedHashSet<>(impactedFileIds);
+        // Impact findings name the files a verified migration fact points at, for THIS edge. A
+        // preparatory test-infrastructure edge exists precisely to change files no framework fact
+        // mentions, so it additionally owns the test sources; without this the gateway would
+        // correctly reject every JUnit 4 rewrite as out of scope.
+        Set<String> edgeScope = new LinkedHashSet<>(edgeFileIds);
         if ("PREPARATORY".equals(edgeClass)) {
             edgeScope.addAll(testFileIds);
         }
         plan.set("affected_file_ids", Json.toTree(edgeScope));
+        plan.put("affected_file_count", edgeScope.size());
         plan.put("scope_note", "PREPARATORY".equals(edgeClass)
-                ? "Impact-derived scope plus every test source, because this edge migrates test "
-                  + "infrastructure rather than application behaviour"
-                : "Impact-derived scope plus build descriptors");
-        plan.set("impact_refs", Json.toTree(impactIds));
-        List<String> knowledgeRefs = new ArrayList<>();
-        factIdsByType.values().forEach(knowledgeRefs::addAll);
-        plan.set("knowledge_refs", Json.toTree(knowledgeRefs));
+                ? "Impact-derived scope for this edge plus every test source, because this edge "
+                  + "migrates test infrastructure rather than application behaviour"
+                : "Impact-derived scope for this edge plus build descriptors");
 
-        // ---- composite transformation reconciliation (R26)
+        // ---- composite transformation reconciliation (R26) ---------------------------------------
         List<TransformationPort.Capability> spanning = capabilities.stream()
                 .filter(c -> "AVAILABLE".equals(c.status()))
                 .filter(c -> "MULTI_EDGE".equals(c.checkpointSpan()))
@@ -493,19 +655,19 @@ public final class PlannerStage implements Stage {
             plan.put("checkpoint_reconciliation", "DECOMPOSED");
         }
 
-        // ---- validation depth: computed once, frozen (spec section 22)
+        // ---- validation depth: computed once for THIS edge, then frozen --------------------------
         ValidationDepth classDepth = switch (edgeClass) {
             case "PATCH" -> ValidationDepth.BUILD_AND_TESTS;
             case "MINOR" -> ValidationDepth.BUILD_TESTS_RUNTIME;
             case "PREPARATORY" -> ValidationDepth.IMPACTED_DIFFERENTIAL;
-            case "MAJOR_BOUNDARY" -> ValidationDepth.FULL_DIFFERENTIAL;
+            case "MAJOR_BOUNDARY", "LANDING" -> ValidationDepth.FULL_DIFFERENTIAL;
             default -> ValidationDepth.BUILD_TESTS_RUNTIME;
         };
         ValidationDepth residualDepth =
-                context.policy().escalateForResidual(classDepth, deterministicCoverage);
-        ValidationDepth impactDepth = requiredDimensions.isEmpty()
+                context.policy().escalateForResidual(classDepth, edgeCoverage);
+        ValidationDepth impactDepth = edgeDimensions.isEmpty()
                 ? ValidationDepth.BUILD_AND_TESTS
-                : (anyHighRisk ? ValidationDepth.FULL_DIFFERENTIAL : ValidationDepth.IMPACTED_DIFFERENTIAL);
+                : (edgeHighRisk ? ValidationDepth.FULL_DIFFERENTIAL : ValidationDepth.IMPACTED_DIFFERENTIAL);
         ValidationDepth policyDepth = impactRecallBelowFloor
                 ? ValidationDepth.FULL_DIFFERENTIAL : ValidationDepth.BUILD_ONLY;
         if ("COLLAPSE_WITH_ESCALATED_VALIDATION".equals(plan.path("checkpoint_reconciliation").asText())) {
@@ -518,29 +680,52 @@ public final class PlannerStage implements Stage {
         depthCalculation.put("residual_depth", residualDepth.name());
         depthCalculation.put("impact_required_depth", impactDepth.name());
         depthCalculation.put("policy_required_depth", policyDepth.name());
-        depthCalculation.put("formula", "MAX(class, residual, impact, policy)");
+        depthCalculation.put("edge_deterministic_coverage", edgeCoverage);
+        depthCalculation.put("formula", "MAX(class, residual, impact, policy) computed from THIS "
+                + "edge's own residual and impact set");
         plan.set("validation_depth_calculation", depthCalculation);
         plan.put("frozen_validation_depth", depth.name());
 
-        // ---- obligations derived from the frozen depth
+        // ---- obligations derived from the frozen depth -------------------------------------------
         plan.put("tests_required", depth.requiresTests());
         plan.put("runtime_required", depth.requiresRuntime());
         plan.put("differential_required", depth.requiresDifferential());
-        plan.set("differential_dimensions", depth == ValidationDepth.FULL_DIFFERENTIAL
-                ? Json.toTree(requiredDimensions)
-                : Json.toTree(depth.requiresDifferential() ? requiredDimensions : Set.of()));
+        plan.set("differential_dimensions",
+                Json.toTree(depth.requiresDifferential() ? edgeDimensions : Set.<String>of()));
+        plan.set("required_validation_dimensions", Json.toTree(edgeDimensions));
 
+        // ---- characterization scenarios that belong to THIS edge ---------------------------------
         ArrayNode contractRefs = Json.arr();
+        int criticalScenarios = 0;
+        int frozenScenarios = 0;
+        int unobservableScenarios = 0;
         if (contracts != null) {
             for (JsonNode contract : contracts.path("contracts")) {
-                if (requiredDimensions.contains(contract.path("dimension").asText())) {
-                    contractRefs.add(contract.path("scenario_id").asText());
+                String dimension = contract.path("dimension").asText();
+                String impactRef = contract.path("impact_id").asText(null);
+                boolean belongs = edgeDimensions.contains(dimension)
+                        && (impactRef == null || impactRef.isBlank() || edgeImpactIds.contains(impactRef));
+                if (!belongs) {
+                    continue;
+                }
+                contractRefs.add(contract.path("scenario_id").asText());
+                criticalScenarios++;
+                String state = contract.path("state").asText();
+                if ("FROZEN".equals(state) || "MAPPED_TO_EXISTING_TEST".equals(state)) {
+                    frozenScenarios++;
+                } else if ("UNOBSERVABLE".equals(state)) {
+                    unobservableScenarios++;
                 }
             }
         }
         plan.set("characterization_refs", contractRefs);
+        plan.put("characterization_required", criticalScenarios);
+        plan.put("characterization_protected", frozenScenarios);
+        plan.put("characterization_unobservable", unobservableScenarios);
+        plan.put("characterization_awaiting_old",
+                Math.max(0, criticalScenarios - frozenScenarios - unobservableScenarios));
 
-        plan.put("approval_required", "MAJOR_BOUNDARY".equals(edgeClass) || anyHighRisk);
+        plan.put("approval_required", "MAJOR_BOUNDARY".equals(edgeClass) || edgeHighRisk);
         plan.set("checkpoint_requirements", Json.toTree(List.of(
                 "mig/<run>/" + edgeId + "/start",
                 "mig/<run>/" + edgeId + "/transformed",
@@ -549,8 +734,164 @@ public final class PlannerStage implements Stage {
                 "mig/<run>/" + edgeId + "/tested",
                 "mig/<run>/" + edgeId + "/runtime-validated",
                 "mig/<run>/" + edgeId + "/differential-validated")));
-        plan.put("expected_residual", 1.0 - deterministicCoverage);
         return plan;
+    }
+
+    // ------------------------------------------------------------------ edge-scoped views
+
+    /**
+     * A migration fact reduced to what edge scoping needs, with its validity interval.
+     *
+     * <p>Reading the interval here rather than in the planner body keeps the intersection rule in one
+     * place: {@link MigrationFact#appliesToEdge(String, String)} is the definition, and this record
+     * simply carries the serialized form of it.
+     */
+    public record EdgeFact(String knowledgeId, String type, String subject, String component,
+                           String validFrom, String validTo, String validityPrecision,
+                           boolean authorizes, List<String> declaredEdges) {
+
+        public static EdgeFact of(JsonNode fact) {
+            List<String> edges = new ArrayList<>();
+            fact.path("applies_to_edges").forEach(n -> edges.add(n.asText()));
+            return new EdgeFact(fact.path("knowledge_id").asText(),
+                    fact.path("type").asText(), fact.path("subject").asText(null),
+                    fact.path("component").asText("spring-boot"),
+                    fact.path("valid_from").asText(null), fact.path("valid_to").asText(null),
+                    fact.path("validity_precision").asText("SPAN_ONLY"),
+                    fact.path("authorizes_transformation").asBoolean(false), edges);
+        }
+
+        /**
+         * True when this fact is in force on the given edge.
+         *
+         * <p>Two channels, in priority order.
+         *
+         * <ul>
+         *   <li><b>Declared attribution.</b> The knowledge engine resolved the BOM at each end of
+         *       every edge and recorded which edges a coordinate actually moved across. That is
+         *       direct evidence about a specific edge, so when it exists it decides - and it decides
+         *       both ways. A fact attributed to {@code EDGE-3-MAJOR-3} and not to
+         *       {@code EDGE-2-PATCH} is <em>absent</em> from the patch edge; it is not merely
+         *       unproven there.</li>
+         *   <li><b>Interval intersection.</b> A fact with no attribution falls back to its validity
+         *       window, intersected with the edge span.</li>
+         * </ul>
+         *
+         * <p>This used to return {@code true} whenever attribution existed, without ever comparing it
+         * to the edge - the edge id was not even a parameter. Every edge therefore received every
+         * attributed fact, which is why all eight edges reported an identical fact count and an
+         * identical deterministic coverage: the plan looked per-edge and was not.
+         */
+        public boolean appliesTo(String edgeId, String edgeFrom, String edgeTo) {
+            if (!declaredEdges.isEmpty()) {
+                return edgeId != null && declaredEdges.contains(edgeId);
+            }
+            if (validFrom == null || validTo == null) {
+                return false;
+            }
+            return MigrationFact.compare(validFrom, edgeTo) <= 0
+                    && MigrationFact.compare(validTo, edgeFrom) > 0;
+        }
+
+        /** Which channel decided, recorded on the edge plan so the narrowing is auditable. */
+        public String scopingChannel() {
+            return declaredEdges.isEmpty() ? "VALIDITY_INTERVAL_INTERSECTION" : "DECLARED_EDGE_ATTRIBUTION";
+        }
+    }
+
+    /** An impact finding reduced to what edge scoping needs. */
+    record ImpactFinding(String impactId, String knowledgeId, String fileId, String symbol,
+                         String module, boolean highRisk, List<String> dimensions) {
+
+        static ImpactFinding of(JsonNode finding) {
+            List<String> dimensions = new ArrayList<>();
+            finding.path("required_validation_dimensions").forEach(d -> dimensions.add(d.asText()));
+            String fileId = finding.path("file_id").asText(null);
+            return new ImpactFinding(finding.path("impact_id").asText(),
+                    finding.path("knowledge_id").asText(null),
+                    fileId == null || fileId.isBlank() ? null : fileId,
+                    finding.path("symbol_id").asText(finding.path("node_id").asText(null)),
+                    finding.path("module").asText("."),
+                    "HIGH".equals(finding.path("risk").asText()), dimensions);
+        }
+    }
+
+    /** One scheduled transformation: which recipe, with which parameters, and why. */
+    public record ScheduledRecipe(String recipeId, Map<String, String> parameters, String why) {
+
+        public static ScheduledRecipe of(String recipeId, String why) {
+            return new ScheduledRecipe(recipeId, Map.of(), why);
+        }
+    }
+
+    /**
+     * The ordered transformation schedule for an edge.
+     *
+     * <p>Where OpenRewrite's Java module is available, the namespace relocation is scheduled through
+     * it rather than through the harness's own textual transformer. The difference is not cosmetic: a
+     * textual rewrite matches the token wherever it appears, including inside comments and string
+     * literals, whereas ChangePackage operates on a parsed model and rewrites declarations, imports
+     * and type references only.
+     *
+     * <p>One recipe instance is scheduled per relocated package, each carrying its own parameters,
+     * because that is the shape OpenRewrite's ChangePackage takes.
+     */
+    public static List<ScheduledRecipe> scheduleFor(String edgeClass, JsonNode edge,
+                                                    boolean openRewriteJavaAvailable) {
+        List<ScheduledRecipe> schedule = new ArrayList<>();
+        switch (edgeClass) {
+            case "PREPARATORY" -> schedule.add(ScheduledRecipe.of(
+                    TestFrameworkTransformer.RECIPE_JUNIT4_TO_JUPITER,
+                    "Test infrastructure moves before any framework change so pass/fail/skip "
+                            + "semantics are proven to survive on their own"));
+            case "MAJOR_BOUNDARY" -> {
+                schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_PARENT_VERSION,
+                        "The parent POM version is what actually changes which framework the module "
+                                + "compiles against"));
+                schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_PROPERTY,
+                        "The declared Java level moves with the major boundary, not before it"));
+                schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_MANAGED_VERSION,
+                        "The Spring Cloud train is version-locked to the Boot line"));
+                if (openRewriteJavaAvailable) {
+                    for (String relocated : JakartaNamespaceTransformer.RELOCATED) {
+                        Map<String, String> parameters = new LinkedHashMap<>();
+                        parameters.put("oldPackageName", relocated);
+                        parameters.put("newPackageName",
+                                relocated.replaceFirst("^javax\\.", "jakarta."));
+                        parameters.put("recursive", "true");
+                        schedule.add(new ScheduledRecipe(
+                                OpenRewriteCoreProvider.RECIPE_CHANGE_PACKAGE, parameters,
+                                "Jakarta EE relocated " + relocated + ". Applied through "
+                                        + "OpenRewrite's type-aware ChangePackage so comments, "
+                                        + "string literals and JDK javax packages are untouched."));
+                    }
+                } else {
+                    schedule.add(ScheduledRecipe.of(JakartaNamespaceTransformer.RECIPE,
+                            "Jakarta EE namespace relocation. OpenRewrite's Java module is not "
+                                    + "available, so the harness's own import-scoped transformer is "
+                                    + "used and the reduced precision is recorded."));
+                }
+                schedule.add(ScheduledRecipe.of(RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION,
+                        "The Spring Cloud train moves with the Boot major, and the train is where "
+                                + "the opt-in annotations were deleted"));
+                schedule.add(ScheduledRecipe.of(ConfigurationPropertyTransformer.RECIPE,
+                        "Configuration properties renamed at this boundary, from the official "
+                                + "deprecation metadata"));
+            }
+            case "PATCH", "MINOR", "LANDING" -> {
+                schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_PARENT_VERSION,
+                        "Move the parent POM to this edge's target version"));
+                schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_MANAGED_VERSION,
+                        "Move the Spring Cloud train to the one published for this Boot line"));
+                schedule.add(ScheduledRecipe.of(RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION,
+                        "Remove annotations deleted at this version"));
+                schedule.add(ScheduledRecipe.of(ConfigurationPropertyTransformer.RECIPE,
+                        "Apply property renames deprecated at this version"));
+            }
+            default -> schedule.add(ScheduledRecipe.of(MavenPomTransformer.RECIPE_PARENT_VERSION,
+                    "Default: move the parent POM"));
+        }
+        return schedule;
     }
 
     /** The ordered recipe list for an edge class. Deliberately explicit rather than discovered. */
@@ -568,7 +909,7 @@ public final class PlannerStage implements Stage {
                     // single file is only ever rewritten by one recipe at a time.
                     RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION,
                     ConfigurationPropertyTransformer.RECIPE);
-            case "PATCH", "MINOR" -> List.of(
+            case "PATCH", "MINOR", "LANDING" -> List.of(
                     MavenPomTransformer.RECIPE_PARENT_VERSION,
                     MavenPomTransformer.RECIPE_MANAGED_VERSION,
                     RemovedAnnotationTransformer.RECIPE_REMOVE_ANNOTATION,
@@ -598,6 +939,9 @@ public final class PlannerStage implements Stage {
     }
 
     static String providerFor(String recipeId) {
+        if (recipeId.startsWith("openrewrite.")) {
+            return OpenRewriteCoreProvider.PROVIDER;
+        }
         if (recipeId.startsWith("maven.")) {
             return MavenPomTransformer.PROVIDER;
         }
@@ -610,7 +954,7 @@ public final class PlannerStage implements Stage {
         if (recipeId.startsWith("config.")) {
             return ConfigurationPropertyTransformer.PROVIDER;
         }
-        return OpenRewriteCoreProbe.PROVIDER;
+        return OpenRewriteCoreProvider.PROVIDER;
     }
 
     static String fallbackFor(String recipeId) {

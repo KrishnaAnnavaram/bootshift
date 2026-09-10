@@ -14,8 +14,23 @@ import java.util.Map;
  */
 public interface BuildSystemPort {
 
+    /**
+     * Which build system produced the model.
+     *
+     * <p>{@link #MIXED} is not a cosmetic addition. A repository holding both a Maven reactor and a
+     * Gradle build was previously labelled MAVEN, which made every downstream stage invoke Maven for
+     * Gradle modules and silently produce nothing for them. A composite repository now says so.
+     */
     enum Kind {
-        MAVEN, GRADLE, UNKNOWN
+        MAVEN, GRADLE, MIXED, UNKNOWN;
+
+        public boolean includesMaven() {
+            return this == MAVEN || this == MIXED;
+        }
+
+        public boolean includesGradle() {
+            return this == GRADLE || this == MIXED;
+        }
     }
 
     /** One resolved dependency with the provenance the spec requires. */
@@ -48,13 +63,76 @@ public interface BuildSystemPort {
     record ModuleModel(String moduleId, String path, String groupId, String artifactId, String version,
                        String packaging, String parentGav, String javaVersion,
                        Map<String, String> properties, List<String> activeProfiles,
-                       List<String> classpath) {
+                       List<String> classpath, Kind buildKind) {
 
         public ModuleModel(String moduleId, String path, String groupId, String artifactId,
                            String version, String packaging, String parentGav, String javaVersion,
                            Map<String, String> properties, List<String> activeProfiles) {
             this(moduleId, path, groupId, artifactId, version, packaging, parentGav, javaVersion,
-                    properties, activeProfiles, List.of());
+                    properties, activeProfiles, List.of(), Kind.MAVEN);
+        }
+
+        public ModuleModel(String moduleId, String path, String groupId, String artifactId,
+                           String version, String packaging, String parentGav, String javaVersion,
+                           Map<String, String> properties, List<String> activeProfiles,
+                           List<String> classpath) {
+            this(moduleId, path, groupId, artifactId, version, packaging, parentGav, javaVersion,
+                    properties, activeProfiles, classpath, Kind.MAVEN);
+        }
+
+        public ModuleModel withClasspath(List<String> resolved) {
+            return new ModuleModel(moduleId, path, groupId, artifactId, version, packaging, parentGav,
+                    javaVersion, properties, activeProfiles, resolved, buildKind);
+        }
+
+        public ModuleModel withBuildKind(Kind kind) {
+            return new ModuleModel(moduleId, path, groupId, artifactId, version, packaging, parentGav,
+                    javaVersion, properties, activeProfiles, classpath, kind);
+        }
+
+        /**
+         * The effective Java release for this module, as the module itself declares it.
+         *
+         * <p>Analysis previously parsed every repository at Java 21 regardless of what the module
+         * said. That is not a harmless default: a construct the module's real level does not allow
+         * parses anyway, and a construct removed after that level is silently accepted.
+         */
+        public int effectiveJavaRelease(int fallback) {
+            String declared = javaVersion;
+            if (declared == null || declared.isBlank()) {
+                for (String key : List.of("maven.compiler.release", "maven.compiler.source",
+                        "java.version", "sourceCompatibility")) {
+                    String candidate = properties == null ? null : properties.get(key);
+                    if (candidate != null && !candidate.isBlank()) {
+                        declared = candidate;
+                        break;
+                    }
+                }
+            }
+            if (declared == null || declared.isBlank()) {
+                return fallback;
+            }
+            String cleaned = declared.trim();
+            if (cleaned.startsWith("1.")) {
+                cleaned = cleaned.substring(2);
+            }
+            StringBuilder digits = new StringBuilder();
+            for (char c : cleaned.toCharArray()) {
+                if (Character.isDigit(c)) {
+                    digits.append(c);
+                } else if (digits.length() > 0) {
+                    break;
+                }
+            }
+            if (digits.length() == 0) {
+                return fallback;
+            }
+            try {
+                int value = Integer.parseInt(digits.toString());
+                return value >= 1 && value <= 99 ? value : fallback;
+            } catch (NumberFormatException e) {
+                return fallback;
+            }
         }
     }
 

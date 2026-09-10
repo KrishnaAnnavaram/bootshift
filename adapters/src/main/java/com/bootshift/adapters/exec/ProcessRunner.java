@@ -68,6 +68,26 @@ public final class ProcessRunner {
         }
     }
 
+    /**
+     * Environment variables a child process is allowed to inherit.
+     *
+     * <p>The runner used to copy the harness process environment wholesale into every build. That
+     * environment routinely holds credentials belonging to whoever launched the tool - registry
+     * tokens, cloud keys, CI secrets - and handing them to an untrusted Maven plugin is exactly the
+     * supply-chain exposure the isolation section exists to prevent. Inheritance is now opt-in.
+     */
+    private static final Set<String> INHERITED_ENVIRONMENT = Set.of(
+            "PATH", "HOME", "USERPROFILE", "SystemRoot", "SYSTEMROOT", "windir", "TEMP", "TMP",
+            "COMSPEC", "PATHEXT", "SystemDrive", "SYSTEMDRIVE", "NUMBER_OF_PROCESSORS", "OS",
+            "PROCESSOR_ARCHITECTURE", "JAVA_HOME", "M2_HOME", "MAVEN_HOME", "GRADLE_USER_HOME",
+            "USER", "USERNAME", "LOGNAME", "SHELL", "LANG", "LC_ALL", "TZ");
+
+    /** Variable names that are dropped even if something adds them to the inherit list. */
+    private static final List<String> SECRET_NAME_FRAGMENTS = List.of(
+            "TOKEN", "SECRET", "PASSWORD", "PASSWD", "APIKEY", "API_KEY", "ACCESS_KEY",
+            "PRIVATE_KEY", "CREDENTIAL", "AUTH", "SESSION", "COOKIE", "NPM_", "PYPI_", "AWS_",
+            "AZURE_", "GCP_", "GOOGLE_", "GH_", "GITHUB_", "GITLAB_", "DOCKER_", "SONAR");
+
     private final Set<String> allowlist;
     private final int maxOutputLines;
 
@@ -111,11 +131,7 @@ public final class ProcessRunner {
         ProcessBuilder builder = new ProcessBuilder(shellWrap(command));
         builder.directory(workingDirectory.toFile());
         builder.redirectErrorStream(false);
-        Map<String, String> env = new LinkedHashMap<>(environment);
-        builder.environment().putAll(env);
-        // Deterministic locale and timezone: part of the environment equivalence contract.
-        builder.environment().put("LANG", "C");
-        builder.environment().put("LC_ALL", "C");
+        applySanitizedEnvironment(builder, environment);
 
         Instant start = Instant.now();
         List<String> stdout = new ArrayList<>();
@@ -136,13 +152,16 @@ public final class ProcessRunner {
         try {
             if (!process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
                 timedOut = true;
-                process.destroyForcibly();
-                process.waitFor(15, TimeUnit.SECONDS);
+                // Kill the tree, not the direct child. Maven and Gradle fork: destroying the
+                // launcher leaves the forked JVM holding the port, the workspace lock and the
+                // database connection, and the next stage then fails for a reason that has nothing
+                // to do with the migration.
+                terminateTree(process, Duration.ofSeconds(15));
             }
             exitCode = process.exitValue();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            process.destroyForcibly();
+            terminateTree(process, Duration.ofSeconds(5));
             exitCode = -1;
         } catch (IllegalThreadStateException e) {
             exitCode = -1;
@@ -193,21 +212,154 @@ public final class ProcessRunner {
         }
     }
 
+    /**
+     * Persists an execution log with credentials removed before anything is written.
+     *
+     * <p>Redacting a final summary is not enough: a build log is itself evidence, is copied into the
+     * evidence store, and is what an operator reads first. A connection string printed by a failing
+     * datasource lands here long before any summary exists.
+     */
     private void writeLog(Path logSink, Result result) {
         try {
             Files.createDirectories(logSink.getParent());
             StringBuilder sb = new StringBuilder();
-            sb.append("$ ").append(result.command()).append(System.lineSeparator());
+            sb.append("$ ").append(redact(result.command())).append(System.lineSeparator());
             sb.append("exit=").append(result.exitCode())
                     .append(" timedOut=").append(result.timedOut())
                     .append(" duration=").append(result.duration()).append(System.lineSeparator());
             sb.append("--- stdout ---").append(System.lineSeparator());
-            result.stdout().forEach(l -> sb.append(l).append(System.lineSeparator()));
+            result.stdout().forEach(l -> sb.append(redact(l)).append(System.lineSeparator()));
             sb.append("--- stderr ---").append(System.lineSeparator());
-            result.stderr().forEach(l -> sb.append(l).append(System.lineSeparator()));
+            result.stderr().forEach(l -> sb.append(redact(l)).append(System.lineSeparator()));
             Files.writeString(logSink, sb.toString(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOG.warn("Cannot persist execution log {}: {}", logSink, e.getMessage());
+        }
+    }
+
+    /** Redaction applied to every line before it reaches disk. */
+    public static String redact(String line) {
+        return com.bootshift.core.security.SensitiveValues.redactLine(null, line);
+    }
+
+    /**
+     * Builds the child environment from an explicit allowlist plus the caller's own additions.
+     *
+     * <p>Locale and timezone are pinned so two sides of a differential comparison format dates and
+     * numbers identically; a difference caused by the harness running in a different locale is not a
+     * migration difference.
+     */
+    void applySanitizedEnvironment(ProcessBuilder builder, Map<String, String> additions) {
+        Map<String, String> inherited = new LinkedHashMap<>(builder.environment());
+        builder.environment().clear();
+        for (Map.Entry<String, String> entry : inherited.entrySet()) {
+            if (isInheritable(entry.getKey())) {
+                builder.environment().put(entry.getKey(), entry.getValue());
+            }
+        }
+        // Caller additions are deliberate and are not filtered by name; they are values the harness
+        // itself computed, such as the JAVA_HOME for the frozen edge toolchain.
+        additions.forEach((key, value) -> {
+            if (value != null) {
+                builder.environment().put(key, value);
+            }
+        });
+        builder.environment().put("LANG", "C");
+        builder.environment().put("LC_ALL", "C");
+        builder.environment().put("TZ", "UTC");
+    }
+
+    /** True when a variable may pass from the harness process into an untrusted child. */
+    public static boolean isInheritable(String name) {
+        if (name == null) {
+            return false;
+        }
+        String upper = name.toUpperCase(Locale.ROOT);
+        if (SECRET_NAME_FRAGMENTS.stream().anyMatch(upper::contains)) {
+            return false;
+        }
+        return INHERITED_ENVIRONMENT.contains(name) || INHERITED_ENVIRONMENT.contains(upper);
+    }
+
+    public static Set<String> inheritedEnvironmentNames() {
+        return INHERITED_ENVIRONMENT;
+    }
+
+    /**
+     * Starts a long-running process under the same controls as {@link #run}.
+     *
+     * <p>The runtime probe used to construct its own {@code ProcessBuilder}, which meant the
+     * application under analysis was launched with none of the allowlist, none of the environment
+     * sanitisation and no tree termination - for the one process in the whole harness that runs
+     * untrusted application code for ninety seconds and opens a port.
+     */
+    public Handle start(List<String> command, Path workingDirectory, Map<String, String> environment,
+                        Path logFile) {
+        if (command.isEmpty()) {
+            throw new IllegalArgumentException("Empty command");
+        }
+        assertAllowed(command.get(0));
+        try {
+            if (logFile != null && logFile.getParent() != null) {
+                Files.createDirectories(logFile.getParent());
+            }
+            ProcessBuilder builder = new ProcessBuilder(shellWrap(command));
+            builder.directory(workingDirectory.toFile());
+            builder.redirectErrorStream(true);
+            if (logFile != null) {
+                builder.redirectOutput(logFile.toFile());
+            }
+            applySanitizedEnvironment(builder, environment);
+            return new Handle(builder.start(), null, String.join(" ", command));
+        } catch (IOException e) {
+            return new Handle(null, e.getMessage(), String.join(" ", command));
+        }
+    }
+
+    /** A started long-running process, with deterministic cleanup. */
+    public record Handle(Process process, String failure, String command) {
+
+        public boolean started() {
+            return process != null;
+        }
+
+        /** Terminates the whole descendant tree and waits for it to be gone. */
+        public void terminate(Duration grace) {
+            if (process != null) {
+                ProcessRunner.terminateTree(process, grace);
+            }
+        }
+    }
+
+    /**
+     * Terminates a process and every descendant it spawned.
+     *
+     * <p>Descendants are collected before the parent is signalled: killing the parent first
+     * reparents its children and they become unreachable through the handle.
+     */
+    public static void terminateTree(Process process, Duration grace) {
+        if (process == null) {
+            return;
+        }
+        List<ProcessHandle> descendants = process.toHandle().descendants().toList();
+        process.destroy();
+        descendants.forEach(ProcessHandle::destroy);
+        try {
+            if (!process.waitFor(grace.toMillis(), TimeUnit.MILLISECONDS)) {
+                descendants.forEach(ProcessHandle::destroyForcibly);
+                process.destroyForcibly();
+                process.waitFor(5, TimeUnit.SECONDS);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            descendants.forEach(ProcessHandle::destroyForcibly);
+            process.destroyForcibly();
+        }
+        // Anything still alive after the forcible pass is reported rather than left silently behind.
+        List<ProcessHandle> survivors = descendants.stream().filter(ProcessHandle::isAlive).toList();
+        if (!survivors.isEmpty()) {
+            LOG.warn("{} descendant process(es) survived termination: {}", survivors.size(),
+                    survivors.stream().map(ProcessHandle::pid).toList());
         }
     }
 

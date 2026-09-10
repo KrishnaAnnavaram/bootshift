@@ -17,6 +17,7 @@ import com.bootshift.core.identity.FileRole;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
 import com.bootshift.ports.analysis.CodeModelPort;
+import com.bootshift.ports.build.BuildModelCodec;
 import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
@@ -118,23 +119,43 @@ public final class ApplicationGraphStage implements Stage {
 
         CodeModelPort codeModel = new JavaParserCodeModelAdapter();
         Map<String, CodeModelPort.AnalysisResult> analysisByModule = new LinkedHashMap<>();
+        Map<String, Integer> javaReleaseByModule = new java.util.TreeMap<>();
+        List<CodeModelPort.ParseIssue> unmodelledSources = new ArrayList<>();
         for (BuildSystemPort.ModuleModel module : buildModel.modules()) {
             Path moduleRoot = ".".equals(module.moduleId()) ? root : root.resolve(module.moduleId());
             if (!Files.isDirectory(moduleRoot)) {
                 continue;
             }
+            // Java roots go to the Java parser. Kotlin and Groovy roots do NOT: handing them to a
+            // Java-only parser produced failures that read as parse errors while the graph silently
+            // lost whatever those files declared, and the coverage number counted only Java files so
+            // nothing showed it.
             List<Path> sourceRoots = new ArrayList<>();
-            for (String candidate : List.of("src/main/java", "src/test/java", "src/main/kotlin")) {
+            for (String candidate : List.of("src/main/java", "src/test/java")) {
                 Path source = moduleRoot.resolve(candidate);
                 if (Files.isDirectory(source)) {
                     sourceRoots.add(source);
                 }
             }
+            List<Path> unmodelledRoots = new ArrayList<>();
+            for (String candidate : List.of("src/main/kotlin", "src/test/kotlin",
+                    "src/main/groovy", "src/test/groovy", "src/main/scala")) {
+                Path source = moduleRoot.resolve(candidate);
+                if (Files.isDirectory(source)) {
+                    unmodelledRoots.add(source);
+                }
+            }
+            unmodelledSources.addAll(
+                    JavaParserCodeModelAdapter.unmodelledSources(unmodelledRoots));
             if (sourceRoots.isEmpty()) {
                 continue;
             }
+            // The level the module declares, not the newest the parser supports.
+            int javaRelease = module.effectiveJavaRelease(21);
+            javaReleaseByModule.put(module.moduleId(), javaRelease);
             analysisByModule.put(module.moduleId(),
-                    codeModel.analyze(moduleRoot, sourceRoots, classpathFor(moduleRoot, module)));
+                    codeModel.analyze(moduleRoot, sourceRoots, classpathFor(moduleRoot, module),
+                            javaRelease));
         }
 
         Map<String, String> configurationFiles = readConfiguration(registry, root);
@@ -161,6 +182,14 @@ public final class ApplicationGraphStage implements Stage {
                     "Type attribution ratio " + round(built.attributionRatio())
                             + " is below the policy floor " + context.policy().graphAttributionFloor(),
                     "Impact classification is capped at POSSIBLY_AFFECTED for unresolved relations"));
+        }
+        if (!unmodelledSources.isEmpty()) {
+            envelope.blindSpot(new Envelope.BlindSpot("BS-GRAPH-LANGUAGE", "STATIC_GRAPH",
+                    unmodelledSources.size() + " source file(s) are in a language this analyser does "
+                            + "not model (Kotlin, Groovy or Scala)",
+                    "Types, endpoints and beans declared in those files are absent from the graph. "
+                            + "Impact findings that would depend on them do not exist, and the "
+                            + "coverage statement counts only the Java sources that were analysed."));
         }
         envelope.blindSpot(new Envelope.BlindSpot("BS-GRAPH-RUNTIME", "RUNTIME_GRAPH",
                 "This graph contains no runtime observations",
@@ -216,12 +245,19 @@ public final class ApplicationGraphStage implements Stage {
         summary.put("content_hash", graph.contentHash());
         summary.put("hash_note", "structural_hash includes run-scoped FILE_IDs and is comparable only within a run; content_hash excludes them and is what two runs should be compared on");
         summary.set("modules_analysed", Json.toTree(analysisByModule.keySet()));
+        summary.set("java_release_by_module", Json.toTree(javaReleaseByModule));
+        summary.put("language_level_rule", "Each module is parsed at the Java release it declares, "
+                + "not at the newest level the parser supports.");
+        summary.put("unmodelled_source_count", unmodelledSources.size());
+        summary.set("unmodelled_sources", Json.toTree(unmodelledSources.stream().limit(100).toList()));
         writer.write("graph-summary.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), summary));
 
         ObjectNode issues = Json.obj();
         issues.put("issue_count", built.issues().size());
         issues.set("issues", Json.toTree(built.issues()));
+        issues.put("unmodelled_source_count", unmodelledSources.size());
+        issues.set("unmodelled_sources", Json.toTree(unmodelledSources));
         writer.write("graph-issues.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), issues));
 
@@ -508,47 +544,15 @@ public final class ApplicationGraphStage implements Stage {
         return classpath;
     }
 
-    /** Rehydrates the build model from the published artifacts. Shared by every later stage. */
+    /**
+     * Rehydrates the build model from the published artifacts.
+     *
+     * <p>Delegates to {@link BuildModelCodec} rather than rebuilding a partial copy. The hand-written
+     * version this replaced dropped managed versions, plugins, repositories and resolution issues on
+     * the floor, so every stage downstream of Stage 02 believed nothing was managed by a BOM.
+     */
     public static BuildSystemPort.BuildModel readBuildModel(JsonNode buildNode, JsonNode dependencyNode) {
-        List<BuildSystemPort.ModuleModel> modules = new ArrayList<>();
-        for (JsonNode module : buildNode.path("modules")) {
-            Map<String, String> properties = new LinkedHashMap<>();
-            module.path("properties").fields()
-                    .forEachRemaining(e -> properties.put(e.getKey(), e.getValue().asText()));
-            List<String> profiles = new ArrayList<>();
-            module.path("activeProfiles").forEach(p -> profiles.add(p.asText()));
-            List<String> classpath = new ArrayList<>();
-            module.path("classpath").forEach(p -> classpath.add(p.asText()));
-            modules.add(new BuildSystemPort.ModuleModel(
-                    module.path("moduleId").asText(), module.path("path").asText(),
-                    module.path("groupId").asText(null), module.path("artifactId").asText(null),
-                    module.path("version").asText(null), module.path("packaging").asText("jar"),
-                    module.path("parentGav").asText(null), module.path("javaVersion").asText(null),
-                    properties, profiles, classpath));
-        }
-        List<BuildSystemPort.ResolvedDependency> dependencies = new ArrayList<>();
-        for (JsonNode dependency : dependencyNode.path("dependencies")) {
-            dependencies.add(new BuildSystemPort.ResolvedDependency(
-                    dependency.path("groupId").asText(), dependency.path("artifactId").asText(),
-                    dependency.path("version").asText(null), dependency.path("type").asText("jar"),
-                    dependency.path("scope").asText("compile"), dependency.path("module").asText("."),
-                    dependency.path("checksum").asText(null), dependency.path("repository").asText(null),
-                    dependency.path("direct").asBoolean(false), dependency.path("managed").asBoolean(false),
-                    dependency.path("bomSource").asText(null),
-                    dependency.path("resolutionStatus").asText("RESOLVED")));
-        }
-        List<BuildSystemPort.ManagedVersion> managed = new ArrayList<>();
-        List<BuildSystemPort.ResolvedPlugin> plugins = new ArrayList<>();
-        Map<String, String> toolchains = new LinkedHashMap<>();
-        buildNode.path("toolchains").fields()
-                .forEachRemaining(e -> toolchains.put(e.getKey(), e.getValue().asText()));
-        return new BuildSystemPort.BuildModel(
-                BuildSystemPort.Kind.valueOf(buildNode.path("kind").asText("MAVEN")),
-                buildNode.path("tool_version").asText(null), buildNode.path("tool_invocation").asText(null),
-                buildNode.path("wrapper_used").asBoolean(false), modules, dependencies, plugins,
-                managed, List.of(), List.of(), toolchains,
-                buildNode.path("authoritative").asBoolean(false),
-                buildNode.path("degraded_reason").asText(null));
+        return BuildModelCodec.decode(buildNode, dependencyNode);
     }
 
     public static double round(double value) {

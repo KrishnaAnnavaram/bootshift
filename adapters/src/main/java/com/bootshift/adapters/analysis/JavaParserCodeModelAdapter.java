@@ -61,6 +61,13 @@ public final class JavaParserCodeModelAdapter implements CodeModelPort {
 
     @Override
     public AnalysisResult analyze(Path moduleRoot, List<Path> sourceRoots, List<Path> classpath) {
+        // 21 only as a fallback for callers that cannot say. Every pipeline caller does say.
+        return analyze(moduleRoot, sourceRoots, classpath, 21);
+    }
+
+    @Override
+    public AnalysisResult analyze(Path moduleRoot, List<Path> sourceRoots, List<Path> classpath,
+                                  int javaRelease) {
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
         typeSolver.add(new ReflectionTypeSolver(false));
         for (Path sourceRoot : sourceRoots) {
@@ -81,7 +88,7 @@ public final class JavaParserCodeModelAdapter implements CodeModelPort {
         }
 
         ParserConfiguration configuration = new ParserConfiguration()
-                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21)
+                .setLanguageLevel(languageLevelFor(javaRelease))
                 .setSymbolResolver(new JavaSymbolSolver(typeSolver));
         JavaParser parser = new JavaParser(configuration);
 
@@ -306,5 +313,67 @@ public final class JavaParserCodeModelAdapter implements CodeModelPort {
 
     private static int line(int value) {
         return Math.max(value, 0);
+    }
+
+    /**
+     * Maps a Java release to the parser's language level.
+     *
+     * <p>An unrecognised release falls back to the newest level the parser knows and the caller is
+     * told, rather than the adapter silently choosing one.
+     */
+    static ParserConfiguration.LanguageLevel languageLevelFor(int javaRelease) {
+        return switch (javaRelease) {
+            case 8 -> ParserConfiguration.LanguageLevel.JAVA_8;
+            case 9 -> ParserConfiguration.LanguageLevel.JAVA_9;
+            case 10 -> ParserConfiguration.LanguageLevel.JAVA_10;
+            case 11 -> ParserConfiguration.LanguageLevel.JAVA_11;
+            case 12 -> ParserConfiguration.LanguageLevel.JAVA_12;
+            case 13 -> ParserConfiguration.LanguageLevel.JAVA_13;
+            case 14 -> ParserConfiguration.LanguageLevel.JAVA_14;
+            case 15 -> ParserConfiguration.LanguageLevel.JAVA_15;
+            case 16 -> ParserConfiguration.LanguageLevel.JAVA_16;
+            case 17 -> ParserConfiguration.LanguageLevel.JAVA_17;
+            case 18 -> ParserConfiguration.LanguageLevel.JAVA_18;
+            case 19 -> ParserConfiguration.LanguageLevel.JAVA_19;
+            case 20 -> ParserConfiguration.LanguageLevel.JAVA_20;
+            default -> ParserConfiguration.LanguageLevel.JAVA_21;
+        };
+    }
+
+    /**
+     * Source files this adapter cannot model.
+     *
+     * <p>Kotlin, Groovy and Scala roots used to be handed to a Java-only parser, which failed on them
+     * and left the graph silently short of whatever they declared while the coverage number counted
+     * only Java files. Reporting them as unmodelled is the difference between a known blind spot and
+     * an unknown one.
+     */
+    public static List<ParseIssue> unmodelledSources(List<Path> sourceRoots) {
+        List<ParseIssue> issues = new java.util.ArrayList<>();
+        for (Path root : sourceRoots) {
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (var stream = Files.walk(root)) {
+                stream.filter(Files::isRegularFile).forEach(file -> {
+                    String name = file.getFileName().toString();
+                    String language = name.endsWith(".kt") || name.endsWith(".kts") ? "Kotlin"
+                            : name.endsWith(".groovy") ? "Groovy"
+                            : name.endsWith(".scala") ? "Scala" : null;
+                    if (language != null) {
+                        issues.add(new ParseIssue(file.toString().replace((char) 92, '/'),
+                                "UNMODELLED",
+                                language + " source is not analysed by this adapter. It is recorded "
+                                        + "as unmodelled rather than parsed, so impact findings that "
+                                        + "would depend on it are absent and this is a declared "
+                                        + "blind spot rather than an unknown one."));
+                    }
+                });
+            } catch (java.io.IOException e) {
+                issues.add(new ParseIssue(root.toString(), "UNMODELLED",
+                        "Cannot enumerate " + root + ": " + e.getMessage()));
+            }
+        }
+        return issues;
     }
 }

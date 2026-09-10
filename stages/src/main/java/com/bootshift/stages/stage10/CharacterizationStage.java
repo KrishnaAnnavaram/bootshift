@@ -14,6 +14,12 @@ import com.bootshift.core.graph.NodeType;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Ids;
 import com.bootshift.core.util.Json;
+import com.bootshift.adapters.runtime.SpringProcessRuntimeProbe;
+import com.bootshift.ports.build.BuildModelCodec;
+import com.bootshift.ports.build.BuildSystemPort;
+import com.bootshift.ports.characterization.Scenario;
+import com.bootshift.ports.characterization.ScenarioObservation;
+import com.bootshift.stages.EdgeToolchain;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -96,6 +102,7 @@ public final class CharacterizationStage implements Stage {
     @Override
     public List<String> outputArtifacts() {
         return List.of("characterization-report.json", "characterization-contracts.json",
+                "characterization-scenarios.json", "characterization-old-observations.json",
                 "characterization-gaps.json", "manifest.json");
     }
 
@@ -143,20 +150,49 @@ public final class CharacterizationStage implements Stage {
             }
         }
 
-        // Endpoint characterization: every observed endpoint gets an HTTP contract, because HTTP
-        // shape is the most commonly broken thing in a Spring Boot major upgrade.
-        for (GraphNode endpoint : graph.nodesOfType(NodeType.ENDPOINT)) {
-            ObjectNode contract = endpointContract(endpoint, runtimeByModule);
-            contracts.add(contract);
-            byState.merge(contract.path("state").asText(), 1, Integer::sum);
-        }
+        // ---------------------------------------------------------------- executable scenarios
+        //
+        // The contracts above describe what should be protected. These are the executable form, and
+        // they are executed here, against the ORIGINAL application, before anything is migrated.
+        // A contract that is never executed protects nothing: it sits in AWAITING_OLD_OBSERVATION
+        // for the life of the run while the report counts it as coverage.
+        Set<String> modulesThatStart = new LinkedHashSet<>();
+        runtimeByModule.forEach((module, node) -> {
+            if (node.path("started").asBoolean(false)) {
+                modulesThatStart.add(module);
+            }
+        });
+        boolean externalInfrastructure = environmentSuppliesInfrastructure(context);
+
+        ScenarioBuilder builder = new ScenarioBuilder();
+        List<Scenario> scenarios = new ArrayList<>(
+                builder.fromGraph(graph, modulesThatStart, externalInfrastructure));
+        scenarios.addAll(builder.fromImpacts(impact, modulesThatStart, externalInfrastructure));
+
+        ScenarioFreeze freeze = freezeAgainstOriginal(context, scenarios, modulesThatStart);
+        scenarios = freeze.scenarios();
+
+        Map<String, Integer> scenarioStates = new java.util.TreeMap<>();
+        scenarios.forEach(scenario -> scenarioStates.merge(scenario.state().name(), 1, Integer::sum));
+
+        long scenariosFrozen = scenarioStates.getOrDefault(Scenario.State.FROZEN.name(), 0);
+        long scenariosUnobservable =
+                scenarioStates.getOrDefault(Scenario.State.UNOBSERVABLE_WITH_EXPLICIT_GAP.name(), 0);
+        long scenariosAwaiting =
+                scenarioStates.getOrDefault(Scenario.State.AWAITING_OLD_OBSERVATION.name(), 0)
+                        + scenarioStates.getOrDefault(Scenario.State.DRAFT.name(), 0);
+        long scenariosRejected = scenarioStates.getOrDefault(Scenario.State.REJECTED.name(), 0);
 
         long frozen = byState.getOrDefault(ContractState.FROZEN.name(), 0);
         long awaiting = byState.getOrDefault(ContractState.AWAITING_OLD_OBSERVATION.name(), 0);
         long unobservable = byState.getOrDefault(ContractState.UNOBSERVABLE.name(), 0);
         long mapped = byState.getOrDefault(ContractState.MAPPED_TO_EXISTING_TEST.name(), 0);
 
-        envelope.stat("contracts", contracts.size())
+        envelope.stat("scenarios", scenarios.size())
+                .stat("scenarios_frozen", scenariosFrozen)
+                .stat("scenarios_unobservable", scenariosUnobservable)
+                .stat("scenarios_awaiting_old", scenariosAwaiting)
+                .stat("contracts", contracts.size())
                 .stat("frozen", frozen)
                 .stat("awaiting_old_observation", awaiting)
                 .stat("mapped_to_existing_tests", mapped)
@@ -169,6 +205,12 @@ public final class CharacterizationStage implements Stage {
 
         ObjectNode report = Json.obj();
         report.put("contract_count", contracts.size());
+        report.put("scenario_count", scenarios.size());
+        report.set("scenarios_by_state", Json.toTree(scenarioStates));
+        report.put("scenarios_executed_against_old", freeze.observations().size());
+        report.put("scenario_execution_rule", "Scenarios are executed against the ORIGINAL "
+                + "application here, before any migration change exists. That is what makes the "
+                + "observed behaviour an oracle rather than an assertion.");
         report.set("by_state", Json.toTree(byState));
         report.put("oracle_rule", "Expected behaviour comes from observed original behaviour, an "
                 + "authoritative specification, or an explicit human decision. Never from invention.");
@@ -184,6 +226,37 @@ public final class CharacterizationStage implements Stage {
         contractArtifact.set("contracts", Json.toTree(contracts));
         writer.write("characterization-contracts.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), contractArtifact));
+
+        ObjectNode scenarioArtifact = Json.obj();
+        scenarioArtifact.put("count", scenarios.size());
+        scenarioArtifact.set("by_state", Json.toTree(scenarioStates));
+        scenarioArtifact.put("frozen", scenariosFrozen);
+        scenarioArtifact.put("unobservable", scenariosUnobservable);
+        scenarioArtifact.put("awaiting_old_observation", scenariosAwaiting);
+        scenarioArtifact.put("rejected", scenariosRejected);
+        scenarioArtifact.put("external_infrastructure_available", externalInfrastructure);
+        scenarioArtifact.put("oracle_rule", "A scenario becomes an oracle by being EXECUTED against "
+                + "the original application. Expected values are never derived by reading migrated "
+                + "code, and AWAITING_OLD_OBSERVATION is not a protected state.");
+        scenarioArtifact.set("scenarios",
+                Json.toTree(scenarios.stream().map(Scenario::toNode).toList()));
+        ObjectNode scenarioPublished = StageSupport.compose(
+                StageSupport.envelope(context, OUTPUT_DIR), scenarioArtifact);
+        StageSupport.validate(context, writer,
+                "characterization/characterization-scenarios.schema.json",
+                "characterization-scenarios.json", scenarioPublished);
+        writer.write("characterization-scenarios.json", scenarioPublished);
+
+        ObjectNode observationArtifact = Json.obj();
+        observationArtifact.put("count", freeze.observations().size());
+        observationArtifact.put("side", "OLD");
+        observationArtifact.put("modules_executed", freeze.modulesExecuted());
+        observationArtifact.set("execution_failures", Json.toTree(freeze.failures()));
+        observationArtifact.set("observations",
+                Json.toTree(freeze.observations().stream()
+                        .map(ScenarioObservation::toNode).toList()));
+        writer.write("characterization-old-observations.json",
+                StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), observationArtifact));
 
         ObjectNode gapArtifact = Json.obj();
         gapArtifact.put("count", gaps.size());
@@ -210,6 +283,15 @@ public final class CharacterizationStage implements Stage {
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));
 
         List<String> messages = new ArrayList<>();
+        if (scenariosAwaiting > 0) {
+            messages.add(scenariosAwaiting + " scenario(s) could not be executed against the original "
+                    + "application and are NOT protection; they cannot act as an oracle");
+        }
+        if (scenariosUnobservable > 0) {
+            messages.add(scenariosUnobservable + " scenario(s) are unobservable in this environment "
+                    + "and are recorded as explicit gaps");
+        }
+        freeze.failures().forEach(f -> messages.add("scenario execution: " + f));
         if (awaiting > 0) {
             messages.add(awaiting + " probe(s) await execution against the original application; "
                     + "they cannot act as an oracle until then");
@@ -219,7 +301,10 @@ public final class CharacterizationStage implements Stage {
         }
 
         return new StageResult(OUTPUT_DIR, ExitCode.SUCCESS,
-                contracts.size() + " characterization contract(s): " + frozen + " frozen, "
+                scenarios.size() + " executable scenario(s): " + scenariosFrozen + " frozen against "
+                        + "OLD, " + scenariosUnobservable + " unobservable, " + scenariosAwaiting
+                        + " unexecuted; "
+                        + contracts.size() + " characterization contract(s): " + frozen + " frozen, "
                         + mapped + " mapped to existing tests, " + awaiting + " awaiting OLD, "
                         + unobservable + " unobservable",
                 messages, artifacts, hash);
@@ -406,5 +491,174 @@ public final class CharacterizationStage implements Stage {
             byModule.put(module.path("module").asText(), module);
         }
         return byModule;
+    }
+
+    // ------------------------------------------------------------------ scenario execution
+
+    /** Result of executing the scenario set against the original application. */
+    record ScenarioFreeze(List<Scenario> scenarios, List<ScenarioObservation> observations,
+                          List<String> failures, int modulesExecuted) {
+    }
+
+    /**
+     * Executes every executable scenario against the ORIGINAL application and freezes what it saw.
+     *
+     * <p>The OLD workspace was built and packaged by Agent 04, so the artifacts already exist. Each
+     * module is started once and every scenario for that module runs against that instance, because
+     * restarting per scenario would multiply a ninety-second startup by the scenario count and would
+     * also make the observations less comparable, not more.
+     */
+    private ScenarioFreeze freezeAgainstOriginal(StageContext context, List<Scenario> scenarios,
+                                                 Set<String> modulesThatStart) {
+        List<ScenarioObservation> observations = new ArrayList<>();
+        List<String> failures = new ArrayList<>();
+        Map<String, Scenario> byId = new LinkedHashMap<>();
+        scenarios.forEach(scenario -> byId.put(scenario.scenarioId(), scenario));
+
+        Path oldWorkspace = context.run().runtimeOldWorkspace();
+        if (!java.nio.file.Files.isDirectory(oldWorkspace)) {
+            failures.add("The OLD workspace does not exist; run the baseline stage first");
+            return new ScenarioFreeze(markUnexecuted(scenarios, "No OLD workspace to execute against"),
+                    observations, failures, 0);
+        }
+
+        JsonNode buildNode = StageSupport.optionalUpstream(context, "02-build", "build-model.json");
+        JsonNode dependencyNode = StageSupport.optionalUpstream(context, "02-build",
+                "dependency-model.json");
+        BuildSystemPort.BuildModel buildModel = buildNode == null ? null
+                : BuildModelCodec.decode(buildNode, dependencyNode);
+        ApplicationGraph graph = null;
+
+        SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(
+                context.run().runWorkspace().resolve("characterization-logs"));
+        int modulesExecuted = 0;
+
+        // The original application is built for the level it declares, so the OLD side runs on a JDK
+        // that supports that level rather than on whatever is newest.
+        com.bootshift.adapters.build.ToolchainProbe toolchainProbe =
+                new com.bootshift.adapters.build.ToolchainProbe();
+        List<com.bootshift.adapters.build.ToolchainProbe.Jdk> jdks = toolchainProbe.discover();
+
+        for (String moduleId : modulesThatStart) {
+            List<Scenario> forModule = scenarios.stream()
+                    .filter(scenario -> moduleId.equals(scenario.module()))
+                    .filter(scenario -> scenario.state() == Scenario.State.DRAFT)
+                    .toList();
+            if (forModule.isEmpty()) {
+                continue;
+            }
+            Path moduleRoot = ".".equals(moduleId) ? oldWorkspace : oldWorkspace.resolve(moduleId);
+            if (!java.nio.file.Files.isDirectory(moduleRoot)) {
+                failures.add("Module " + moduleId + " is absent from the OLD workspace");
+                continue;
+            }
+
+            Map<String, String> settings = new LinkedHashMap<>();
+            settings.put("fingerprint", "characterization-old");
+            int declaredJava = declaredJavaFor(buildModel, moduleId);
+            toolchainProbe.select(declaredJava, jdks).ifPresent(jdk -> {
+                settings.put("bootshift.javaHome", jdk.home().toString());
+                com.bootshift.adapters.build.JavaTargetSelector
+                        .javaExecutable(jdk.home().toString())
+                        .ifPresent(exe -> settings.put("bootshift.javaExecutable", exe.toString()));
+            });
+            if (buildModel != null) {
+                if (graph == null) {
+                    JsonNode graphNode = StageSupport.optionalUpstream(context, "03-graph",
+                            "application-graph.json");
+                    graph = graphNode == null ? new ApplicationGraph()
+                            : ApplicationGraph.fromNode(graphNode);
+                }
+                settings.putAll(com.bootshift.stages.ValidationSupport
+                        .runtimeSettings(moduleId, graph, buildModel));
+            }
+
+            SpringProcessRuntimeProbe.ScenarioRun run = probe.runScenarios(moduleRoot, moduleId,
+                    forModule, ScenarioObservation.Side.OLD, settings);
+            observations.addAll(run.observations());
+            if (!run.started()) {
+                failures.add("Module " + moduleId + " could not be started for characterization: "
+                        + run.failureReason());
+            } else {
+                modulesExecuted++;
+            }
+        }
+
+        // Freeze what actually executed successfully; everything else keeps a state that says so.
+        Map<String, ScenarioObservation> successful = new LinkedHashMap<>();
+        observations.stream().filter(ScenarioObservation::successful)
+                .forEach(observation -> successful.put(observation.scenarioId(), observation));
+
+        List<Scenario> resolved = new ArrayList<>();
+        for (Scenario scenario : scenarios) {
+            if (scenario.state() != Scenario.State.DRAFT) {
+                resolved.add(scenario);
+                continue;
+            }
+            ScenarioObservation observation = successful.get(scenario.scenarioId());
+            if (observation != null) {
+                resolved.add(scenario.withOldObservation(observation.rawHash()));
+                continue;
+            }
+            ScenarioObservation attempted = observations.stream()
+                    .filter(o -> o.scenarioId().equals(scenario.scenarioId()))
+                    .findFirst().orElse(null);
+            if (attempted != null) {
+                // Attempted and failed is a finished question, not a pending one.
+                //
+                // AWAITING_OLD_OBSERVATION means "not executed yet" - a state a later stage could
+                // still resolve. A scenario whose module was running and whose request came back
+                // unusable will never be resolved by anything in this run, and leaving it pending
+                // kept it out of the declared-gap count: it protected nothing and was not counted as
+                // an admitted blind spot either, which is the one combination the evidence rules do
+                // not allow. The failure reason travels with the state so the gap says why.
+                resolved.add(scenario.withState(Scenario.State.UNOBSERVABLE_WITH_EXPLICIT_GAP,
+                        "Execution against the original application did not succeed, so this "
+                                + "behaviour is unobserved and is declared as a gap rather than left "
+                                + "pending: " + attempted.failureReason()));
+            } else {
+                resolved.add(scenario.withState(Scenario.State.AWAITING_OLD_OBSERVATION,
+                        "Never attempted against the original application"));
+            }
+        }
+        return new ScenarioFreeze(resolved, observations, failures, modulesExecuted);
+    }
+
+    private static List<Scenario> markUnexecuted(List<Scenario> scenarios, String reason) {
+        List<Scenario> marked = new ArrayList<>();
+        for (Scenario scenario : scenarios) {
+            marked.add(scenario.state() == Scenario.State.DRAFT
+                    ? scenario.withState(Scenario.State.AWAITING_OLD_OBSERVATION, reason)
+                    : scenario);
+        }
+        return marked;
+    }
+
+    private static int declaredJavaFor(BuildSystemPort.BuildModel model, String moduleId) {
+        if (model == null) {
+            return 17;
+        }
+        return model.modules().stream()
+                .filter(m -> m.moduleId().equals(moduleId))
+                .findFirst()
+                .map(m -> m.effectiveJavaRelease(17))
+                .orElse(17);
+    }
+
+    /**
+     * Whether the environment provider can actually supply the datastores and brokers the
+     * infrastructure-dependent dimensions need.
+     *
+     * <p>Asked rather than assumed. Claiming a persistence comparison happened when no database was
+     * ever provisioned is the failure mode this question exists to prevent.
+     */
+    private static boolean environmentSuppliesInfrastructure(StageContext context) {
+        try {
+            var provisioned = context.environment().provision("characterization-probe",
+                    Map.of("purpose", "infrastructure-availability-probe"));
+            return provisioned.usable() && !provisioned.endpoints().isEmpty();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 }

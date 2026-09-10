@@ -160,6 +160,26 @@ public final class ValidationSupport {
         return settings;
     }
 
+    /**
+     * Infrastructure requirements in the shape the environment provider expects.
+     *
+     * <p>Prefixed with {@code infrastructure.} so the provider knows to actually start something.
+     * Callers previously computed the dependency list and then never asked for any of it, so nothing
+     * was ever provisioned and every persistence dimension was NOT_COMPARED on every run.
+     */
+    public static Map<String, String> infrastructureRequirements(String moduleId,
+                                                                 ApplicationGraph graph,
+                                                                 BuildSystemPort.BuildModel model) {
+        Map<String, String> requirements = new LinkedHashMap<>();
+        for (String dependency : externalDependencies(moduleId, graph, model)) {
+            if (com.bootshift.adapters.environment.ContainerProvisioner.catalogComponents()
+                    .contains(dependency)) {
+                requirements.put("infrastructure." + dependency, "required");
+            }
+        }
+        return requirements;
+    }
+
     /** External infrastructure a module needs but the harness may be unable to provide. */
     public static List<String> externalDependencies(String moduleId, ApplicationGraph graph,
                                                     BuildSystemPort.BuildModel buildModel) {

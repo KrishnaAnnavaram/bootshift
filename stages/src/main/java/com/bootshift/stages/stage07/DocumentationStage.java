@@ -11,6 +11,8 @@ import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
+import com.bootshift.ports.build.BuildModelCodec;
+import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.ports.docs.DocumentationPort;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
@@ -21,7 +23,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Agent 07 - Documentation Registry (spec section 18).
@@ -36,24 +40,6 @@ import java.util.Optional;
 public final class DocumentationStage implements Stage {
 
     public static final String OUTPUT_DIR = "07-documentation";
-
-    /** A document the harness knows how to locate for a given edge. */
-    private record Source(String urlTemplate, String publisher, String component,
-                          DocumentationPort.TrustLevel trustLevel, String description) {
-    }
-
-    private static final List<Source> EDGE_SOURCES = List.of(
-            new Source("https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-%s-Release-Notes",
-                    "Spring", "spring-boot", DocumentationPort.TrustLevel.OFFICIAL_RELEASE_NOTES,
-                    "Official release notes for the target line"),
-            new Source("https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-%s-Migration-Guide",
-                    "Spring", "spring-boot", DocumentationPort.TrustLevel.OFFICIAL_MIGRATION_GUIDE,
-                    "Official migration guide for the target line"));
-
-    private static final List<Source> GENERAL_SOURCES = List.of(
-            new Source("https://raw.githubusercontent.com/spring-projects/spring-boot/main/README.adoc",
-                    "Spring", "spring-boot", DocumentationPort.TrustLevel.OFFICIAL_GENERAL_DOC,
-                    "Project overview and system requirements"));
 
     @Override
     public String id() {
@@ -82,7 +68,8 @@ public final class DocumentationStage implements Stage {
 
     @Override
     public List<String> inputArtifacts() {
-        return List.of("06-target/target-state.json", "06-target/migration-path.json");
+        return List.of("06-target/target-state.json", "06-target/migration-path.json",
+                "02-build/build-model.json");
     }
 
     @Override
@@ -96,6 +83,20 @@ public final class DocumentationStage implements Stage {
                 "Run: harness resolve-target --target auto");
         JsonNode path = StageSupport.requireUpstream(context, "06-target", "migration-path.json",
                 "Run: harness resolve-target --target auto");
+        JsonNode buildNode = StageSupport.optionalUpstream(context, "02-build", "build-model.json");
+        JsonNode dependencyNode = StageSupport.optionalUpstream(context, "02-build",
+                "dependency-model.json");
+
+        // Which components this repository actually uses. Fetching only Spring Boot documentation
+        // and calling the migration documented was the previous behaviour; a Boot major moves Spring
+        // Framework, Security, Data, Hibernate, Jackson and the Cloud train underneath it at once.
+        BuildSystemPort.BuildModel buildModel = buildNode == null ? null
+                : BuildModelCodec.decode(buildNode, dependencyNode);
+        ComponentDocumentationCatalog.ComponentDetection detection =
+                ComponentDocumentationCatalog.detect(buildModel);
+        Set<String> components = detection.components();
+        List<String> unsupportedComponents =
+                ComponentDocumentationCatalog.unsupportedComponents(components);
 
         HttpDocumentationAdapter documentation = new HttpDocumentationAdapter(context.http(),
                 context.run().runWorkspace().resolve("documents"));
@@ -105,30 +106,74 @@ public final class DocumentationStage implements Stage {
 
         List<DocumentationPort.DocumentRef> retrieved = new ArrayList<>();
         List<ObjectNode> attempts = new ArrayList<>();
+        // Retrieval is exact-edge aware: the edge a document was fetched for is recorded, so a Boot
+        // 4 migration guide can never authorize a change on the earlier Boot 3 edge.
+        Map<String, String> documentEdge = new LinkedHashMap<>();
+        Map<String, String> documentEdgeClass = new LinkedHashMap<>();
+        Set<String> retrievedUrls = new LinkedHashSet<>();
 
         for (JsonNode edge : path.path("edges")) {
             String from = edge.path("fromVersion").asText();
             String to = edge.path("toVersion").asText();
+            String edgeId = edge.path("edgeId").asText();
+            String edgeClass = edge.path("edgeClass").asText("MINOR");
             if (from.equals(to)) {
                 continue;
             }
-            String line = lineOf(to);
-            for (Source source : EDGE_SOURCES) {
-                String url = String.format(source.urlTemplate(), line);
+            String line = ComponentDocumentationCatalog.lineOf(to);
+            String major = ComponentDocumentationCatalog.majorOf(to);
+
+            List<ComponentDocumentationCatalog.Source> sources = new ArrayList<>();
+            for (String component : components) {
+                sources.addAll(ComponentDocumentationCatalog.sourcesFor(component,
+                        ComponentDocumentationCatalog.Scope.PER_EDGE));
+                if ("MAJOR_BOUNDARY".equals(edgeClass)) {
+                    sources.addAll(ComponentDocumentationCatalog.sourcesFor(component,
+                            ComponentDocumentationCatalog.Scope.PER_MAJOR_BOUNDARY));
+                }
+            }
+
+            for (ComponentDocumentationCatalog.Source source : sources) {
+                String url = source.url(line, major, to);
+                // A component document with no edge-specific URL would otherwise be re-fetched for
+                // every edge and recorded as if each retrieval were independent evidence.
+                String dedupeKey = url + "|" + edgeId;
+                if (!retrievedUrls.add(dedupeKey)) {
+                    continue;
+                }
                 Optional<DocumentationPort.DocumentRef> ref = documentation.retrieve(url,
                         source.publisher(), source.component(), from, to, source.trustLevel());
-                attempts.add(renderAttempt(url, source, from, to, ref));
-                ref.ifPresent(retrieved::add);
+                attempts.add(renderAttempt(url, source, from, to, edgeId, edgeClass, ref));
+                ref.ifPresent(r -> {
+                    retrieved.add(r);
+                    documentEdge.put(r.documentId(), edgeId);
+                    documentEdgeClass.put(r.documentId(), edgeClass);
+                });
             }
         }
-        for (Source source : GENERAL_SOURCES) {
-            Optional<DocumentationPort.DocumentRef> ref = documentation.retrieve(source.urlTemplate(),
-                    source.publisher(), source.component(),
-                    target.path("source_version").asText(), target.path("landing_version").asText(),
-                    source.trustLevel());
-            attempts.add(renderAttempt(source.urlTemplate(), source,
-                    target.path("source_version").asText(), target.path("landing_version").asText(), ref));
-            ref.ifPresent(retrieved::add);
+
+        for (String component : components) {
+            for (ComponentDocumentationCatalog.Source source
+                    : ComponentDocumentationCatalog.sourcesFor(component,
+                            ComponentDocumentationCatalog.Scope.ONCE)) {
+                String url = source.url(
+                        ComponentDocumentationCatalog.lineOf(target.path("landing_version").asText()),
+                        ComponentDocumentationCatalog.majorOf(target.path("landing_version").asText()),
+                        target.path("landing_version").asText());
+                if (!retrievedUrls.add(url + "|RUN")) {
+                    continue;
+                }
+                Optional<DocumentationPort.DocumentRef> ref = documentation.retrieve(url,
+                        source.publisher(), source.component(),
+                        target.path("source_version").asText(),
+                        target.path("landing_version").asText(), source.trustLevel());
+                attempts.add(renderAttempt(url, source, target.path("source_version").asText(),
+                        target.path("landing_version").asText(), null, "RUN_SCOPED", ref));
+                ref.ifPresent(r -> {
+                    retrieved.add(r);
+                    documentEdgeClass.put(r.documentId(), "RUN_SCOPED");
+                });
+            }
         }
 
         ObjectNode registry = Json.obj();
@@ -148,6 +193,11 @@ public final class DocumentationStage implements Stage {
             node.put("retrieved_at", ref.retrievedAt());
             node.put("content_hash", ref.contentHash());
             node.put("trust_level", ref.trustLevel().name());
+            node.put("edge_id", documentEdge.get(ref.documentId()));
+            node.put("edge_class", documentEdgeClass.getOrDefault(ref.documentId(), "RUN_SCOPED"));
+            node.put("authorizes_only_this_edge", documentEdge.containsKey(ref.documentId()));
+            node.put("advisory_only",
+                    ref.trustLevel() == DocumentationPort.TrustLevel.COMMUNITY_ADVISORY);
             node.put("etag", ref.etag());
             node.put("last_modified", ref.lastModified());
             node.put("from_cache", ref.fromCache());
@@ -161,6 +211,22 @@ public final class DocumentationStage implements Stage {
                             EvidenceManifest.Classification.PUBLIC, "SEALED_EVIDENCE", OUTPUT_DIR));
         }
         registry.set("documents", documents);
+        registry.set("components_detected", Json.toTree(components));
+        registry.set("components_without_authoritative_source", Json.toTree(unsupportedComponents));
+        // Two different gaps, kept apart on purpose: one is a gap in this harness's catalogue of
+        // documents, the other is a gap in what this harness can reach at all.
+        registry.set("public_components_without_catalogued_document",
+                Json.toTree(detection.publicWithoutCatalogue()));
+        registry.set("possibly_internal_components", Json.toTree(detection.possiblyInternal()));
+        registry.put("component_classification_rule", "A coordinate the build resolver fetched from "
+                + "a public repository is a public open-source component, whatever its group is "
+                + "named. Only a coordinate that did not resolve, or that resolved from a repository "
+                + "not demonstrably public, is reported as possibly organization-internal - and only "
+                + "as possibly, because a private mirror of a public library is indistinguishable "
+                + "from here.");
+        registry.put("exact_edge_rule", "A document is bound to the edge it was retrieved for. "
+                + "A migration guide for a later boundary can never authorize a change on an "
+                + "earlier edge.");
         writer.write("document-registry.json", StageSupport.compose(envelope, registry));
 
         ObjectNode coverage = Json.obj();
@@ -179,6 +245,14 @@ public final class DocumentationStage implements Stage {
         coverage.put("edges_requiring_documentation", edgesNeedingDocs);
         coverage.put("edges_with_official_migration_guide", edgesWithGuide);
         coverage.put("attempt_count", attempts.size());
+        coverage.set("components_detected", Json.toTree(components));
+        coverage.set("components_without_authoritative_source", Json.toTree(unsupportedComponents));
+        coverage.put("public_components_without_catalogued_document",
+                detection.publicWithoutCatalogue().size());
+        coverage.put("possibly_internal_component_count", detection.possiblyInternal().size());
+        Map<String, Integer> byComponent = new java.util.TreeMap<>();
+        retrieved.forEach(r -> byComponent.merge(r.component(), 1, Integer::sum));
+        coverage.set("documents_by_component", Json.toTree(byComponent));
         coverage.set("attempts", Json.toTree(attempts));
         writer.write("document-coverage.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), coverage));
@@ -188,6 +262,12 @@ public final class DocumentationStage implements Stage {
                     "Only " + edgesWithGuide + " of " + edgesNeedingDocs
                             + " edge(s) have an official migration guide pinned",
                     "Migration facts for the uncovered edges must come from the artifact channel alone"));
+        }
+        if (!unsupportedComponents.isEmpty()) {
+            envelope.gap(new Envelope.Gap("GAP-DOC-003", "DOCUMENTATION",
+                    "No authoritative documentation source is known for: " + unsupportedComponents,
+                    "Migration facts for those components can only come from the artifact channel; "
+                            + "changes they document are invisible to the documentation channel"));
         }
         if (unusable > 0) {
             envelope.gap(new Envelope.Gap("GAP-DOC-002", "DOCUMENTATION",
@@ -220,15 +300,19 @@ public final class DocumentationStage implements Stage {
                 messages, artifacts, hash);
     }
 
-    private ObjectNode renderAttempt(String url, Source source, String from, String to,
+    private ObjectNode renderAttempt(String url, ComponentDocumentationCatalog.Source source,
+                                     String from, String to, String edgeId, String edgeClass,
                                      Optional<DocumentationPort.DocumentRef> ref) {
         ObjectNode node = Json.obj();
         node.put("url", url);
         node.put("publisher", source.publisher());
         node.put("component", source.component());
         node.put("trust_level", source.trustLevel().name());
+        node.put("scope", source.scope().name());
         node.put("source_version", from);
         node.put("target_version", to);
+        node.put("edge_id", edgeId);
+        node.put("edge_class", edgeClass);
         node.put("retrieved", ref.isPresent());
         node.put("document_id", ref.map(DocumentationPort.DocumentRef::documentId).orElse(null));
         node.put("description", source.description());
