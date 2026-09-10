@@ -43,12 +43,17 @@ final class MigrateCommand implements Callable<Integer> {
                 result -> StageRunner.print(result, context));
         if (edge != null) {
             for (Stage stage : orchestrator.edgeStages(edge)) {
-                StageResult result = stage.execute(context);
+                StageResult result = com.bootshift.stages.StageExecutor.run(stage, context);
                 StageRunner.print(result, context);
                 if (!result.succeeded()) {
                     return result.exitCode().code();
                 }
             }
+            // A single-edge migration reaches EDGE_COMPLETE exactly as the orchestrated route does.
+            // It previously did not, so driving a run one edge at a time left it permanently short
+            // of the state approval requires, with no way to finish.
+            PipelineOrchestrator.completeEdge(context, edge);
+            System.out.println("  edge " + edge + " complete");
             return ExitCode.SUCCESS.code();
         }
         PipelineOrchestrator.RunOutcome outcome = orchestrator.runEdges();
@@ -76,12 +81,15 @@ final class ValidateCommand implements Callable<Integer> {
                 new com.bootshift.stages.stage16.RuntimeValidationStage(edge),
                 new com.bootshift.stages.stage17.DifferentialStage(edge));
         for (Stage stage : stages) {
-            StageResult result = stage.execute(context);
+            StageResult result = com.bootshift.stages.StageExecutor.run(stage, context);
             StageRunner.print(result, context);
             if (!result.succeeded()) {
                 return result.exitCode().code();
             }
         }
+        // Re-validating an edge that already transformed brings it back to EDGE_COMPLETE, so a run
+        // recovered after a validation failure can be finished without re-transforming.
+        PipelineOrchestrator.completeEdge(context, edge);
         return ExitCode.SUCCESS.code();
     }
 }
@@ -126,7 +134,9 @@ final class ApproveCommand implements Callable<Integer> {
         System.out.println("  Recorded " + decision.decisionId() + " for " + request);
         System.out.println("  verdict   " + decision.verdict());
         System.out.println("  actor     " + decision.actor() + " (" + decision.role() + ")");
-        System.out.println("  signature " + decision.signature());
+        System.out.println("  integrity " + decision.integrityHash());
+        System.out.println("  note      integrity_hash detects modification of this record; it is not");
+        System.out.println("            a signature and does not authenticate the actor.");
         System.out.println();
         return StageRunner.run(new ApprovalStage(), context);
     }
@@ -142,12 +152,12 @@ final class ReportCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         StageContext context = options.context();
-        StageResult evidence = new EvidenceStage().execute(context);
+        StageResult evidence = com.bootshift.stages.StageExecutor.run(new EvidenceStage(), context);
         StageRunner.print(evidence, context);
         if (evidence.exitCode() == ExitCode.STAGE_FAILURE) {
             return evidence.exitCode().code();
         }
-        StageResult provenance = new ProvenanceStage().execute(context);
+        StageResult provenance = com.bootshift.stages.StageExecutor.run(new ProvenanceStage(), context);
         StageRunner.print(provenance, context);
         return evidence.succeeded() ? provenance.exitCode().code() : evidence.exitCode().code();
     }
@@ -168,20 +178,30 @@ final class ExportCommand implements Callable<Integer> {
             "Destination directory. Default: <output>/validated-migration")
     Path destination;
 
+    @CommandLine.Option(names = "--diagnostic", description =
+            "Export an incomplete run for inspection. The bundle is labelled NOT VALIDATED. "
+                    + "Without this flag, export refuses anything but MIGRATION_COMPLETE.")
+    boolean diagnostic;
+
     @Override
     public Integer call() {
         StageContext context = options.context();
         Path target = destination == null
                 ? options.outputRoot().resolve("validated-migration") : destination;
-        BundleExporter.Bundle bundle = new BundleExporter(context).export(target, format);
+        BundleExporter.Bundle bundle = new BundleExporter(context).export(target, format,
+                diagnostic ? BundleExporter.Mode.DIAGNOSTIC : BundleExporter.Mode.VALIDATED);
         System.out.println();
-        System.out.println("  Validated migration bundle");
+        System.out.println(bundle.validated()
+                ? "  Validated migration bundle"
+                : "  DIAGNOSTIC bundle - NOT a validated migration (status "
+                        + bundle.status() + ")");
         System.out.println("  location        " + bundle.root());
         System.out.println("  exported tree   " + bundle.exportedTreeHash());
         System.out.println("  recorded tree   " + bundle.recordedTreeHash());
         System.out.println("  hashes match    " + bundle.hashesMatch());
         System.out.println("  patch series    " + bundle.patchCount() + " patch(es)");
         System.out.println("  SBOM components " + bundle.sbomComponents());
+        System.out.println("  final build fp  " + bundle.finalBuildModelFingerprint());
         bundle.licenseFindings().forEach(f -> System.out.println("  license         " + f));
         System.out.println();
         return bundle.hashesMatch() ? 0 : ExitCode.POLICY_BLOCK.code();

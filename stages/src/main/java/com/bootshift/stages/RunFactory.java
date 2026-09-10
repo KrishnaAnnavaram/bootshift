@@ -131,9 +131,85 @@ public final class RunFactory {
         if (output.resolveLatestDir("11-plan") != null) {
             reached = RunState.PLAN_FROZEN;
         }
+
+        // The analysis half restores from published pointers. The mutating half cannot: the per-edge
+        // loop runs the same stages once per edge, so a pointer names whichever edge ran last and
+        // says nothing about the others. The edge index records what each edge actually did, and a
+        // resumed run reads its state from there.
         context.stateMachine().restore(reached, sealed, sealHash);
         if (sealed) {
             context.stateMachine().recordBaselineSeal(sealHash);
+        }
+        if (reached == RunState.PLAN_FROZEN && sealed) {
+            restoreEdgeState(context);
+        }
+        restoreFinalisationState(context, output);
+    }
+
+    /**
+     * Reconstructs the furthest edge state from the edge index.
+     *
+     * <p>Deliberately the furthest, not the last: the state machine tracks where the run got to, and
+     * an edge that completed is not undone by a later edge that failed. Which specific edges remain
+     * is answered by {@link EdgeIndex#incompleteEdges()}, which the orchestrator consults; the
+     * machine only needs to know that the run is inside the mutating half and how far in.
+     */
+    private static void restoreEdgeState(StageContext context) {
+        EdgeIndex index = EdgeIndex.open(context);
+        if (index.edges().isEmpty()) {
+            return;
+        }
+        RunState furthest = null;
+        for (EdgeIndex.EdgeRecord record : index.edges()) {
+            RunState edgeState = null;
+            if (record.reached(EdgeIndex.Phase.COMPLETE)) {
+                edgeState = RunState.EDGE_COMPLETE;
+            } else if (record.reached(EdgeIndex.Phase.DIFFERENTIAL_VALIDATED)) {
+                edgeState = RunState.EDGE_DIFFERENTIAL_VALIDATED;
+            } else if (record.reached(EdgeIndex.Phase.RUNTIME_VALIDATED)) {
+                edgeState = RunState.EDGE_RUNTIME_GRAPH_ENRICHED;
+            } else if (record.reached(EdgeIndex.Phase.TESTED)) {
+                edgeState = RunState.EDGE_TESTED;
+            } else if (record.reached(EdgeIndex.Phase.GRAPH_VERIFIED)) {
+                edgeState = RunState.EDGE_SCOPE_VERIFIED;
+            } else if (record.reached(EdgeIndex.Phase.COMPILED)) {
+                edgeState = RunState.EDGE_COMPILED;
+            } else if (record.reached(EdgeIndex.Phase.TRANSFORMED)) {
+                edgeState = RunState.EDGE_TRANSFORMED;
+            }
+            if (edgeState != null && (furthest == null || edgeState.ordinal() > furthest.ordinal())) {
+                furthest = edgeState;
+            }
+        }
+        if (furthest != null) {
+            context.stateMachine().restore(furthest, true, context.stateMachine().baselineSealHash());
+        }
+    }
+
+    /**
+     * Restores approval, evidence and completion from their published artifacts.
+     *
+     * <p>Without this a resumed run that had already sealed evidence reported itself as still inside
+     * the edge loop, and {@code bootshift report} would re-derive a completion state it had already
+     * established.
+     */
+    private static void restoreFinalisationState(StageContext context, OutputLayout output) {
+        JsonNode approval = output.readLatest("18-approval", "approval-report.json");
+        if (approval != null && approval.path("outstanding_requests").asInt(1) == 0) {
+            context.stateMachine().restore(RunState.FINAL_APPROVAL, true,
+                    context.stateMachine().baselineSealHash());
+        }
+        JsonNode result = output.readLatest("19-evidence", "migration-result.json");
+        if (result == null) {
+            return;
+        }
+        String status = result.path("status").asText("");
+        if ("MIGRATION_COMPLETE".equals(status)) {
+            context.stateMachine().restore(RunState.MIGRATION_COMPLETE, true,
+                    context.stateMachine().baselineSealHash());
+        } else if (output.resolveLatestDir("19-evidence") != null) {
+            context.stateMachine().restore(RunState.EVIDENCE_SEALED, true,
+                    context.stateMachine().baselineSealHash());
         }
     }
 

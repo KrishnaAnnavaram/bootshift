@@ -3,7 +3,7 @@ package com.bootshift.tests.wiring;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.bootshift.adapters.transform.JakartaNamespaceTransformer;
 import com.bootshift.adapters.transform.MavenPomTransformer;
-import com.bootshift.adapters.transform.OpenRewriteCoreProbe;
+import com.bootshift.adapters.transform.OpenRewriteCoreProvider;
 import com.bootshift.adapters.transform.RemovedAnnotationTransformer;
 import com.bootshift.adapters.transform.TestFrameworkTransformer;
 import com.bootshift.ports.transformation.TransformationPort;
@@ -104,11 +104,18 @@ class ControlsAreWiredTest {
                 new JakartaNamespaceTransformer(),
                 new TestFrameworkTransformer(),
                 new RemovedAnnotationTransformer(),
-                new OpenRewriteCoreProbe());
+                new OpenRewriteCoreProvider());
 
         Set<String> planned = new LinkedHashSet<>();
-        for (String edgeClass : List.of("PREPARATORY", "MAJOR_BOUNDARY", "PATCH", "MINOR")) {
+        for (String edgeClass : List.of("PREPARATORY", "MAJOR_BOUNDARY", "PATCH", "MINOR", "LANDING")) {
             planned.addAll(PlannerStage.recipesFor(edgeClass, MissingNode.getInstance()));
+            // Both schedules: with OpenRewrite available and without. A recipe that only appears on
+            // one of those paths still has to have a provider, or the path that schedules it records
+            // NO_PROVIDER and reports success while changing nothing.
+            for (boolean openRewrite : List.of(true, false)) {
+                PlannerStage.scheduleFor(edgeClass, MissingNode.getInstance(), openRewrite)
+                        .forEach(scheduled -> planned.add(scheduled.recipeId()));
+            }
         }
         assertThat(planned).contains("java.remove-annotation", "jakarta.namespace");
 

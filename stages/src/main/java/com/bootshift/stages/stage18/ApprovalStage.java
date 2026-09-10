@@ -14,6 +14,7 @@ import com.bootshift.core.util.Hashing;
 import com.bootshift.core.util.Ids;
 import com.bootshift.core.util.Json;
 import com.bootshift.ports.approval.ApprovalPort;
+import com.bootshift.ports.approval.DecisionStore;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -47,7 +48,9 @@ public final class ApprovalStage implements Stage, ApprovalPort {
     private final AtomicLong sequence = new AtomicLong();
     private final List<Request> pending = new ArrayList<>();
     private final List<Decision> decisions = new ArrayList<>();
-    private Path decisionStore;
+    /** Where decisions actually live. The stage reads them; it never writes one for a human. */
+    private DecisionStore store;
+    private final List<DecisionStore.StoredDecision> stored = new ArrayList<>();
 
     @Override
     public String id() {
@@ -81,7 +84,7 @@ public final class ApprovalStage implements Stage, ApprovalPort {
 
     @Override
     public StageResult execute(StageContext context) {
-        decisionStore = context.run().runWorkspace().resolve(DECISIONS_FILE);
+        store = context.decisions();
         loadDecisions();
 
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
@@ -130,6 +133,23 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         report.put("decision_count", decisions.size());
         report.put("outstanding_requests", outstanding);
         report.put("rule", "An empty rationale is not a decision. The harness never approves itself.");
+        report.put("decision_sources", store == null ? "none" : store.describeSources());
+        report.put("integrity_note", "integrity_hash detects modification of a stored decision. It is "
+                + "not a signature and does not authenticate the actor; actor identity is locally "
+                + "asserted unless a stored decision says otherwise.");
+        List<ObjectNode> integrity = new ArrayList<>();
+        if (store != null) {
+            for (DecisionStore.IntegrityCheck check : store.verifyIntegrity()) {
+                ObjectNode node = Json.obj();
+                node.put("decision_id", check.decisionId());
+                node.put("intact", check.intact());
+                node.put("detail", check.detail());
+                integrity.add(node);
+            }
+        }
+        report.set("integrity_checks", Json.toTree(integrity));
+        long tampered = integrity.stream().filter(n -> !n.path("intact").asBoolean(true)).count();
+        report.put("decisions_failing_integrity", tampered);
         ArrayNode decisionArray = Json.arr();
         for (Decision decision : decisions) {
             ObjectNode node = Json.obj();
@@ -144,7 +164,12 @@ public final class ApprovalStage implements Stage, ApprovalPort {
             node.set("evidence_refs", Json.toTree(decision.evidenceRefs()));
             node.put("policy_version", decision.policyVersion());
             node.put("timestamp", decision.timestamp());
-            node.put("signature", decision.signature());
+            node.put("integrity_hash", decision.integrityHash());
+            storedFor(decision.decisionId()).ifPresent(record -> {
+                node.put("integrity_algorithm", record.integrityAlgorithm());
+                node.put("actor_authentication", record.authentication().name());
+                node.put("source_ref", record.sourceRef());
+            });
             decisionArray.add(node);
         }
         report.set("decisions", decisionArray);
@@ -284,6 +309,14 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         return request;
     }
 
+    /**
+     * Files a decision into the store on behalf of a named human operator.
+     *
+     * <p>This is the CLI path: a person ran {@code bootshift approve} and supplied their name, their
+     * role and a rationale. The harness records what they said; it does not decide anything. The
+     * refusals below are the mechanism - no actor and no rationale means no decision, so a machine
+     * calling this with blank fields cannot manufacture an approval.
+     */
     @Override
     public Decision record(String requestId, String actor, String role, Verdict verdict,
                            String rationale, List<String> evidenceRefs, String policyVersion) {
@@ -294,20 +327,18 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         if (actor == null || actor.isBlank()) {
             throw HarnessException.refusal("A decision requires a named actor.");
         }
+        if (store == null) {
+            throw HarnessException.refusal("No decision store is bound; call bind(context) first.");
+        }
         String scope = pending.stream().filter(r -> r.requestId().equals(requestId))
                 .map(Request::scope).findFirst().orElse(requestId);
         Gate gate = pending.stream().filter(r -> r.requestId().equals(requestId))
                 .map(Request::gate).findFirst().orElse(Gate.EVIDENCE_SHORTFALL);
-        String decisionId = Ids.decisionId(sequence.incrementAndGet());
-        String timestamp = Instant.now().toString();
-        String signature = Hashing.sha256(String.join("|", decisionId, requestId, actor, role,
-                verdict.name(), rationale, policyVersion, timestamp));
-        Decision decision = new Decision(decisionId, requestId, gate, actor, role, scope, verdict,
-                rationale, evidenceRefs == null ? List.of() : evidenceRefs, policyVersion, timestamp,
-                signature);
-        decisions.add(decision);
-        persist(decision);
-        return decision;
+        DecisionStore.StoredDecision recorded = store.record(requestId, gate, scope, actor, role,
+                verdict, rationale, evidenceRefs, policyVersion, "cli:bootshift approve");
+        stored.add(recorded);
+        decisions.add(recorded.decision());
+        return recorded.decision();
     }
 
     @Override
@@ -327,63 +358,36 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         return List.copyOf(decisions);
     }
 
-    /** Binds the port to a run workspace so decisions can be filed outside a stage execution. */
+    /** Binds the port to the run's decision store so decisions can be filed outside a stage run. */
     public ApprovalStage bind(StageContext context) {
-        this.decisionStore = context.run().runWorkspace().resolve(DECISIONS_FILE);
+        this.store = context.decisions();
         loadDecisions();
         raiseFromEvidence(context);
         return this;
     }
 
-    private void persist(Decision decision) {
-        ObjectNode node = Json.obj();
-        node.put("decision_id", decision.decisionId());
-        node.put("request_id", decision.requestId());
-        node.put("gate", decision.gate().name());
-        node.put("actor", decision.actor());
-        node.put("role", decision.role());
-        node.put("scope", decision.scope());
-        node.put("verdict", decision.verdict().name());
-        node.put("rationale", decision.rationale());
-        node.set("evidence_refs", Json.toTree(decision.evidenceRefs()));
-        node.put("policy_version", decision.policyVersion());
-        node.put("timestamp", decision.timestamp());
-        node.put("signature", decision.signature());
-        Json.appendLine(decisionStore, node);
-    }
-
+    /** Reads decisions from the store. The stage is a reader here, never a writer. */
     private void loadDecisions() {
         decisions.clear();
-        if (decisionStore == null || !Files.isRegularFile(decisionStore)) {
+        stored.clear();
+        if (store == null) {
             return;
         }
-        try {
-            for (String line : Files.readAllLines(decisionStore)) {
-                if (line.isBlank()) {
-                    continue;
-                }
-                JsonNode node = Json.parse(line);
-                decisions.add(new Decision(node.path("decision_id").asText(),
-                        node.path("request_id").asText(),
-                        Gate.valueOf(node.path("gate").asText()),
-                        node.path("actor").asText(), node.path("role").asText(),
-                        node.path("scope").asText(),
-                        Verdict.valueOf(node.path("verdict").asText()),
-                        node.path("rationale").asText(),
-                        toList(node.path("evidence_refs")),
-                        node.path("policy_version").asText(),
-                        node.path("timestamp").asText(),
-                        node.path("signature").asText()));
-                sequence.incrementAndGet();
-            }
-        } catch (java.io.IOException e) {
-            throw new java.io.UncheckedIOException("Cannot read approval decisions", e);
+        for (DecisionStore.StoredDecision record : store.all()) {
+            stored.add(record);
+            decisions.add(record.decision());
+            sequence.incrementAndGet();
         }
     }
 
-    private static List<String> toList(JsonNode node) {
-        List<String> values = new ArrayList<>();
-        node.forEach(n -> values.add(n.asText()));
-        return values;
+    /** The stored form of a decision, when one exists, so its authentication level can be reported. */
+    public java.util.Optional<DecisionStore.StoredDecision> storedFor(String decisionId) {
+        return stored.stream()
+                .filter(d -> d.decision().decisionId().equals(decisionId))
+                .findFirst();
+    }
+
+    public List<DecisionStore.StoredDecision> storedDecisions() {
+        return List.copyOf(stored);
     }
 }

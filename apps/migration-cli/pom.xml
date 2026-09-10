@@ -23,11 +23,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.7.1</version>
         <configuration>
           <archive><manifest><mainClass>com.bootshift.cli.BootshiftCli</mainClass></manifest></archive>
           <descriptorRefs><descriptorRef>jar-with-dependencies</descriptorRef></descriptorRefs>
           <appendAssemblyId>false</appendAssemblyId>
+          <!--
+            The executable jar is produced at the documented path but is NOT attached as this
+            module's Maven artifact. Attaching it replaced the thin jar, so every consumer -
+            including the tests module - resolved a shaded copy containing a duplicate of every
+            class in the reactor. Tests then ran against whichever copy the classloader reached
+            first, which is the copy from the last full `package`, not the one just compiled. A
+            source fix could be verified as failing purely because the fat jar was stale.
+          -->
+          <attach>false</attach>
         </configuration>
         <executions>
           <execution><id>make-cli</id><phase>package</phase><goals><goal>single</goal></goals></execution>

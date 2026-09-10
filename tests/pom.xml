@@ -12,6 +12,11 @@
   <name>Bootshift :: Cross-cutting Tests</name>
   <description>Architecture (ArchUnit), schema, security-boundary, tamper, failure-injection and end-to-end tests.</description>
   <dependencies>
+    <!--
+      Depends on the CLI's thin jar, which transitively brings stages, adapters, ports and core.
+      The executable fat jar is deliberately not attached, so nothing here can resolve a shaded
+      duplicate of classes the reactor just rebuilt.
+    -->
     <dependency><groupId>com.bootshift</groupId><artifactId>bootshift-cli</artifactId><version>${project.version}</version></dependency>
     <dependency><groupId>com.tngtech.archunit</groupId><artifactId>archunit-junit5</artifactId></dependency>
   </dependencies>

@@ -67,7 +67,7 @@ public final class TestFrameworkTransformer implements TransformationPort {
         List<Capability> capabilities = new ArrayList<>();
         capabilities.add(new Capability(
                 "CAP-JUNIT4-JUPITER", PROVIDER, "bootshift-test-framework-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", "*", "*",
+                "MIT", "harness-owned", "*", "*",
                 List.of("API_REMOVED", "API_RENAMED"),
                 List.of("org.junit.", "junit."), true, true, "PREPARATORY_EDGE", 0.85,
                 "AVAILABLE",
@@ -75,7 +75,7 @@ public final class TestFrameworkTransformer implements TransformationPort {
                         + "as residual because they have no safe mechanical equivalent."));
         capabilities.add(new Capability(
                 "CAP-MOCKBEAN-MOCKITOBEAN", PROVIDER, "bootshift-test-framework-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", "3.0.0", "3.4.0",
+                "MIT", "harness-owned", "3.0.0", "3.4.0",
                 List.of("API_REMOVED", "API_RENAMED"),
                 List.of("org.springframework.boot.test.mock.mockito."), true, true, "SINGLE_EDGE", 1.0, "AVAILABLE",
                 "Replaces MockBean and SpyBean with the Spring Framework bean-override annotations."));
@@ -85,6 +85,19 @@ public final class TestFrameworkTransformer implements TransformationPort {
     @Override
     public boolean handles(String recipeId) {
         return RECIPE_JUNIT4_TO_JUPITER.equals(recipeId) || RECIPE_MOCKBEAN.equals(recipeId);
+    }
+
+    @Override
+    public java.util.Optional<Capability> capabilityFor(String recipeId, String sourceVersion,
+                                                        String targetVersion) {
+        String capabilityId = RECIPE_JUNIT4_TO_JUPITER.equals(recipeId) ? "CAP-JUNIT4-JUPITER"
+                : RECIPE_MOCKBEAN.equals(recipeId) ? "CAP-MOCKBEAN-MOCKITOBEAN" : null;
+        if (capabilityId == null) {
+            return java.util.Optional.empty();
+        }
+        return capabilities(sourceVersion, targetVersion).stream()
+                .filter(c -> c.capabilityId().equals(capabilityId))
+                .findFirst();
     }
 
     @Override

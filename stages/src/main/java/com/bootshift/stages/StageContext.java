@@ -1,5 +1,6 @@
 package com.bootshift.stages;
 
+import com.bootshift.adapters.approval.FilesystemDecisionStore;
 import com.bootshift.adapters.evidence.FilesystemEvidenceStore;
 import com.bootshift.adapters.http.HttpFetcher;
 import com.bootshift.adapters.scm.GitScmAdapter;
@@ -11,6 +12,7 @@ import com.bootshift.core.state.StateMachine;
 import com.bootshift.core.util.SchemaValidator;
 import com.bootshift.ports.ai.AIProvider;
 import com.bootshift.ports.environment.EnvironmentProvider;
+import com.bootshift.ports.approval.DecisionStore;
 import com.bootshift.ports.evidence.EvidenceObjectStore;
 import com.bootshift.ports.scm.ScmPort;
 import com.bootshift.ports.state.RunStateStore;
@@ -37,6 +39,7 @@ public final class StageContext {
     private final AIProvider ai;
     private final EnvironmentProvider environment;
     private final Path harnessRoot;
+    private final DecisionStore decisions;
 
     public StageContext(RunContext run,
                         StateMachine stateMachine,
@@ -49,6 +52,24 @@ public final class StageContext {
                         AIProvider ai,
                         EnvironmentProvider environment,
                         Path harnessRoot) {
+        this(run, stateMachine, scm, runStateStore, evidenceStore, telemetry, schemaValidator,
+                httpFetcher, ai, environment, harnessRoot,
+                new FilesystemDecisionStore(run.runWorkspace(), externalDecisionsDirectory()));
+    }
+
+    public StageContext(RunContext run,
+                        StateMachine stateMachine,
+                        ScmPort scm,
+                        RunStateStore runStateStore,
+                        EvidenceObjectStore evidenceStore,
+                        TelemetryPort telemetry,
+                        SchemaValidator schemaValidator,
+                        HttpFetcher httpFetcher,
+                        AIProvider ai,
+                        EnvironmentProvider environment,
+                        Path harnessRoot,
+                        DecisionStore decisions) {
+        this.decisions = decisions;
         this.run = run;
         this.stateMachine = stateMachine;
         this.scm = scm;
@@ -60,6 +81,32 @@ public final class StageContext {
         this.ai = ai;
         this.environment = environment;
         this.harnessRoot = harnessRoot;
+    }
+
+    /**
+     * The human decision store.
+     *
+     * <p>Reachable from any stage, deliberately. Validation needs to know whether a legitimate
+     * intentional-change decision exists, and routing that question through the approval stage - which
+     * runs after validation and derives its gates from validation's output - made the two mutually
+     * dependent.
+     */
+    public DecisionStore decisions() {
+        return decisions;
+    }
+
+    /**
+     * Where externally supplied decisions are read from.
+     *
+     * <p>Outside the run workspace on purpose: a decision that only exists inside the artifacts of
+     * the run it approves cannot have been supplied independently of it.
+     */
+    public static Path externalDecisionsDirectory() {
+        String configured = System.getenv("BOOTSHIFT_DECISIONS_DIR");
+        if (configured != null && !configured.isBlank()) {
+            return Path.of(configured);
+        }
+        return Path.of(System.getProperty("user.home"), ".bootshift", "decisions");
     }
 
     public RunContext run() {

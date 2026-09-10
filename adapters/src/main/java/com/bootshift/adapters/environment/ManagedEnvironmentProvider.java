@@ -29,6 +29,9 @@ public final class ManagedEnvironmentProvider implements EnvironmentProvider {
 
     private final Map<String, ProvisionedEnvironment> provisioned = new LinkedHashMap<>();
     private final Map<String, String> infrastructureOverrides;
+    private final Map<String, List<ContainerProvisioner.Provisioned>> provisionedContainers =
+            new LinkedHashMap<>();
+    private ContainerProvisioner containerProvisioner;
 
     public ManagedEnvironmentProvider() {
         this(Map.of());
@@ -62,7 +65,17 @@ public final class ManagedEnvironmentProvider implements EnvironmentProvider {
         attributes.add(new Attribute("timezone", "UTC", Constraint.MUST_MATCH, "harness-forced"));
         attributes.add(new Attribute("clock.strategy", "system-utc", Constraint.MUST_MATCH, "harness-forced"));
         attributes.add(new Attribute("file.encoding", "UTF-8", Constraint.MUST_MATCH, "harness-forced"));
-        attributes.add(new Attribute("network.egress", "allowlist", Constraint.MUST_MATCH, "harness-policy"));
+        // What is actually enforced, and only that. The allowlist governs the harness's own HTTP
+        // client. It does not govern the child processes - Maven resolving dependencies, the
+        // application opening a connection - because nothing in this deployment intercepts their
+        // traffic. Recording "network.egress = allowlist" as though it covered everything claimed a
+        // control that does not exist for the processes that matter most.
+        attributes.add(new Attribute("network.egress.harness", "allowlist",
+                Constraint.MUST_MATCH, "harness-http-client"));
+        attributes.add(new Attribute("network.egress.child.processes", "UNRESTRICTED",
+                Constraint.MUST_MATCH,
+                "no mechanism in this deployment restricts egress from build tools or from the "
+                        + "application under analysis"));
 
         // Expected to differ: this is the whole point of the migration.
         attributes.add(new Attribute("java.version", System.getProperty("java.version"),
@@ -82,23 +95,57 @@ public final class ManagedEnvironmentProvider implements EnvironmentProvider {
         List<String> gaps = new ArrayList<>();
         Map<String, String> endpoints = new LinkedHashMap<>(infrastructureOverrides);
 
-        String oci = detectOciRuntime();
+        // A binary on PATH is not a runtime: Docker Desktop is routinely installed with its engine
+        // stopped. Availability is decided by asking the daemon.
+        ContainerProvisioner containers = provisioner();
+        String oci = containers.runtime();
         if (oci == null) {
-            gaps.add("NO_OCI_RUNTIME: no rootless OCI runtime (podman/docker) was detected, so "
-                    + "infrastructure dependencies cannot be provisioned by the harness. Any dimension "
-                    + "requiring a database, broker or cache is recorded as unobservable rather than "
-                    + "assumed equivalent.");
-            attributes.add(new Attribute("container.runtime", "none", Constraint.MUST_MATCH, "probe"));
+            gaps.add("NO_OCI_RUNTIME: no rootless OCI runtime daemon (podman/docker/nerdctl) "
+                    + "answered, so infrastructure dependencies cannot be provisioned by the harness. "
+                    + "Any dimension requiring a database, broker or cache is recorded as "
+                    + "NOT_COMPARED rather than assumed equivalent.");
+            attributes.add(new Attribute("container.runtime", "none", Constraint.MUST_MATCH,
+                    "daemon-probe"));
         } else {
-            attributes.add(new Attribute("container.runtime", oci, Constraint.MUST_MATCH, "probe"));
+            attributes.add(new Attribute("container.runtime", oci, Constraint.MUST_MATCH,
+                    "daemon-probe"));
         }
 
+        // Provision exactly what was asked for, and nothing else. Starting a database the graph
+        // never mentioned costs minutes and proves nothing.
         for (Map.Entry<String, String> requirement : requirements.entrySet()) {
-            if (requirement.getKey().startsWith("infrastructure.")
-                    && !endpoints.containsKey(requirement.getKey())) {
-                if (oci == null) {
-                    gaps.add("UNPROVISIONED: " + requirement.getKey() + " requested but no runtime available");
-                }
+            if (!requirement.getKey().startsWith("infrastructure.")) {
+                continue;
+            }
+            String component = requirement.getKey().substring("infrastructure.".length());
+            if (endpoints.containsKey(component)) {
+                // Supplied externally; the harness did not create it and says so.
+                attributes.add(new Attribute("infrastructure." + component + ".source", "EXTERNAL",
+                        Constraint.MUST_MATCH, "operator-supplied"));
+                continue;
+            }
+            if (oci == null) {
+                gaps.add("UNPROVISIONED: " + component + " is required by this module but no "
+                        + "container runtime is available to supply it");
+                continue;
+            }
+            ContainerProvisioner.Provisioned provisionedContainer =
+                    containers.provision(component, role);
+            provisionedContainers.computeIfAbsent(role, k -> new ArrayList<>())
+                    .add(provisionedContainer);
+            if (provisionedContainer.usable()) {
+                endpoints.put(component, provisionedContainer.endpoint());
+                // The digest, not just the tag: two sides that pulled different builds of the same
+                // tag are two different environments.
+                attributes.add(new Attribute("infrastructure." + component + ".image",
+                        provisionedContainer.image() + ":" + provisionedContainer.tag(),
+                        Constraint.MUST_MATCH, "container-provisioner"));
+                attributes.add(new Attribute("infrastructure." + component + ".digest",
+                        provisionedContainer.digest(), Constraint.MUST_MATCH,
+                        "container-provisioner"));
+            } else {
+                gaps.add("UNPROVISIONED: " + component + " could not be started: "
+                        + provisionedContainer.unusableReason());
             }
         }
 
@@ -134,20 +181,44 @@ public final class ManagedEnvironmentProvider implements EnvironmentProvider {
         return checks;
     }
 
+    /** Lazily created so a run that never needs infrastructure never probes for a runtime. */
+    private synchronized ContainerProvisioner provisioner() {
+        if (containerProvisioner == null) {
+            containerProvisioner = new ContainerProvisioner();
+        }
+        return containerProvisioner;
+    }
+
+    /** Everything this provider started, for the evidence record. */
+    public Map<String, List<ContainerProvisioner.Provisioned>> provisionedContainers() {
+        return provisionedContainers;
+    }
+
     @Override
     public void release(String role) {
         provisioned.remove(role);
+        provisionedContainers.remove(role);
+        // Deterministic cleanup. A container left running holds a port that the next run needs.
+        if (containerProvisioner != null && provisionedContainers.isEmpty()) {
+            List<String> failures = containerProvisioner.release();
+            failures.forEach(failure ->
+                    org.slf4j.LoggerFactory.getLogger(ManagedEnvironmentProvider.class)
+                            .warn("Could not remove container {}", failure));
+        }
     }
 
-    /** Detects a rootless OCI runtime whose license passes the strict-OSS gate. */
+    /**
+     * Detects a rootless OCI runtime whose daemon actually answers.
+     *
+     * <p>The previous implementation returned the first candidate whose binary was on {@code PATH}.
+     * On a machine with Docker Desktop installed but stopped that reported
+     * {@code container.runtime=docker} while nothing could be provisioned - claiming an isolation
+     * mechanism the run did not have.
+     */
     public static String detectOciRuntime() {
-        for (String candidate : List.of("podman", "docker", "nerdctl")) {
-            String resolved = ProcessRunner.which(candidate);
-            if (resolved != null) {
-                return candidate;
-            }
-        }
-        return null;
+        return ContainerProvisioner.detectWorkingRuntime(new ProcessRunner(
+                java.util.Set.of("podman", "podman.exe", "docker", "docker.exe",
+                        "nerdctl", "nerdctl.exe"), 4000));
     }
 
     private static String fingerprint(String role, List<Attribute> attributes) {

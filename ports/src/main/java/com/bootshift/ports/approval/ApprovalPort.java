@@ -25,9 +25,20 @@ public interface ApprovalPort {
                    List<String> evidenceRefs, String raisedBy, String raisedAt) {
     }
 
+    /**
+     * One recorded decision.
+     *
+     * <p>{@code integrityHash} was called {@code signature}. It is a keyed hash over the decision's
+     * fields, computed with a key held alongside the store, so it detects modification and does not
+     * authenticate anybody. Naming it a signature claimed a property the harness cannot provide, and
+     * a reader who trusted that name would have believed an approval was cryptographically attested
+     * when the actor was simply whatever string the caller typed. The
+     * {@link DecisionStore.ActorAuthentication} recorded with each stored decision says which of the
+     * two it actually is.
+     */
     record Decision(String decisionId, String requestId, Gate gate, String actor, String role,
                     String scope, Verdict verdict, String rationale, List<String> evidenceRefs,
-                    String policyVersion, String timestamp, String signature) {
+                    String policyVersion, String timestamp, String integrityHash) {
     }
 
     Request raise(Gate gate, String scope, String summary, List<String> evidenceRefs, String raisedBy);

@@ -20,8 +20,11 @@ import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
 import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.ports.environment.EnvironmentProvider;
+import com.bootshift.ports.characterization.Scenario;
+import com.bootshift.ports.characterization.ScenarioObservation;
 import com.bootshift.ports.runtime.RuntimeProbePort;
 import com.bootshift.stages.EdgeSupport;
+import com.bootshift.stages.EdgeToolchain;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -90,7 +93,7 @@ public final class RuntimeValidationStage implements Stage {
 
     @Override
     public List<String> outputArtifacts() {
-        return List.of("runtime-report.json", "configuration-binding.json",
+        return List.of("runtime-report.json", "scenario-observations-new.json", "configuration-binding.json",
                 "runtime-graph-current.json", "application-graph-current-enriched.json",
                 "silently-ignored-properties.json", "manifest.json");
     }
@@ -127,9 +130,12 @@ public final class RuntimeValidationStage implements Stage {
         EnvironmentProvider.ProvisionedEnvironment environment = context.environment()
                 .provision("runtime-new-" + edgeId, requirements(buildModel));
 
-        ToolchainProbe toolchainProbe = new ToolchainProbe();
-        String javaHome = toolchainProbe.select(17, toolchainProbe.discover())
-                .map(jdk -> jdk.home().toString()).orElse(null);
+        // The frozen edge toolchain, not a hardcoded 17 and not whatever java is on PATH. The
+        // application must be packaged and started on the JDK the edge selected, or the runtime
+        // observation is about a different toolchain than the one being migrated to.
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain.Verification toolchainVerification = toolchain.verify();
+        String javaHome = toolchain.resolved().javaHome();
         MavenBuildAdapter maven = new MavenBuildAdapter();
         SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(logs);
 
@@ -151,16 +157,12 @@ public final class RuntimeValidationStage implements Stage {
                 continue;
             }
             Map<String, String> packageOptions = new LinkedHashMap<>();
-            if (javaHome != null) {
-                packageOptions.put("bootshift.javaHome", javaHome);
-            }
+            packageOptions.putAll(toolchain.buildOptions(null));
             maven.invoke(moduleRoot, List.of("-B", "-DskipTests", "package"), packageOptions);
 
             Map<String, String> settings = new LinkedHashMap<>();
             settings.put("fingerprint", environment.fingerprint());
-            if (javaHome != null) {
-                settings.put("bootshift.javaHome", javaHome);
-            }
+            settings.putAll(toolchain.buildOptions(null));
             settings.putAll(ValidationSupport.runtimeSettings(module.moduleId(), graph, buildModel));
 
             RuntimeProbePort.ProbeResult result =
@@ -254,7 +256,20 @@ public final class RuntimeValidationStage implements Stage {
         StageSupport.toEvidence(context, "runtime-report", reportArtifact,
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
-        String hash = StageSupport.publish(context, writer);
+        // ---------------------------------------------------------------- frozen scenarios on NEW
+        //
+        // The same scenario objects that were executed against the original application, executed
+        // now against the migrated one. This is what differential validation compares; without it
+        // the comparison has nothing to work from but Actuator metadata, which describes the shape
+        // of a context rather than the behaviour of an endpoint.
+        ObjectNode scenarioArtifact = executeFrozenScenarios(context, edgePlan, buildModel, graph,
+                toolchain, envelope);
+        writer.write("scenario-observations-new.json",
+                StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
+                        scenarioArtifact));
+
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.RUNTIME_VALIDATED, "published");
         context.stateMachine().transition(RunState.EDGE_RUNTIME_VALIDATED,
                 started + " module(s) started");
         context.stateMachine().transition(RunState.EDGE_RUNTIME_GRAPH_ENRICHED,
@@ -435,5 +450,111 @@ public final class RuntimeValidationStage implements Stage {
 
     private static String safe(String value) {
         return value == null ? "unknown" : value.replaceAll("[^A-Za-z0-9._-]", "_");
+    }
+
+    // ------------------------------------------------------------------ scenario execution on NEW
+
+    /**
+     * Executes every frozen scenario against the migrated application.
+     *
+     * <p>Only scenarios that are actually oracles are executed: a scenario still in
+     * AWAITING_OLD_OBSERVATION has no expected value, so running it against NEW would produce a
+     * number with nothing to compare it to, and recording that as evidence would be worse than
+     * recording nothing.
+     */
+    private ObjectNode executeFrozenScenarios(StageContext context, JsonNode edgePlan,
+                                              BuildSystemPort.BuildModel buildModel,
+                                              ApplicationGraph graph, EdgeToolchain toolchain,
+                                              Envelope envelope) {
+        ObjectNode artifact = Json.obj();
+        JsonNode scenarioSource = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-scenarios.json");
+        if (scenarioSource == null) {
+            artifact.put("count", 0);
+            artifact.put("reason", "No executable scenarios were produced by characterization");
+            artifact.set("observations", Json.arr());
+            envelope.blindSpot(new Envelope.BlindSpot("BS-SCENARIO-NONE", "CHARACTERIZATION",
+                    "No executable scenarios exist for this run",
+                    "Differential validation has no behavioural contract to compare, so no "
+                            + "dimension can reach E4"));
+            return artifact;
+        }
+
+        List<Scenario> executable = new ArrayList<>();
+        int notOracles = 0;
+        for (JsonNode node : scenarioSource.path("scenarios")) {
+            Scenario scenario = Scenario.fromNode(node);
+            if (scenario.state().isOracle()) {
+                executable.add(scenario);
+            } else {
+                notOracles++;
+            }
+        }
+
+        List<ScenarioObservation> observations = new ArrayList<>();
+        List<String> failures = new ArrayList<>();
+        Set<String> modules = new LinkedHashSet<>();
+        executable.forEach(scenario -> modules.add(scenario.module()));
+
+        SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(
+                context.run().runWorkspace().resolve("scenario-logs"));
+        Path workspace = context.run().migrationWorkspace();
+        int modulesExecuted = 0;
+
+        for (String moduleId : modules) {
+            List<Scenario> forModule = executable.stream()
+                    .filter(scenario -> moduleId.equals(scenario.module()))
+                    .toList();
+            if (forModule.isEmpty()) {
+                continue;
+            }
+            Path moduleRoot = ".".equals(moduleId) ? workspace : workspace.resolve(moduleId);
+            if (!Files.isDirectory(moduleRoot)) {
+                forModule.forEach(scenario -> observations.add(ScenarioObservation.notExecuted(
+                        scenario.scenarioId(), ScenarioObservation.Side.NEW,
+                        "Module " + moduleId + " is absent from the migration workspace")));
+                continue;
+            }
+            Map<String, String> settings = new LinkedHashMap<>();
+            settings.put("fingerprint", "scenario-new");
+            settings.putAll(toolchain.buildOptions(null));
+            settings.putAll(ValidationSupport.runtimeSettings(moduleId, graph, buildModel));
+
+            SpringProcessRuntimeProbe.ScenarioRun run = probe.runScenarios(moduleRoot, moduleId,
+                    forModule, ScenarioObservation.Side.NEW, settings);
+            observations.addAll(run.observations());
+            if (run.started()) {
+                modulesExecuted++;
+            } else {
+                failures.add("Module " + moduleId + ": " + run.failureReason());
+            }
+        }
+
+        long executed = observations.stream().filter(ScenarioObservation::successful).count();
+        artifact.put("count", observations.size());
+        artifact.put("side", "NEW");
+        artifact.put("oracles_available", executable.size());
+        artifact.put("scenarios_without_an_oracle", notOracles);
+        artifact.put("successfully_executed", executed);
+        artifact.put("modules_executed", modulesExecuted);
+        artifact.set("failures", Json.toTree(failures));
+        artifact.put("rule", "Only scenarios that were executed against the original application are "
+                + "executed here. A scenario with no oracle produces a number with nothing to "
+                + "compare it against.");
+        artifact.set("observations",
+                Json.toTree(observations.stream().map(ScenarioObservation::toNode).toList()));
+
+        if (notOracles > 0) {
+            envelope.gap(new Envelope.Gap("GAP-SCENARIO-ORACLE", "CHARACTERIZATION",
+                    notOracles + " scenario(s) have no frozen oracle and were not executed against "
+                            + "the migrated application",
+                    "Those behaviours are NOT_COMPARED and cannot contribute to E4"));
+        }
+        if (!failures.isEmpty()) {
+            envelope.gap(new Envelope.Gap("GAP-SCENARIO-EXEC", "RUNTIME",
+                    failures.size() + " module(s) could not run their scenarios on the migrated side",
+                    "Every scenario for those modules is NOT_COMPARED"));
+        }
+        return artifact;
     }
 }

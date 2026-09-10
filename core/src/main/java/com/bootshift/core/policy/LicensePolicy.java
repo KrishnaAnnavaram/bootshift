@@ -48,6 +48,48 @@ public final class LicensePolicy {
             "io.moderne:moderne-recipe",
             "io.moderne.recipe:rewrite-spring"));
 
+    /**
+     * Java package prefixes that must never be loadable at runtime under the strict-OSS profile.
+     *
+     * <p>This is the single source of truth. The OpenRewrite provider probes against it, the
+     * architecture test forbids a compile-time dependency on it, and the dependency test checks the
+     * coordinates that would introduce it. Three copies of this list is how one of them silently
+     * stops matching the other two.
+     */
+    private static final List<String> FORBIDDEN_RECIPE_PACKAGES = List.of(
+            "org.openrewrite.java.spring",
+            "org.openrewrite.recipe.spring",
+            "io.moderne");
+
+    /**
+     * Marker classes used to detect a forbidden estate on the classpath. Probing a package name is
+     * not enough - a package with no loaded class is invisible to {@code Class.forName} - so each
+     * estate contributes at least one class that only it ships.
+     */
+    private static final List<String> FORBIDDEN_RECIPE_MARKER_CLASSES = List.of(
+            "org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0",
+            "org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7",
+            "org.openrewrite.java.spring.NoAutowiredOnConstructor",
+            "io.moderne.recipe.ModerneRecipe");
+
+    /** Package prefixes no Bootshift component may load. Never mutated by configuration. */
+    public static List<String> forbiddenRecipePackages() {
+        return FORBIDDEN_RECIPE_PACKAGES;
+    }
+
+    /** Classes whose presence proves a forbidden estate is on the classpath. */
+    public static List<String> forbiddenRecipeMarkerClasses() {
+        return FORBIDDEN_RECIPE_MARKER_CLASSES;
+    }
+
+    /** True when the class name belongs to a forbidden recipe estate. */
+    public static boolean isForbiddenRecipeClass(String className) {
+        if (className == null) {
+            return false;
+        }
+        return FORBIDDEN_RECIPE_PACKAGES.stream().anyMatch(p -> className.startsWith(p + "."));
+    }
+
     private final Set<String> allowlist;
     private final Set<String> denylist;
     private final Set<String> forbiddenArtifacts;

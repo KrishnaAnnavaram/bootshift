@@ -8,6 +8,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.evidence.EvidenceManifest;
+import com.bootshift.adapters.transform.YamlPropertyModel;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.EdgeType;
 import com.bootshift.core.graph.GraphNode;
@@ -329,32 +330,97 @@ public final class ImpactStage implements Stage {
                     resolved ? 0.95 : 0.5, node.getLineStart(), resolved));
         }
 
-        // 2. textual scan for namespace-level facts the graph cannot carry as a single node.
+        // 2. Declaration match: a file whose package plus type declaration IS the subject.
+        //
+        // A fully qualified subject rarely appears verbatim in the file that declares it - the
+        // package is on one line and the type name on another - so a literal scan misses the
+        // declaring file entirely while a simple-name scan hits every same-named type in the
+        // repository. Matching the pair distinguishes com.example.billing.Order from
+        // com.example.catalogue.Order.
+        if (subject.contains(".")) {
+            String packageName = subject.substring(0, subject.lastIndexOf('.'));
+            for (FileRecord record : registry.active()) {
+                if (!record.getRole().isJavaSource()) {
+                    continue;
+                }
+                String content = readSource(root, record, sourceCache);
+                if (content == null || !declaresType(content, packageName, simpleName)) {
+                    continue;
+                }
+                if (matches.stream().anyMatch(m -> record.getFileId().equals(m.fileId()))) {
+                    continue;
+                }
+                matches.add(new Match(record.getFileId(), null, "FILE:" + record.getFileId(),
+                        Classification.DEFINITELY_AFFECTED,
+                        record.getCurrentPath() + " declares " + subject
+                                + " (package declaration plus type declaration); this is the "
+                                + "fully qualified type the fact names, not another type sharing "
+                                + "its simple name",
+                        0.9, lineOf(content, Math.max(0, content.indexOf(simpleName))), true));
+            }
+        }
+
+        // 3. Textual scan for namespace-level facts the graph cannot carry as a single node.
+        //
+        // Two rules make this usable rather than noisy. Comments and string literals are removed
+        // first, because a file that merely mentions a removed API in prose is not affected by its
+        // removal. And the match must sit on Java identifier boundaries, because
+        // "EnableEurekaClientMetrics" contains "EnableEurekaClient" and is a different symbol.
         if (searchToken.length() >= 4) {
             Pattern pattern = Pattern.compile(Pattern.quote(searchToken));
             for (FileRecord record : registry.active()) {
                 if (!record.getRole().isJavaSource()) {
                     continue;
                 }
-                String content = readSource(root, record, sourceCache);
-                if (content == null) {
+                String raw = readSource(root, record, sourceCache);
+                if (raw == null) {
                     continue;
                 }
+                String content = stripCommentsAndLiterals(raw);
                 var matcher = pattern.matcher(content);
-                if (!matcher.find()) {
-                    continue;
+                Integer hit = null;
+                while (matcher.find()) {
+                    if (isIdentifierBoundedMatch(content, matcher.start(), matcher.end())) {
+                        hit = matcher.start();
+                        break;
+                    }
+                }
+                boolean reflective = false;
+                if (hit == null) {
+                    // Not a code reference. It may still be a reflective one: a type named only
+                    // inside Class.forName or getBean is genuinely used, and dropping it because
+                    // literals were stripped would trade a false positive for a false negative.
+                    Integer reflectiveHit = findReflectiveLiteral(raw, searchToken);
+                    if (reflectiveHit == null) {
+                        continue;
+                    }
+                    hit = reflectiveHit;
+                    reflective = true;
                 }
                 boolean alreadyMatched = matches.stream()
                         .anyMatch(m -> record.getFileId().equals(m.fileId()));
                 if (alreadyMatched) {
                     continue;
                 }
+                if (reflective) {
+                    // POSSIBLE, never definite: static analysis cannot prove the branch executes,
+                    // and it cannot see a name assembled at runtime either.
+                    matches.add(new Match(record.getFileId(), null, "FILE:" + record.getFileId(),
+                            Classification.POSSIBLY_AFFECTED,
+                            record.getCurrentPath() + " names " + searchToken + " inside a string "
+                                    + "literal passed to a reflective API. Static analysis cannot "
+                                    + "prove this executes, and cannot see names assembled at "
+                                    + "runtime at all, so this is POSSIBLE rather than definite.",
+                            0.45, lineOf(raw, hit), false));
+                    continue;
+                }
                 // A textual match is not a type-resolved fact, so it is capped.
                 matches.add(new Match(record.getFileId(), null, "FILE:" + record.getFileId(),
                         Classification.LIKELY_AFFECTED.capAt(Classification.POSSIBLY_AFFECTED),
-                        "Source of " + record.getCurrentPath() + " contains the token " + searchToken
-                                + "; this is a textual match, not a type-resolved reference",
-                        0.55, lineOf(content, matcher.start()), false));
+                        "Source of " + record.getCurrentPath() + " references the token "
+                                + searchToken + " outside comments and string literals; this is a "
+                                + "textual match, not a type-resolved reference",
+                        0.55, lineOf(content, hit), false));
             }
         }
         return matches;
@@ -402,7 +468,9 @@ public final class ImpactStage implements Stage {
             if (content == null) {
                 continue;
             }
-            Integer line = findPropertyLine(content, subject);
+            boolean yaml = record.getCurrentPath().endsWith(".yml")
+                    || record.getCurrentPath().endsWith(".yaml");
+            Integer line = findPropertyLine(content, subject, yaml);
             if (line == null) {
                 continue;
             }
@@ -471,6 +539,30 @@ public final class ImpactStage implements Stage {
      * flow-style YAML. Nested YAML is left to the graph's configuration view, and a miss here is a
      * miss, not a guess.
      */
+    /**
+     * Finds the line binding a property.
+     *
+     * <p>YAML nests: {@code server.max-http-header-size} is written as {@code max-http-header-size}
+     * indented under {@code server}, so a flat comparison of "the text before the separator" against
+     * the dotted key never matches and the property looks unused. The dotted key is resolved
+     * structurally for YAML and compared directly for properties files.
+     */
+    static Integer findPropertyLine(String content, String key, boolean yaml) {
+        if (yaml) {
+            YamlPropertyModel model = YamlPropertyModel.parse(content);
+            if (model.parsed()) {
+                for (YamlPropertyModel.Leaf leaf : model.leaves()) {
+                    if (leaf.dottedKey().equals(key) || leaf.dottedKey().startsWith(key + ".")) {
+                        return leaf.keyLine() + 1;
+                    }
+                }
+                return null;
+            }
+            // Unparseable YAML: fall through to the flat scan and let the confidence say so.
+        }
+        return findPropertyLine(content, key);
+    }
+
     private static Integer findPropertyLine(String content, String key) {
         String[] lines = content.split("\\R");
         for (int i = 0; i < lines.length; i++) {
@@ -688,5 +780,152 @@ public final class ImpactStage implements Stage {
 
     static String normalize(String value) {
         return value == null ? null : value.toLowerCase(Locale.ROOT);
+    }
+
+    // ------------------------------------------------------------------ textual matching helpers
+
+    /**
+     * True when the file declares exactly this fully qualified type.
+     *
+     * <p>Both halves are required. The package alone matches every type in it; the simple name alone
+     * matches every same-named type anywhere in the repository, which is how an ambiguous simple
+     * name turns one real finding into several wrong ones.
+     */
+    static boolean declaresType(String content, String packageName, String simpleName) {
+        String stripped = stripCommentsAndLiterals(content);
+        java.util.regex.Matcher packageMatcher = java.util.regex.Pattern
+                .compile("(?m)^\\s*package\\s+" + Pattern.quote(packageName) + "\\s*;")
+                .matcher(stripped);
+        if (!packageMatcher.find()) {
+            return false;
+        }
+        return java.util.regex.Pattern
+                .compile("\\b(class|interface|enum|record|@interface)\\s+"
+                        + Pattern.quote(simpleName) + "\\b")
+                .matcher(stripped)
+                .find();
+    }
+
+    /**
+     * True when a match sits on Java identifier boundaries.
+     *
+     * <p>Without this, a search for {@code EnableEurekaClient} matches inside
+     * {@code EnableEurekaClientMetrics}, which is a different symbol that the removal does not
+     * affect. A leading {@code .} is allowed because a qualified reference legitimately has one.
+     */
+    static boolean isIdentifierBoundedMatch(String content, int start, int end) {
+        if (start > 0) {
+            char before = content.charAt(start - 1);
+            if (Character.isJavaIdentifierPart(before)) {
+                return false;
+            }
+        }
+        if (end < content.length()) {
+            char after = content.charAt(end);
+            if (Character.isJavaIdentifierPart(after)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Blanks out comments and string literals, preserving offsets and line structure.
+     *
+     * <p>Offsets are preserved by replacing each removed character with a space rather than deleting
+     * it, so a reported line number still points at the right line. A file that mentions a removed
+     * API only in prose is not affected by its removal, and reporting it as affected sends a
+     * reviewer to read a comment.
+     */
+    static String stripCommentsAndLiterals(String content) {
+        char[] out = content.toCharArray();
+        int i = 0;
+        int n = out.length;
+        while (i < n) {
+            char c = out[i];
+            if (c == '/' && i + 1 < n && out[i + 1] == '/') {
+                while (i < n && out[i] != '\n') {
+                    out[i++] = ' ';
+                }
+            } else if (c == '/' && i + 1 < n && out[i + 1] == '*') {
+                out[i++] = ' ';
+                out[i++] = ' ';
+                while (i < n && !(out[i] == '*' && i + 1 < n && out[i + 1] == '/')) {
+                    if (out[i] != '\n') {
+                        out[i] = ' ';
+                    }
+                    i++;
+                }
+                if (i < n) {
+                    out[i++] = ' ';
+                }
+                if (i < n) {
+                    out[i++] = ' ';
+                }
+            } else if (c == '"' || c == '\'') {
+                char quote = c;
+                out[i++] = ' ';
+                while (i < n && out[i] != quote) {
+                    if (out[i] == '\\' && i + 1 < n) {
+                        out[i++] = ' ';
+                        if (i < n && out[i] != '\n') {
+                            out[i++] = ' ';
+                        }
+                        continue;
+                    }
+                    if (out[i] == '\n') {
+                        break;
+                    }
+                    out[i++] = ' ';
+                }
+                if (i < n && out[i] == quote) {
+                    out[i++] = ' ';
+                }
+            } else {
+                i++;
+            }
+        }
+        return new String(out);
+    }
+
+    /**
+     * Markers that make a string literal a type reference rather than prose.
+     *
+     * <p>{@code Class.forName("com.example.Removed")} uses the type. {@code String NOTE =
+     * "com.example.Removed"} mentions it. The difference is the call the literal is an argument to,
+     * so that is what is looked for.
+     */
+    private static final List<String> REFLECTIVE_MARKERS = List.of(
+            "Class.forName", "forName", "loadClass", "getBean", "getDeclaredMethod", "getMethod",
+            "getDeclaredField", "getField", "newInstance", "ConditionalOnClass",
+            "ConditionalOnMissingBean", "beanClassName", "setBeanClassName", "registerBeanDefinition",
+            "resolveClassName", "getConstructor", "getDeclaredConstructor", "MethodHandles",
+            "ServiceLoader.load", "Proxy.newProxyInstance");
+
+    /**
+     * Finds the token inside a string literal that is an argument to a reflective API.
+     *
+     * <p>The window looks backwards from the literal rather than forwards, because the call name
+     * precedes its argument, and it is bounded so an unrelated call earlier in the file cannot
+     * lend its meaning to a literal far below it.
+     */
+    static Integer findReflectiveLiteral(String content, String token) {
+        java.util.regex.Matcher literal = java.util.regex.Pattern
+                .compile("\"(?:[^\"\\\\]|\\\\.)*\"")
+                .matcher(content);
+        while (literal.find()) {
+            String value = literal.group();
+            if (!value.contains(token)) {
+                continue;
+            }
+            int windowStart = Math.max(0, literal.start() - 120);
+            String window = content.substring(windowStart, literal.start());
+            for (String marker : REFLECTIVE_MARKERS) {
+                if (window.contains(marker)) {
+                    return literal.start();
+                }
+            }
+        }
+        return null;
     }
 }

@@ -79,7 +79,7 @@ public final class JakartaNamespaceTransformer implements TransformationPort {
         boolean relevant = majorOf(sourceVersion) < 3 && majorOf(targetVersion) >= 3;
         return List.of(new Capability(
                 "CAP-JAKARTA-NAMESPACE", PROVIDER, "bootshift-jakarta-transformer", "1.0.0",
-                "Apache-2.0", "harness-owned", "2.x", "3.x",
+                "MIT", "harness-owned", "2.x", "3.x",
                 List.of("API_RENAMED", "ARTIFACT_RELOCATED"),
                 // "javax." covers both shapes the knowledge base produces: a per-package fact whose
                 // subject is javax.persistence, and the structural boundary fact whose subject is

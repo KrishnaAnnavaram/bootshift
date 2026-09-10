@@ -88,7 +88,8 @@ public final class EvidenceStage implements Stage {
     @Override
     public List<String> outputArtifacts() {
         return List.of("migration-report.md", "migration-result.json", "evidence-manifest.json",
-                "file-lineage.json", "symbol-lineage.json", "claims.json", "manifest.json");
+                "file-lineage.json", "symbol-lineage.json", "claims.json", "edge-evidence.json",
+                "coverage-statement.json", "MIGRATION_DOCUMENT.md", "manifest.json");
     }
 
     @Override
@@ -114,6 +115,13 @@ public final class EvidenceStage implements Stage {
         JsonNode target = StageSupport.optionalUpstream(context, "06-target", "target-state.json");
         JsonNode plan = StageSupport.optionalUpstream(context, "11-plan", "migration-plan.json");
         JsonNode graphDiff = StageSupport.optionalUpstream(context, "14-graph-diff", "graph-diff.json");
+        JsonNode edgePlan = StageSupport.optionalUpstream(context, "11-plan", "edge-plan.json");
+
+        // Every planned edge, proven from the edge index rather than from whichever edge published
+        // last. This is the difference between "the migration was validated" and "edge eight was".
+        EdgeEvidenceAggregator.Aggregate perEdge =
+                EdgeEvidenceAggregator.aggregate(context, edgePlan);
+        List<JsonNode> allComparisons = EdgeEvidenceAggregator.allComparisons(context, edgePlan);
 
         FileRegistry registry = EdgeSupport.loadRegistry(context);
         ChangeLedger.Verification ledgerVerification = EdgeSupport.verifyLedger(context);
@@ -133,10 +141,10 @@ public final class EvidenceStage implements Stage {
         List<Claim> claims = new ArrayList<>();
         claims.add(inventoryClaim(inventory));
         claims.add(structureClaim(graphVerification));
-        claims.add(buildClaim(buildReport));
-        claims.add(testClaim(testReport));
-        claims.add(runtimeClaim(runtimeReport));
-        claims.addAll(differentialClaims(differential, approvals));
+        claims.add(buildClaim(perEdge));
+        claims.add(testClaim(perEdge));
+        claims.add(runtimeClaim(perEdge));
+        claims.addAll(differentialClaims(allComparisons, perEdge, approvals));
         claims.forEach(manifest::claim);
 
         // ---- evidence entries --------------------------------------------------------------------
@@ -148,6 +156,10 @@ public final class EvidenceStage implements Stage {
                 .stat("evidence_entries", indexed)
                 .stat("claims", claims.size())
                 .stat("manifest_hash", manifestHash), manifestNode));
+
+        ObjectNode edgeEvidence = EdgeEvidenceAggregator.toNode(perEdge);
+        writer.write("edge-evidence.json",
+                StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), edgeEvidence));
 
         ObjectNode claimsArtifact = Json.obj();
         ArrayNode claimArray = Json.arr();
@@ -264,23 +276,51 @@ public final class EvidenceStage implements Stage {
                         + " but policy requires " + required + " (" + claim.getCoverage().render() + ")");
             }
         }
-        long unexplained = differential == null ? 0
-                : differential.path("classification_counts").path("UNEXPLAINED").asLong(0);
-        long outstandingApprovals = approvals == null ? 0
-                : approvals.path("outstanding_requests").asLong(0);
+        // Differential outcomes across EVERY edge, not the last one.
+        long unexplained = perEdge.differentialTotals().getOrDefault("UNEXPLAINED", 0);
+        long unexpected = perEdge.differentialTotals().getOrDefault("UNEXPECTED", 0);
+        long notCompared = perEdge.differentialTotals().getOrDefault("NOT_COMPARED", 0);
 
-        boolean complete = shortfalls.isEmpty() && unexplained == 0 && outstandingApprovals == 0
-                && ledgerVerification.valid() && unpublishable.isEmpty();
+        // A missing approval report is not zero outstanding approvals. It means the approval stage
+        // never ran, so nothing has established that no gate is open - which is the opposite of the
+        // conclusion the previous default reached.
+        long outstandingApprovals;
+        boolean approvalsEstablished = approvals != null;
+        if (approvalsEstablished) {
+            outstandingApprovals = approvals.path("outstanding_requests").asLong(0);
+        } else {
+            outstandingApprovals = -1;
+            shortfalls.add("No approval report exists, so it is unknown whether any human decision "
+                    + "gate is outstanding. Run: bootshift approve");
+        }
+
+        // A required NOT_COMPARED dimension is a shortfall: the frozen plan asked for a comparison
+        // and none happened, which is not the same as the comparison finding nothing.
+        if (notCompared > 0) {
+            shortfalls.add(notCompared + " required differential comparison(s) were NOT_COMPARED "
+                    + "across the planned edges; a comparison that did not run is not a pass");
+        }
+        perEdge.shortfalls().forEach(shortfalls::add);
+
+        boolean complete = shortfalls.isEmpty() && unexplained == 0 && unexpected == 0
+                && outstandingApprovals == 0 && ledgerVerification.valid() && unpublishable.isEmpty()
+                && perEdge.allEdgesAccountedFor();
 
         String finalTreeHash = context.scm().currentTreeHash(context.run().migrationWorkspace(),
                 context.run().checkpointGit());
+        if (finalTreeHash == null || finalTreeHash.isBlank()) {
+            // Export compares against this value. A null one previously compared equal to anything,
+            // so a bundle could be exported that had never been checked against the validated tree.
+            shortfalls.add("The final source tree hash could not be computed, so the exported bundle "
+                    + "cannot be proven to be the state that passed validation");
+        }
 
         ObjectNode result = Json.obj();
         result.put("status", complete ? "MIGRATION_COMPLETE"
                 : (unexplained > 0 ? "BLOCKED" : "NEEDS_HUMAN"));
         result.put("source_version", target == null ? null : target.path("source_version").asText());
         result.put("target_version", target == null ? null : target.path("landing_version").asText());
-        result.put("edges_planned", plan == null ? 0 : plan.path("edge_count").asInt());
+        result.put("edges_declared_by_plan", plan == null ? 0 : plan.path("edge_count").asInt());
         result.put("deterministic_coverage", plan == null ? 0 : plan.path("deterministic_coverage").asDouble());
         result.put("final_source_tree_hash", finalTreeHash);
         result.put("baseline_manifest_hash", baseline.path("baseline_manifest_hash").asText());
@@ -289,7 +329,17 @@ public final class EvidenceStage implements Stage {
         result.put("change_ledger_valid", ledgerVerification.valid());
         result.put("change_ledger_events", ledgerVerification.verifiedEvents());
         result.put("unexplained_differences", unexplained);
+        result.put("unexpected_differences", unexpected);
+        result.put("not_compared_dimensions", notCompared);
         result.put("outstanding_approvals", outstandingApprovals);
+        result.put("approvals_established", approvalsEstablished);
+        result.put("edges_planned", perEdge.edgesPlanned());
+        result.put("edges_complete", perEdge.edgesComplete());
+        result.put("all_edges_accounted_for", perEdge.allEdgesAccountedFor());
+        result.set("per_edge_shortfalls", Json.toTree(perEdge.shortfalls()));
+        result.put("total_changes_applied", perEdge.totalChangesApplied());
+        result.put("total_residual_recipes", perEdge.totalResidualRecipes());
+        result.set("differential_totals", Json.toTree(perEdge.differentialTotals()));
         result.set("evidence_shortfalls", Json.toTree(shortfalls));
         result.set("unpublishable_claims", Json.toTree(unpublishable));
         result.set("ledger_violations", Json.toTree(ledgerVerification.violations()));
@@ -301,6 +351,11 @@ public final class EvidenceStage implements Stage {
 
         writer.writeText("migration-report.md", renderReport(context, result, claims, registry,
                 ledgerVerification, differential, approvals, target, plan));
+
+        // The end-to-end migration document. The report above answers "is this defensible?"; this
+        // answers the question a reviewer asks first - what actually happened, to which architecture,
+        // in which order, and on whose authority. It is generated on every run, from the artifacts.
+        writer.writeText("MIGRATION_DOCUMENT.md", new MigrationDocument(context).render());
 
         String hash = StageSupport.publish(context, writer);
 
@@ -324,6 +379,11 @@ public final class EvidenceStage implements Stage {
 
         List<String> messages = new ArrayList<>(shortfalls);
         messages.addAll(unpublishable);
+        if (!perEdge.allEdgesAccountedFor()) {
+            messages.add(perEdge.edgesComplete() + " of " + perEdge.edgesPlanned()
+                    + " planned edge(s) completed; final evidence covers only what every edge "
+                    + "actually did");
+        }
         if (unexplained > 0) {
             messages.add(unexplained + " unexplained behavioural difference(s) remain");
         }
@@ -376,77 +436,100 @@ public final class EvidenceStage implements Stage {
                 .blindSpot("BS-GRAPH-RUNTIME");
     }
 
-    private Claim buildClaim(JsonNode buildReport) {
-        boolean compiled = buildReport != null && buildReport.path("compiled").asBoolean(false);
+    /**
+     * BUILD reaches E2 only when every planned edge compiled.
+     *
+     * <p>One compiled edge out of eight is not "the migrated repository compiles".
+     */
+    private Claim buildClaim(EdgeEvidenceAggregator.Aggregate perEdge) {
+        long compiled = perEdge.edges().stream()
+                .filter(EdgeEvidenceAggregator.EdgeEvidence::compiled).count();
+        int planned = perEdge.edgesPlanned();
+        boolean all = planned > 0 && compiled == planned;
         return new Claim("CL-BUILD-001", "BUILD",
-                "The migrated repository resolves its dependencies and compiles.")
-                .level(compiled ? EvidenceLevel.E2 : EvidenceLevel.E1)
-                .coverage(buildReport == null
-                        ? CoverageStatement.none("modules compiled", "no migration edge was executed")
-                        : new CoverageStatement("modules compiled", compiled ? 1 : 0, 1,
-                        compiled ? 0 : 1, List.of(), "after "
-                        + buildReport.path("rounds").asInt() + " repair round(s)"))
+                "Every planned migration edge resolves its dependencies and compiles.")
+                .level(all ? EvidenceLevel.E2 : EvidenceLevel.E1)
+                .coverage(new CoverageStatement("planned edges compiled", (int) compiled, planned,
+                        (int) Math.max(0, planned - compiled), List.of(),
+                        planned == 0 ? "no migration edge was executed"
+                                : compiled + " of " + planned + " edge(s) compiled"))
+                .evidence("19-evidence/edge-evidence.json")
                 .evidence("13-build-repair/build-report.json");
     }
 
-    private Claim testClaim(JsonNode testReport) {
-        if (testReport == null) {
-            return new Claim("CL-TESTS-001", "TESTS",
-                    "The application test suite was not executed against the migrated state.")
-                    .level(EvidenceLevel.E1)
-                    .coverage(CoverageStatement.none("tests executed",
-                            "no migration edge reached test validation"))
-                    .evidence("04-baseline/baseline-tests.json");
-        }
-        int total = testReport.path("total_tests").asInt();
-        long passed = testReport.path("classification_counts").path("PASSED").asLong(0);
-        long regressions = testReport.path("classification_counts").path("EDGE_LOCAL_REGRESSION").asLong(0)
-                + testReport.path("classification_counts").path("CUMULATIVE_REGRESSION").asLong(0);
+    /** TESTS reaches E3 only when every edge that required tests ran them with no regression. */
+    private Claim testClaim(EdgeEvidenceAggregator.Aggregate perEdge) {
+        long required = perEdge.edges().stream()
+                .filter(EdgeEvidenceAggregator.EdgeEvidence::testsRequired).count();
+        long executed = perEdge.edges().stream()
+                .filter(e -> e.testsRequired() && e.testsExecuted()).count();
+        boolean satisfied = required > 0 && executed == required
+                && perEdge.totalTestRegressions() == 0;
         return new Claim("CL-TESTS-001", "TESTS",
-                "Existing tests pass relative to sealed baseline debt.")
-                .level(regressions == 0 && total > 0 ? EvidenceLevel.E3 : EvidenceLevel.E2)
-                .coverage(new CoverageStatement("tests", (int) passed, total,
-                        (int) (total - passed), List.of(),
-                        regressions == 0 ? "no regressions" : regressions + " regression(s)"))
-                .evidence("15-test/test-report.json")
-                .evidence("15-test/coverage-report.json");
+                "Existing tests pass relative to sealed baseline debt on every edge that required them.")
+                .level(satisfied ? EvidenceLevel.E3 : EvidenceLevel.E2)
+                .coverage(new CoverageStatement("edges with tests executed", (int) executed,
+                        (int) required, (int) Math.max(0, required - executed), List.of(),
+                        perEdge.totalTestRegressions() == 0
+                                ? perEdge.totalTests() + " test(s) executed, no regressions"
+                                : perEdge.totalTestRegressions() + " regression(s) across "
+                                        + perEdge.totalTests() + " test(s)"))
+                .evidence("19-evidence/edge-evidence.json")
+                .evidence("15-test/test-report.json");
     }
 
-    private Claim runtimeClaim(JsonNode runtimeReport) {
-        if (runtimeReport == null) {
-            return new Claim("CL-RUNTIME-001", "RUNTIME",
-                    "The migrated application was not started.")
-                    .level(EvidenceLevel.E1)
-                    .coverage(CoverageStatement.none("modules started", "runtime validation never ran"))
-                    .evidence("04-baseline/baseline-runtime.json");
-        }
-        int started = runtimeReport.path("modules_started").asInt();
-        int attempted = runtimeReport.path("modules_attempted").asInt();
+    /** RUNTIME reaches E3 only when every edge that required a runtime observation produced one. */
+    private Claim runtimeClaim(EdgeEvidenceAggregator.Aggregate perEdge) {
+        long required = perEdge.edges().stream()
+                .filter(EdgeEvidenceAggregator.EdgeEvidence::runtimeRequired).count();
+        long executed = perEdge.edges().stream()
+                .filter(e -> e.runtimeRequired() && e.runtimeExecuted()).count();
+        int started = perEdge.edges().stream()
+                .mapToInt(EdgeEvidenceAggregator.EdgeEvidence::modulesStarted).max().orElse(0);
+        int attempted = perEdge.edges().stream()
+                .mapToInt(EdgeEvidenceAggregator.EdgeEvidence::modulesAttempted).max().orElse(0);
+        boolean satisfied = required > 0 && executed == required && started > 0;
         return new Claim("CL-RUNTIME-001", "RUNTIME",
                 "The migrated application starts and its context, mappings and configuration binding "
-                        + "were observed.")
-                .level(started > 0 ? EvidenceLevel.E3 : EvidenceLevel.E2)
-                .coverage(new CoverageStatement("modules started", started, attempted,
-                        attempted - started, List.of(),
-                        "startup is one observation, not migration success"))
-                .evidence("16-runtime/runtime-report.json")
-                .evidence("16-runtime/configuration-binding.json");
+                        + "were observed on every edge that required it.")
+                .level(satisfied ? EvidenceLevel.E3 : EvidenceLevel.E2)
+                .coverage(new CoverageStatement("edges with runtime observed", (int) executed,
+                        (int) required, (int) Math.max(0, required - executed), List.of(),
+                        "startup is one observation, not migration success; best edge started "
+                                + started + "/" + attempted + " module(s)"))
+                .evidence("19-evidence/edge-evidence.json")
+                .evidence("16-runtime/runtime-report.json");
     }
 
-    private List<Claim> differentialClaims(JsonNode differential, JsonNode approvals) {
+    /**
+     * Behavioural claims, assigned mechanically.
+     *
+     * <p>The rule is fixed and has no judgement in it: a dimension reaches E4 when executed OLD/NEW
+     * scenario comparisons exist for it across the planned edges, every comparison that ran came out
+     * IDENTICAL or EXPECTED, and nothing required was left NOT_COMPARED. Otherwise it is capped at
+     * E3 when something was compared and at E2 when nothing was.
+     *
+     * <p>E4 is never inferred from application startup, from the test suite passing, or from the two
+     * graphs being equal. Each of those is evidence about something else: a context that builds, a
+     * suite that still passes, a structure that did not change. None of them is evidence that an HTTP
+     * response, an authorization decision, a persisted row or a serialized payload is the same.
+     */
+    private List<Claim> differentialClaims(List<JsonNode> comparisons,
+                                           EdgeEvidenceAggregator.Aggregate perEdge,
+                                           JsonNode approvals) {
         List<Claim> claims = new ArrayList<>();
-        Map<String, String> dimensionToClaim = Map.of(
-                "CONFIGURATION_BINDING", "CL-CONFIG-001",
-                "HTTP_API", "CL-HTTPAPI-001",
-                "SECURITY_AUTHORIZATION", "CL-SECURITY-001",
-                "PERSISTENCE_STATE", "CL-PERSISTENCE-001",
-                "SERIALIZATION", "CL-SERIALIZATION-001");
-        Map<String, String> dimensionToReported = Map.of(
-                "CONFIGURATION_BINDING", "CONFIGURATION_BINDING",
-                "HTTP_API", "HTTP_API",
-                "SECURITY_AUTHORIZATION", "SECURITY",
-                "PERSISTENCE_STATE", "PERSISTENCE",
-                "SERIALIZATION", "SERIALIZATION");
+        Map<String, String> dimensionToClaim = new LinkedHashMap<>();
+        dimensionToClaim.put("CONFIGURATION_BINDING", "CL-CONFIG-001");
+        dimensionToClaim.put("HTTP_API", "CL-HTTPAPI-001");
+        dimensionToClaim.put("SECURITY_AUTHORIZATION", "CL-SECURITY-001");
+        dimensionToClaim.put("PERSISTENCE_STATE", "CL-PERSISTENCE-001");
+        dimensionToClaim.put("SERIALIZATION", "CL-SERIALIZATION-001");
+        Map<String, String> dimensionToReported = new LinkedHashMap<>();
+        dimensionToReported.put("CONFIGURATION_BINDING", "CONFIGURATION_BINDING");
+        dimensionToReported.put("HTTP_API", "HTTP_API");
+        dimensionToReported.put("SECURITY_AUTHORIZATION", "SECURITY");
+        dimensionToReported.put("PERSISTENCE_STATE", "PERSISTENCE");
+        dimensionToReported.put("SERIALIZATION", "SERIALIZATION");
 
         for (Map.Entry<String, String> entry : dimensionToClaim.entrySet()) {
             String dimension = entry.getKey();
@@ -454,24 +537,50 @@ public final class EvidenceStage implements Stage {
             int compared = 0;
             int identicalOrExplained = 0;
             int notCompared = 0;
-            if (differential != null) {
-                for (JsonNode comparison : differential.path("comparisons")) {
-                    if (!dimension.equals(comparison.path("dimension").asText())) {
-                        continue;
-                    }
-                    String classification = comparison.path("classification").asText();
-                    if ("NOT_COMPARED".equals(classification)) {
-                        notCompared++;
-                        continue;
-                    }
-                    compared++;
-                    if ("IDENTICAL".equals(classification) || "EXPECTED".equals(classification)) {
-                        identicalOrExplained++;
-                    }
+            int adverse = 0;
+            List<String> edgesCovered = new ArrayList<>();
+            for (JsonNode comparison : comparisons) {
+                if (!dimension.equals(comparison.path("dimension").asText())) {
+                    continue;
+                }
+                String classification = comparison.path("classification").asText();
+                String edgeId = comparison.path("edge_id").asText(null);
+                if (edgeId != null && !edgesCovered.contains(edgeId)) {
+                    edgesCovered.add(edgeId);
+                }
+                if ("NOT_COMPARED".equals(classification)) {
+                    notCompared++;
+                    continue;
+                }
+                compared++;
+                if ("IDENTICAL".equals(classification) || "EXPECTED".equals(classification)) {
+                    identicalOrExplained++;
+                } else {
+                    adverse++;
                 }
             }
-            EvidenceLevel level = compared == 0 ? EvidenceLevel.E2
-                    : (identicalOrExplained == compared ? EvidenceLevel.E4 : EvidenceLevel.E3);
+
+            EvidenceLevel level;
+            String levelReason;
+            if (compared == 0) {
+                level = EvidenceLevel.E2;
+                levelReason = "No OLD-versus-NEW scenario for this dimension was executed. E4 "
+                        + "requires executed comparisons and is never inferred from startup, from "
+                        + "the test suite, or from graph equality.";
+            } else if (adverse == 0 && notCompared == 0) {
+                level = EvidenceLevel.E4;
+                levelReason = compared + " executed OLD/NEW comparison(s), all IDENTICAL or "
+                        + "EXPECTED with a verified explanation, none left NOT_COMPARED.";
+            } else if (adverse == 0) {
+                level = EvidenceLevel.E3;
+                levelReason = "Comparisons ran and agreed, but " + notCompared
+                        + " required comparison(s) were NOT_COMPARED, so the dimension is not "
+                        + "covered end to end.";
+            } else {
+                level = EvidenceLevel.E3;
+                levelReason = adverse + " comparison(s) were UNEXPECTED or UNEXPLAINED.";
+            }
+
             Claim claim = new Claim(entry.getValue(), reported,
                     dimension + " behaviour was compared between the original and migrated "
                             + "applications for every scenario the environment permitted.")
@@ -479,9 +588,14 @@ public final class EvidenceStage implements Stage {
                     .coverage(new CoverageStatement(dimension + " scenarios",
                             identicalOrExplained, compared + notCompared, notCompared,
                             notCompared > 0 ? List.of("GAP-DIFF-001") : List.of(),
-                            compared == 0 ? "not compared in this run" : null))
+                            levelReason + " Edges covered: "
+                                    + (edgesCovered.isEmpty() ? "none" : edgesCovered)))
+                    .evidence("19-evidence/edge-evidence.json")
                     .evidence("17-differential/differential-report.json")
                     .evidence("17-differential/normalization-policy.json");
+            if (compared == 0) {
+                claim.blindSpot("BS-DIFF-" + dimension);
+            }
             if (approvals != null) {
                 approvals.path("decisions").forEach(d -> {
                     if (d.path("scope").asText("").contains(dimension)) {

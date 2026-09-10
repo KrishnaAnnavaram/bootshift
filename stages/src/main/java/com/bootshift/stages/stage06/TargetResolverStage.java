@@ -3,6 +3,8 @@ package com.bootshift.stages.stage06;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.bootshift.adapters.build.JavaTargetSelector;
+import com.bootshift.adapters.build.ToolchainProbe;
 import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
@@ -130,12 +132,17 @@ public final class TargetResolverStage implements Stage {
         int unknownInternal = internal.path("unknown_count").asInt();
         String internalAction = internal.path("policy_action").asText("BLOCK");
 
-        // Judge Java constraints against the JDKs actually installed, not only the one running the
-        // harness: the harness JVM and the application toolchain are separate concerns.
-        List<Integer> availableJdks = new ArrayList<>();
-        compatibility.path("available_jdk_majors").forEach(n -> availableJdks.add(n.asInt()));
+        // Judge Java constraints against the JDKs actually installed, not the one running the
+        // harness. The harness JVM and the application toolchain are separate concerns, and deriving
+        // one from the other is how a migration silently acquires a compiler-target change nobody
+        // asked for.
+        List<ToolchainProbe.Jdk> installedJdks = new ToolchainProbe().discover();
+        List<Integer> availableJdks = new ArrayList<>(installedJdks.stream()
+                .map(ToolchainProbe.Jdk::major).distinct().sorted().toList());
         if (availableJdks.isEmpty()) {
-            availableJdks.add(runningJdk);
+            // Nothing discovered is a fact worth recording, not a reason to substitute the harness
+            // JVM: an application toolchain that does not exist cannot build anything.
+            compatibility.path("available_jdk_majors").forEach(n -> availableJdks.add(n.asInt()));
         }
 
         boolean usesSpringCloud = compatibility.path("application_uses_spring_cloud").asBoolean(false);
@@ -186,7 +193,10 @@ public final class TargetResolverStage implements Stage {
             throw HarnessException.block(buildNoViableTargetExplanation(context, candidates));
         }
 
-        List<Checkpoint> path = buildPath(currentVersion, currentJava, runningJdk, landing, candidates);
+        List<Checkpoint> path = buildPath(context, currentVersion, currentJava, landing, candidates,
+                installedJdks);
+        Checkpoint landingEdge = path.stream().filter(Checkpoint::landing).findFirst()
+                .orElse(path.isEmpty() ? null : path.get(path.size() - 1));
 
         ObjectNode targetState = Json.obj();
         targetState.put("source_version", currentVersion);
@@ -195,7 +205,20 @@ public final class TargetResolverStage implements Stage {
         targetState.put("landing_line", landing.line());
         targetState.put("landing_spring_framework_line", landing.springFrameworkLine());
         targetState.put("landing_spring_cloud_train", landing.springCloudTrain());
-        targetState.put("landing_java", String.valueOf(recommendedJava(landing, runningJdk)));
+        targetState.put("landing_java",
+                landingEdge == null ? currentJava : String.valueOf(landingEdge.edgeJava()));
+        targetState.put("landing_java_version", landingEdge == null ? null : landingEdge.javaVersion());
+        targetState.put("landing_java_vendor", landingEdge == null ? null : landingEdge.javaVendor());
+        targetState.put("landing_java_home", landingEdge == null ? null : landingEdge.javaHome());
+        targetState.put("landing_java_selection_reason",
+                landingEdge == null ? "no landing edge was produced" : landingEdge.javaSelectionReason());
+        targetState.set("landing_java_supporting_evidence", Json.toTree(
+                landingEdge == null ? List.<String>of() : landingEdge.javaSupportingEvidence()));
+        targetState.put("landing_java_resolved", landingEdge != null && landingEdge.javaResolved());
+        targetState.put("landing_java_is_lts", landingEdge != null
+                && com.bootshift.adapters.build.JavaTargetSelector.isLts(landingEdge.edgeJava()));
+        targetState.put("java_target_preference", context.policy().javaTargetPreference());
+        targetState.set("installed_jdk_majors", Json.toTree(availableJdks));
         targetState.put("selection_mode", selectionMode);
         targetState.put("support_horizon_months", landing.supportHorizonMonths());
         targetState.put("lifecycle_evidence_quality", landing.lifecycleEvidenceQuality());
@@ -212,6 +235,15 @@ public final class TargetResolverStage implements Stage {
         migrationPath.put("edge_count", path.size());
         migrationPath.put("mandatory_checkpoints",
                 path.stream().filter(Checkpoint::mandatory).count());
+        migrationPath.put("major_boundaries_crossed",
+                path.stream().filter(c -> EdgeClass.MAJOR_BOUNDARY.name().equals(c.edgeClass())).count());
+        migrationPath.put("majors_between_source_and_landing",
+                Math.max(0, majorOf(landing.version()) - majorOf(currentVersion)));
+        migrationPath.put("boundary_rule", "One mandatory MAJOR_BOUNDARY edge exists for every major "
+                + "version crossed. A path that crosses two majors with one edge is rejected here, "
+                + "not discovered later when the compile fails.");
+        migrationPath.set("edge_classes", Json.toTree(
+                java.util.Arrays.stream(EdgeClass.values()).map(Enum::name).toList()));
         migrationPath.set("edges", Json.toTree(path));
         writer.write("migration-path.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), migrationPath));
@@ -220,6 +252,41 @@ public final class TargetResolverStage implements Stage {
                 selectionMode, path);
         writer.write("target-resolution-report.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), report));
+
+        // Self-check. The path builder is the only thing standing between a 2.x source and a 4.x
+        // landing target crossing two majors in one hop, so its output is asserted rather than
+        // trusted. A shortfall here is a harness defect and must stop the run.
+        int majorsToCross = Math.max(0, majorOf(landing.version()) - majorOf(currentVersion));
+        long boundaryEdges = path.stream()
+                .filter(c -> EdgeClass.MAJOR_BOUNDARY.name().equals(c.edgeClass())).count();
+        if (boundaryEdges < majorsToCross) {
+            StageSupport.publish(context, writer);
+            throw HarnessException.stageFailure(
+                    "Migration path is missing a mandatory major boundary: crossing from "
+                            + currentVersion + " to " + landing.version() + " spans " + majorsToCross
+                            + " major version(s) but the path contains only " + boundaryEdges
+                            + " MAJOR_BOUNDARY edge(s). Refusing to freeze a path that skips a "
+                            + "boundary.", null);
+        }
+        if (path.stream().noneMatch(Checkpoint::javaResolved)) {
+            envelope.blindSpot(new Envelope.BlindSpot("BS-TARGET-JDK", "TOOLCHAIN",
+                    "No installed JDK satisfies any edge on the planned path",
+                    "Every compile, test and runtime observation on this path would run on an "
+                            + "unselected toolchain, so none of them would be evidence"));
+        }
+        if (landingEdge != null && !landingEdge.javaResolved()) {
+            envelope.gap(new Envelope.Gap("GAP-TARGET-JDK", "TOOLCHAIN",
+                    "The landing edge has no installed JDK: " + landingEdge.javaSelectionReason(),
+                    "The landing target cannot be built on this machine as configured"));
+        }
+        if (landingEdge != null && !com.bootshift.adapters.build.JavaTargetSelector
+                .isLts(landingEdge.edgeJava()) && !context.policy().allowNonLtsJavaLanding()) {
+            StageSupport.publish(context, writer);
+            throw HarnessException.block("The only admissible Java target for the landing edge is "
+                    + landingEdge.edgeJava() + ", which is not a long-term-support release, and "
+                    + "policy allow_non_lts_java_landing is false. "
+                    + landingEdge.javaSelectionReason());
+        }
 
         StageSupport.toEvidence(context, "target-state", targetArtifact,
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
@@ -249,7 +316,8 @@ public final class TargetResolverStage implements Stage {
 
         return new StageResult(OUTPUT_DIR, ExitCode.SUCCESS,
                 "Landing target Spring Boot " + landing.version() + " (Java "
-                        + recommendedJava(landing, runningJdk) + ", Spring Cloud "
+                        + (landingEdge == null ? currentJava : String.valueOf(landingEdge.edgeJava()))
+                        + ", Spring Cloud "
                         + landing.springCloudTrain() + "), " + path.size() + " migration edge(s), "
                         + landing.supportHorizonMonths() + " month support horizon",
                 messages, artifacts, hash);
@@ -398,10 +466,32 @@ public final class TargetResolverStage implements Stage {
                 quality, eliminations, cautions, score);
     }
 
-    /** One migration edge on the path from source to landing. */
+    /**
+     * One migration edge on the path from source to landing.
+     *
+     * <p>Every edge records why it exists. "Because the planner emitted it" is not a reason a
+     * reviewer can check, so each edge carries the lifecycle facts that made it necessary and the
+     * toolchain decision taken for it.
+     */
     public record Checkpoint(String edgeId, String fromVersion, String toVersion, String edgeClass,
                              boolean landing, boolean mandatory, String rationale,
-                             List<String> requiredPreparations) {
+                             List<String> requiredPreparations, String existsBecause,
+                             List<String> supportingEvidence, String springCloudTrain,
+                             int edgeJava, String javaVersion, String javaVendor, String javaHome,
+                             String javaSelectionReason, List<String> javaSupportingEvidence,
+                             boolean javaResolved, boolean transitOnly) {
+    }
+
+    /**
+     * Edge classes, in the order they can legally appear.
+     *
+     * <p>MAJOR_BOUNDARY is separated from MINOR because it is the only class that may never be
+     * collapsed: it carries the namespace relocation, the security configuration rewrite and the
+     * language-level baseline. LANDING is separated from MINOR because a version can be a legal
+     * transit checkpoint while being an illegal place to stop.
+     */
+    public enum EdgeClass {
+        PREPARATORY, PATCH, MINOR, MAJOR_BOUNDARY, LANDING
     }
 
     /**
@@ -411,74 +501,207 @@ public final class TargetResolverStage implements Stage {
      * carries the Jakarta namespace change, the Spring Security 6 rewrite and the Java 17 baseline.
      * Test-infrastructure work is modelled as a PREPARATORY edge that runs first (spec section 22).
      */
-    private List<Checkpoint> buildPath(String currentVersion, String currentJava, int runningJdk,
-                                       Candidate landing, List<Candidate> candidates) {
+    /**
+     * Builds the checkpoint sequence from source to landing.
+     *
+     * <p>The rule that matters: EVERY major boundary between the source and the landing target is its
+     * own mandatory edge, and the last supported line of a major is reached before the next major is
+     * entered. The previous implementation jumped straight to the lowest line of the landing major,
+     * so a 2.7 to 4.x migration crossed the Boot 3 boundary and the Boot 4 boundary in one hop and
+     * produced no Boot 3 checkpoint at all - which is exactly the transition where the Jakarta
+     * relocation and the Spring Security rewrite live.
+     */
+    private List<Checkpoint> buildPath(StageContext context, String currentVersion, String currentJava,
+                                       Candidate landing, List<Candidate> candidates,
+                                       List<ToolchainProbe.Jdk> installedJdks) {
         List<Checkpoint> path = new ArrayList<>();
         int index = 0;
         String from = currentVersion;
         String currentLine = lineOf(currentVersion);
+        int sourceJava = parseJava(currentJava);
 
-        path.add(new Checkpoint("EDGE-" + (++index) + "-PREP-TEST", from, from, "PREPARATORY", false,
-                true, "Migrate test infrastructure before framework changes so pass/fail/skip semantics "
-                + "are proven to survive independently.",
-                List.of("JUnit 4 to Jupiter where present", "assert pass/fail/skip parity")));
+        // 1. Preparatory: test infrastructure moves before any framework change, so pass/fail/skip
+        //    semantics are proven to survive on their own.
+        path.add(checkpoint(context, "EDGE-" + (++index) + "-PREP-TEST", from, from,
+                EdgeClass.PREPARATORY, false, true,
+                "Migrate test infrastructure before framework changes so pass/fail/skip semantics "
+                        + "are proven to survive independently.",
+                List.of("JUnit 4 to Jupiter where present", "assert pass/fail/skip parity"),
+                "A framework change and a test-framework change applied together are "
+                        + "indistinguishable when a test starts failing.",
+                List.of("01-inventory/inventory-signals.json#JUNIT4"),
+                candidateFor(currentLine, candidates), sourceJava, installedJdks));
 
-        // Land on the newest patch of the current line first: patch edges are cheap and remove
-        // known defects before the boundary.
-        Candidate sameLine = candidates.stream().filter(c -> c.line().equals(currentLine))
-                .findFirst().orElse(null);
-        if (sameLine != null && compare(sameLine.version(), from) > 0) {
-            path.add(new Checkpoint("EDGE-" + (++index) + "-PATCH", from, sameLine.version(), "PATCH",
-                    false, false, "Move to the latest patch of the current line before the boundary.",
-                    List.of()));
+        // 2. Latest patch of the current line: cheap, and removes known defects before the boundary.
+        Candidate sameLine = candidateFor(currentLine, candidates);
+        if (sameLine != null && sameLine.version() != null && compare(sameLine.version(), from) > 0) {
+            path.add(checkpoint(context, "EDGE-" + (++index) + "-PATCH", from, sameLine.version(),
+                    EdgeClass.PATCH, false, false,
+                    "Move to the latest patch of the current line before the boundary.",
+                    List.of(),
+                    "Patch releases on the current line carry defect fixes only, so applying them "
+                            + "first keeps the boundary edge free of unrelated failures.",
+                    List.of("05-compatibility/lifecycle-registry.json#" + sameLine.line()),
+                    sameLine, sourceJava, installedJdks));
             from = sameLine.version();
         }
 
-        int fromMajor = majorOf(from);
-        int toMajor = majorOf(landing.version());
-        if (fromMajor < toMajor) {
-            String boundaryTarget = candidates.stream()
-                    .filter(c -> majorOf(c.version()) == toMajor)
-                    .min(java.util.Comparator.comparingInt(c -> numericLine(c.line())))
-                    .map(Candidate::version)
-                    .orElse(landing.version());
-            path.add(new Checkpoint("EDGE-" + (++index) + "-MAJOR", from, boundaryTarget,
-                    "MAJOR_BOUNDARY", boundaryTarget.equals(landing.version()), true,
-                    "Major boundary carrying the Jakarta EE namespace relocation, the Spring Security "
-                            + "configuration model change and the Java 17 baseline. This checkpoint is "
-                            + "mandatory and may not be collapsed silently (R26).",
-                    List.of("javax to jakarta namespace", "Java " + Math.min(17, runningJdk) + " baseline",
-                            "Spring Security 6 configuration model", "spring.factories to "
-                            + "AutoConfiguration.imports")));
-            from = boundaryTarget;
+        // 3. Cross each major boundary in turn. Never more than one major per edge.
+        int landingMajor = majorOf(landing.version());
+        int landingLineOrder = numericLine(landing.line());
+        for (int major = majorOf(from) + 1; major <= landingMajor; major++) {
+            Candidate entry = lowestLineOfMajor(major, candidates);
+            if (entry == null || entry.version() == null) {
+                // No published line for this major: the path cannot be built without inventing one.
+                break;
+            }
+            final int boundaryMajor = major;
+            boolean isLandingEdge = entry.line().equals(landing.line());
+            path.add(checkpoint(context, "EDGE-" + (++index) + "-MAJOR-" + major, from,
+                    entry.version(), EdgeClass.MAJOR_BOUNDARY, isLandingEdge, true,
+                    majorBoundaryRationale(boundaryMajor),
+                    majorBoundaryPreparations(boundaryMajor, entry),
+                    "Spring Boot " + boundaryMajor + " is a major boundary between " + from + " and "
+                            + landing.version() + ". A mandatory checkpoint exists for every major "
+                            + "crossed; none may be skipped or collapsed silently (R26).",
+                    List.of("05-compatibility/lifecycle-registry.json#" + entry.line(),
+                            "07-documentation/document-registry.json#boot-" + boundaryMajor
+                                    + "-migration-guide"),
+                    entry, sourceJava, installedJdks));
+            from = entry.version();
+
+            // Walk the minor lines of this major. When another major still has to be crossed, walk
+            // all the way to the highest line of this major first: that is the supported stepping
+            // stone, and entering the next major from an early minor is not a supported path.
+            int stopOrder = major == landingMajor
+                    ? landingLineOrder : highestLineOrderOfMajor(major, candidates);
+            String cursorLine = entry.line();
+            while (numericLine(cursorLine) < stopOrder) {
+                String stopLine = orderToLine(stopOrder, candidates);
+                String nextLine = nextLineAfter(cursorLine, candidates, stopLine);
+                if (nextLine == null) {
+                    break;
+                }
+                Candidate next = candidateFor(nextLine, candidates);
+                if (next == null || next.version() == null || compare(next.version(), from) <= 0) {
+                    break;
+                }
+                boolean landingHop = major == landingMajor && next.line().equals(landing.line());
+                path.add(checkpoint(context,
+                        "EDGE-" + (++index) + (landingHop ? "-LANDING" : "-MINOR"),
+                        from, next.version(),
+                        landingHop ? EdgeClass.LANDING : EdgeClass.MINOR, landingHop, false,
+                        landingHop
+                                ? "Final hop onto the frozen landing target " + next.version() + "."
+                                : "Minor upgrade to " + next.line()
+                                        + " carrying deprecations and default changes.",
+                        List.of(),
+                        landingHop
+                                ? "This is the frozen landing target selected by target resolution."
+                                : (major == landingMajor
+                                        ? "An intermediate minor on the landing major, so "
+                                                + "deprecations removed later surface one line at a time."
+                                        : "A required stepping stone: the next major may only be "
+                                                + "entered from the last supported line of this one."),
+                        List.of("05-compatibility/lifecycle-registry.json#" + next.line()),
+                        next, sourceJava, installedJdks));
+                from = next.version();
+                cursorLine = next.line();
+            }
         }
 
-        while (!from.equals(landing.version())) {
-            String nextLine = nextLineAfter(lineOf(from), candidates, landing.line());
-            if (nextLine == null) {
-                break;
-            }
-            Candidate next = candidates.stream().filter(c -> c.line().equals(nextLine))
-                    .findFirst().orElse(null);
-            if (next == null || compare(next.version(), from) <= 0) {
-                break;
-            }
-            boolean isLanding = next.line().equals(landing.line());
-            path.add(new Checkpoint("EDGE-" + (++index) + "-MINOR", from, next.version(), "MINOR",
-                    isLanding, false,
-                    "Minor upgrade to " + next.line() + " carrying deprecations and default changes.",
-                    List.of()));
-            from = next.version();
-            if (isLanding) {
-                break;
-            }
-        }
-
+        // 4. If nothing above landed, emit the explicit landing hop rather than ending the path short.
         if (path.stream().noneMatch(Checkpoint::landing)) {
-            path.add(new Checkpoint("EDGE-" + (++index) + "-LANDING", from, landing.version(),
-                    "MINOR", true, false, "Final hop to the frozen landing target.", List.of()));
+            Candidate landingCandidate = candidateFor(landing.line(), candidates);
+            path.add(checkpoint(context, "EDGE-" + (++index) + "-LANDING", from, landing.version(),
+                    EdgeClass.LANDING, true, false,
+                    "Final hop to the frozen landing target.", List.of(),
+                    "The preceding checkpoints did not reach the landing line, so an explicit landing "
+                            + "edge is emitted rather than silently ending the path early.",
+                    List.of("06-target/target-state.json"),
+                    landingCandidate == null ? landing : landingCandidate, sourceJava, installedJdks));
         }
         return path;
+    }
+
+    /** Builds one checkpoint, including the toolchain decision taken for it. */
+    private Checkpoint checkpoint(StageContext context, String edgeId, String fromVersion,
+                                  String toVersion, EdgeClass edgeClass, boolean landing,
+                                  boolean mandatory, String rationale, List<String> preparations,
+                                  String existsBecause, List<String> supportingEvidence,
+                                  Candidate targetLine, int sourceJava,
+                                  List<ToolchainProbe.Jdk> installedJdks) {
+        List<Integer> supported = targetLine == null ? List.of() : targetLine.supportedJavaMajors();
+        JavaTargetSelector.Preference preference;
+        try {
+            preference = JavaTargetSelector.Preference.valueOf(context.policy().javaTargetPreference());
+        } catch (IllegalArgumentException e) {
+            preference = JavaTargetSelector.Preference.LTS_PREFERRED;
+        }
+        JavaTargetSelector.Selection selection = new JavaTargetSelector()
+                .select(supported, sourceJava, installedJdks, preference);
+        return new Checkpoint(edgeId, fromVersion, toVersion, edgeClass.name(), landing, mandatory,
+                rationale, preparations, existsBecause, supportingEvidence,
+                targetLine == null ? null : targetLine.springCloudTrain(),
+                selection.major(), selection.version(), selection.vendor(), selection.home(),
+                selection.selectionReason(), selection.supportingEvidence(), selection.resolved(),
+                !landing);
+    }
+
+    private static String majorBoundaryRationale(int major) {
+        if (major == 3) {
+            return "Major boundary carrying the Jakarta EE namespace relocation, the Spring Security "
+                    + "configuration model change and the Java 17 baseline. This checkpoint is "
+                    + "mandatory and may not be collapsed silently (R26).";
+        }
+        return "Major boundary into Spring Boot " + major + ". A major boundary is always its own "
+                + "mandatory checkpoint so its behavioural changes are validated in isolation (R26).";
+    }
+
+    private static List<String> majorBoundaryPreparations(int major, Candidate entry) {
+        if (major == 3) {
+            return List.of("javax to jakarta namespace",
+                    "Java " + entry.supportedJavaMajors().stream().min(Integer::compareTo).orElse(17)
+                            + " baseline",
+                    "Spring Security 6 configuration model",
+                    "spring.factories to AutoConfiguration.imports");
+        }
+        return List.of("review the Spring Boot " + major + " migration guide for removed APIs",
+                "confirm the Spring Cloud train published for this line",
+                "confirm the language level this line requires");
+    }
+
+    private static Candidate candidateFor(String line, List<Candidate> candidates) {
+        return candidates.stream().filter(c -> c.line().equals(line)).findFirst().orElse(null);
+    }
+
+    private static Candidate lowestLineOfMajor(int major, List<Candidate> candidates) {
+        return candidates.stream()
+                .filter(c -> majorOfLine(c.line()) == major)
+                .filter(c -> c.version() != null)
+                .min(java.util.Comparator.comparingInt(c -> numericLine(c.line())))
+                .orElse(null);
+    }
+
+    private static int highestLineOrderOfMajor(int major, List<Candidate> candidates) {
+        return candidates.stream()
+                .filter(c -> majorOfLine(c.line()) == major)
+                .filter(c -> c.version() != null)
+                .mapToInt(c -> numericLine(c.line()))
+                .max()
+                .orElse(-1);
+    }
+
+    private static String orderToLine(int order, List<Candidate> candidates) {
+        return candidates.stream()
+                .filter(c -> numericLine(c.line()) == order)
+                .map(Candidate::line)
+                .findFirst()
+                .orElse(null);
+    }
+
+    static int majorOfLine(String line) {
+        return line == null ? -1 : numericLine(line) / 100;
     }
 
     private ObjectNode renderReport(String currentVersion, String currentJava, List<Candidate> candidates,
@@ -516,13 +739,6 @@ public final class TargetResolverStage implements Stage {
     }
 
     // ------------------------------------------------------------------ version helpers
-
-    private static int recommendedJava(Candidate landing, int runningJdk) {
-        return landing.supportedJavaMajors().stream()
-                .filter(major -> major <= runningJdk)
-                .max(Integer::compareTo)
-                .orElse(17);
-    }
 
     private static String nextLineAfter(String currentLine, List<Candidate> candidates, String stopLine) {
         int current = numericLine(currentLine);

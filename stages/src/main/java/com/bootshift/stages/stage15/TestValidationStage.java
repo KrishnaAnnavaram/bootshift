@@ -11,8 +11,11 @@ import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
+import com.bootshift.ports.approval.ApprovalPort;
+import com.bootshift.ports.approval.DecisionStore;
 import com.bootshift.ports.build.BuildSystemPort;
 import com.bootshift.stages.EdgeSupport;
+import com.bootshift.stages.EdgeToolchain;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -24,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +116,9 @@ public final class TestValidationStage implements Stage {
                 "dependency-model.json", "Run: harness resolve-build --repo <path>");
         JsonNode knowledge = StageSupport.optionalUpstream(context, "08-knowledge",
                 "migration-knowledge.json");
-        JsonNode approvals = StageSupport.optionalUpstream(context, "18-approval", "approval-report.json");
+        // Decisions from the store, for the same reason the differential stage reads them there:
+        // a test-expectation decision must be able to influence the validation it was filed for.
+        DecisionStore decisionStore = context.decisions();
 
         if (!edgePlan.path("tests_required").asBoolean(true)) {
             return skip(context, "The frozen plan for " + edgeId + " does not require tests at depth "
@@ -124,8 +130,11 @@ public final class TestValidationStage implements Stage {
         Path workspace = context.run().migrationWorkspace();
         Path logs = context.run().runWorkspace().resolve("test-logs").resolve(safe(edgeId));
 
-        ToolchainProbe probe = new ToolchainProbe();
-        String javaHome = probe.select(17, probe.discover()).map(j -> j.home().toString()).orElse(null);
+        // Java 17 was hardcoded here. An edge that froze a different major therefore ran its tests
+        // on a JDK the plan did not select, and the resulting pass or fail described that JDK.
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain.Verification toolchainVerification = toolchain.verify();
+        String javaHome = toolchain.resolved().javaHome();
         MavenBuildAdapter maven = new MavenBuildAdapter();
 
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
@@ -151,7 +160,7 @@ public final class TestValidationStage implements Stage {
             }
             ValidationSupport.TestRun run = ValidationSupport.runTests(maven, moduleRoot,
                     logs.resolve(safe(module.moduleId()) + "-test.log"), javaHome);
-            BaselineStage.TestOutcome outcome = BaselineStage.parseSurefire(moduleRoot);
+            BaselineStage.TestOutcome outcome = BaselineStage.parseTestReports(moduleRoot);
             totalTests += outcome.total();
 
             JsonNode baselineModule = baselineByModule.get(module.moduleId());
@@ -169,13 +178,26 @@ public final class TestValidationStage implements Stage {
             moduleNode.put("skipped", outcome.skipped());
             moduleNode.put("retried_without_coverage", run.retriedWithoutCoverage());
 
+            // Flaky detection. A test that fails once and passes on an identical re-run has not
+            // been shown to be a regression, and classifying it as one blocks a migration for a
+            // reason that has nothing to do with the migration. The re-run is only performed for
+            // tests that actually failed, and only once: a test that needs three attempts is not
+            // flaky, it is broken.
+            Set<String> flakyTests = detectFlaky(maven, moduleRoot, outcome,
+                    logs.resolve(safe(module.moduleId()) + "-flaky-rerun.log"), toolchain);
+            moduleNode.put("flaky_rerun_performed", !flakyTests.isEmpty()
+                    || outcome.failed() + outcome.errors() > 0);
+            moduleNode.set("flaky_tests", Json.toTree(flakyTests));
+
             ArrayNode cases = Json.arr();
             for (BaselineStage.TestCase testCase : outcome.cases()) {
                 String key = testCase.className() + "#" + testCase.name();
                 String baselineOutcome = baselineOutcomes.get(key);
                 String previousOutcome = previousOutcomes.get(key);
-                Classification classification = classify(testCase, baselineOutcome, previousOutcome,
-                        knowledge, approvals);
+                Classification classification = flakyTests.contains(key)
+                        ? Classification.FLAKY
+                        : classify(testCase, baselineOutcome, previousOutcome, knowledge,
+                                decisionStore);
                 classificationCounts.merge(classification.name(), 1, Integer::sum);
 
                 ObjectNode caseNode = Json.obj();
@@ -244,6 +266,10 @@ public final class TestValidationStage implements Stage {
             coverageResults.add(coverageNode);
         }
 
+        if (!toolchainVerification.verified()) {
+            blockingFindings.add("TOOLCHAIN_MISMATCH: " + toolchainVerification.detail());
+        }
+
         long unexplained = classificationCounts.getOrDefault(Classification.UNEXPLAINED.name(), 0);
         long regressions = classificationCounts.getOrDefault(
                 Classification.EDGE_LOCAL_REGRESSION.name(), 0)
@@ -254,6 +280,7 @@ public final class TestValidationStage implements Stage {
                 .stat("regressions", regressions);
 
         ObjectNode report = Json.obj();
+        report.set("toolchain", toolchain.toNode(toolchainVerification));
         report.put("total_tests", totalTests);
         report.set("classification_counts", Json.toTree(classificationCounts));
         report.set("modules", moduleResults);
@@ -277,7 +304,8 @@ public final class TestValidationStage implements Stage {
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
                         coverageReport));
 
-        String hash = StageSupport.publish(context, writer);
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.TESTED, "published");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));
@@ -313,7 +341,8 @@ public final class TestValidationStage implements Stage {
      * failure is a regression or UNEXPLAINED - never quietly accepted.
      */
     static Classification classify(BaselineStage.TestCase testCase, String baselineOutcome,
-                                   String previousOutcome, JsonNode knowledge, JsonNode approvals) {
+                                   String previousOutcome, JsonNode knowledge,
+                                   DecisionStore decisionStore) {
         boolean failingNow = "FAILED".equals(testCase.outcome()) || "ERROR".equals(testCase.outcome());
         if (!failingNow) {
             return Classification.PASSED;
@@ -329,7 +358,7 @@ public final class TestValidationStage implements Stage {
         }
 
         String detail = testCase.detail() == null ? "" : testCase.detail();
-        if (hasSignedApproval(approvals, testCase)) {
+        if (hasRecordedApproval(decisionStore, testCase)) {
             return Classification.INTENTIONALLY_CHANGED_CONTRACT;
         }
         if (explainedByVerifiedFact(knowledge, detail)) {
@@ -403,17 +432,22 @@ public final class TestValidationStage implements Stage {
         return false;
     }
 
-    private static boolean hasSignedApproval(JsonNode approvals, BaselineStage.TestCase testCase) {
-        if (approvals == null) {
+    /**
+     * True when a human recorded that this test's expectation changed intentionally.
+     *
+     * <p>The scope has to name the test. A blanket decision cannot reclassify an arbitrary failure,
+     * because a gate that can be satisfied without naming what it covers is not a gate.
+     */
+    private static boolean hasRecordedApproval(DecisionStore store, BaselineStage.TestCase testCase) {
+        if (store == null) {
             return false;
         }
         String key = testCase.className() + "#" + testCase.name();
-        for (JsonNode decision : approvals.path("decisions")) {
-            if (!"APPROVED".equals(decision.path("verdict").asText())) {
-                continue;
-            }
-            if ("TEST_EXPECTATION_CHANGE".equals(decision.path("gate").asText())
-                    && decision.path("scope").asText("").contains(key)) {
+        for (DecisionStore.StoredDecision stored : store.matching(
+                ApprovalPort.Gate.TEST_EXPECTATION_CHANGE, key)) {
+            if (stored.decision().verdict() == ApprovalPort.Verdict.APPROVED
+                    && stored.decision().scope() != null
+                    && stored.decision().scope().contains(key)) {
                 return true;
             }
         }
@@ -448,5 +482,56 @@ public final class TestValidationStage implements Stage {
 
     private static String safe(String value) {
         return value == null ? "unknown" : value.replaceAll("[^A-Za-z0-9._-]", "_");
+    }
+
+    // ------------------------------------------------------------------ flaky detection
+
+    /**
+     * Re-runs the tests that failed and reports which of them passed the second time.
+     *
+     * <p>{@code FLAKY} was a declared classification that nothing could ever produce, so a test that
+     * failed intermittently was classified as a regression and blocked the edge. A single identical
+     * re-run is the smallest thing that can distinguish the two, and it is deliberately not repeated:
+     * a test that needs three attempts to pass is not flaky in any sense that should let a migration
+     * proceed.
+     *
+     * <p>The re-run uses the same toolchain and the same command as the original, so a pass on the
+     * second attempt is a statement about the test rather than about the environment changing.
+     */
+    private Set<String> detectFlaky(MavenBuildAdapter maven, Path moduleRoot,
+                                    BaselineStage.TestOutcome outcome, Path logSink,
+                                    EdgeToolchain toolchain) {
+        List<String> failing = new ArrayList<>();
+        for (BaselineStage.TestCase testCase : outcome.cases()) {
+            if ("FAILED".equals(testCase.outcome()) || "ERROR".equals(testCase.outcome())) {
+                failing.add(testCase.className() + "#" + testCase.name());
+            }
+        }
+        if (failing.isEmpty() || failing.size() > 40) {
+            // A whole suite failing is not flakiness; it is a broken build, and re-running it costs
+            // as much as the original run for no information.
+            return Set.of();
+        }
+
+        Map<String, String> options = new LinkedHashMap<>(toolchain.buildOptions(logSink));
+        String selection = String.join(",", failing.stream()
+                .map(test -> test.replace('#', '#'))
+                .toList());
+        BuildSystemPort.ExecutionResult rerun = maven.invoke(moduleRoot,
+                List.of("-B", "test", "-Dtest=" + selection, "-DfailIfNoSpecifiedTests=false"),
+                options);
+        if (rerun.exitCode() == -1) {
+            return Set.of();
+        }
+
+        BaselineStage.TestOutcome second = BaselineStage.parseTestReports(moduleRoot);
+        Set<String> passedOnRerun = new java.util.LinkedHashSet<>();
+        for (BaselineStage.TestCase testCase : second.cases()) {
+            String key = testCase.className() + "#" + testCase.name();
+            if (failing.contains(key) && "PASSED".equals(testCase.outcome())) {
+                passedOnRerun.add(key);
+            }
+        }
+        return passedOnRerun;
     }
 }

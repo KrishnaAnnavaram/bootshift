@@ -90,9 +90,20 @@ public final class FileMutationGateway implements MutationPort {
         int rejected = 0;
         int failed = 0;
 
-        if (proposals.size() > authorization.maxFiles() && authorization.maxFiles() > 0) {
-            LOG.warn("Proposal batch of {} exceeds the authorized file budget {}",
-                    proposals.size(), authorization.maxFiles());
+        // A budget that only logs is not a budget. The plan authorized a bounded number of files for
+        // this edge; a batch above it is refused as a whole, and every proposal in it is recorded as
+        // REJECTED so the ledger shows what was attempted rather than showing nothing.
+        if (authorization.maxFiles() > 0 && proposals.size() > authorization.maxFiles()) {
+            String reason = "BUDGET_EXCEEDED: batch of " + proposals.size()
+                    + " proposal(s) exceeds the authorized file budget of " + authorization.maxFiles()
+                    + " for edge " + authorization.edgeId();
+            LOG.error("{}", reason);
+            for (TransformationPort.ProposedChange proposal : proposals) {
+                outcomes.add(reject(authorization, proposal, provider,
+                        registry.byPath(FileRegistry.normalize(proposal.path()))
+                                .map(FileRecord::getFileId).orElse(null), reason));
+            }
+            return new BatchOutcome(outcomes, 0, outcomes.size(), 0, null);
         }
 
         for (TransformationPort.ProposedChange proposal : proposals) {
@@ -215,6 +226,7 @@ public final class FileMutationGateway implements MutationPort {
         String afterContent;
         String afterHash;
         String fileId;
+        List<String> mergedFrom = List.of();
 
         switch (operation) {
             case "DELETE" -> {
@@ -281,15 +293,26 @@ public final class FileMutationGateway implements MutationPort {
                 afterHash = Hashing.sha256(afterContent);
                 fileId = existing.get().getFileId();
                 registry.appendVersion(fileId, changeId, relativePath, afterHash, proposal.rationale());
+                // Sources were validated during authorization: each one exists, is active, has a
+                // FILE_ID and is in scope. Deleting a file because its name appeared in a proposal
+                // attribute is how a merge quietly destroys something nobody authorized.
                 String sources = proposal.attributes() == null ? null : proposal.attributes().get("merged_from");
+                List<String> mergedSourceIds = new ArrayList<>();
                 if (sources != null) {
-                    for (String source : sources.split(",")) {
-                        registry.byPath(source.trim()).ifPresent(r -> {
-                            registry.recordMerge(r.getFileId(), existing.get().getFileId(), changeId);
-                            deleteFile(resolveInsideWorkspace(r.getCurrentPath()));
-                        });
+                    for (String raw : sources.split(",")) {
+                        String source = FileRegistry.normalize(raw.trim());
+                        Optional<FileRecord> sourceRecord = registry.byPath(source);
+                        if (sourceRecord.isEmpty()) {
+                            continue;
+                        }
+                        FileRecord merged = sourceRecord.get();
+                        mergedSourceIds.add(merged.getFileId());
+                        String sourcePath = merged.getCurrentPath();
+                        registry.recordMerge(merged.getFileId(), existing.get().getFileId(), changeId);
+                        deleteFile(resolveInsideWorkspace(sourcePath));
                     }
                 }
+                mergedFrom = mergedSourceIds;
                 resolvedOperation = ChangeEvent.Operation.MERGE;
             }
             default -> {
@@ -345,6 +368,11 @@ public final class FileMutationGateway implements MutationPort {
         if (proposal.attributes() != null && proposal.attributes().containsKey("split_from")) {
             event.setSplitFrom(proposal.attributes().get("split_from"));
         }
+        if (!mergedFrom.isEmpty()) {
+            // Lineage in the ledger, not only in the registry: a reviewer reading the chain must be
+            // able to see which identities this file absorbed.
+            event.setMergedInto(String.join(",", mergedFrom));
+        }
         ledger.append(event);
         if (registry.byId(fileId).isPresent()) {
             registry.primeContent(fileId, afterContent == null ? "" : afterContent);
@@ -378,8 +406,21 @@ public final class FileMutationGateway implements MutationPort {
     }
 
     /**
-     * Authorization check. A change is legal only when the target file is in the frozen scope for the
-     * edge, and only when the operation class is permitted.
+     * Authorization check. A change is legal only when every path it touches is in the frozen scope
+     * for the edge, and only when the operation class is permitted.
+     *
+     * <p>Three things this checks that the earlier version did not:
+     *
+     * <ul>
+     *   <li>a RENAME authorizes both the source and the destination path. Authorizing only the
+     *       source let a rename write to any path in the workspace, which is the whole scope check
+     *       undone by one field;</li>
+     *   <li>a MERGE authorizes every {@code merged_from} source and requires each to be a registered,
+     *       active file. Sources were previously read straight out of a proposal attribute and
+     *       deleted;</li>
+     *   <li>prefix matching uses path semantics rather than string prefixes, so an authorized prefix
+     *       of {@code foo} no longer authorizes {@code foobar}.</li>
+     * </ul>
      */
     private String authorize(Authorization authorization, FileRecord record, String path,
                              String operation, TransformationPort.ProposedChange proposal) {
@@ -392,15 +433,56 @@ public final class FileMutationGateway implements MutationPort {
         if ("RENAME".equals(operation) && !authorization.allowRename()) {
             return "Authorization does not permit renames for this edge";
         }
-        boolean fileAuthorized = record != null
-                && authorization.authorizedFileIds().contains(record.getFileId());
-        boolean prefixAuthorized = authorization.authorizedPathPrefixes().stream()
-                .anyMatch(path::startsWith);
-        if (!fileAuthorized && !prefixAuthorized) {
-            return "Path " + path + " is outside the authorized scope of edge " + authorization.edgeId()
-                    + " (" + authorization.authorizedFileIds().size() + " authorized files, "
-                    + authorization.authorizedPathPrefixes().size() + " authorized prefixes)";
+
+        String denial = authorizePath(authorization, record, path, "target");
+        if (denial != null) {
+            return denial;
         }
+
+        if ("RENAME".equals(operation)) {
+            String destination = proposal.newPath() == null ? null
+                    : FileRegistry.normalize(proposal.newPath());
+            if (destination == null || destination.isBlank()) {
+                return "RENAME proposal carried no destination path";
+            }
+            // The destination is a distinct location and needs its own authorization. It may not be
+            // registered yet, so a file-id match is impossible: an authorized prefix is required.
+            if (!prefixAuthorized(authorization, destination)
+                    && registry.byPath(destination)
+                            .filter(r -> authorization.authorizedFileIds().contains(r.getFileId()))
+                            .isEmpty()) {
+                return "RENAME destination " + destination + " is outside the authorized scope of edge "
+                        + authorization.edgeId();
+            }
+        }
+
+        if ("MERGE".equals(operation)) {
+            String sources = proposal.attributes() == null ? null
+                    : proposal.attributes().get("merged_from");
+            if (sources == null || sources.isBlank()) {
+                return "MERGE proposal declared no merged_from sources";
+            }
+            for (String raw : sources.split(",")) {
+                String source = FileRegistry.normalize(raw.trim());
+                if (source.isEmpty()) {
+                    continue;
+                }
+                Optional<FileRecord> sourceRecord = registry.byPath(source);
+                if (sourceRecord.isEmpty()) {
+                    return "MERGE source " + source + " has no registered FILE_ID; a merge may not "
+                            + "consume a file the registry does not describe";
+                }
+                if (sourceRecord.get().getStatus() != FileStatus.ACTIVE) {
+                    return "MERGE source " + source + " is not active ("
+                            + sourceRecord.get().getStatus() + ")";
+                }
+                String sourceDenial = authorizePath(authorization, sourceRecord.get(), source, "merge source");
+                if (sourceDenial != null) {
+                    return sourceDenial;
+                }
+            }
+        }
+
         if (authorization.maxChangedLines() > 0 && proposal.newContent() != null) {
             int changed = estimateChangedLines(record, proposal);
             if (changed > authorization.maxChangedLines()) {
@@ -409,6 +491,48 @@ public final class FileMutationGateway implements MutationPort {
             }
         }
         return null;
+    }
+
+    private String authorizePath(Authorization authorization, FileRecord record, String path,
+                                 String role) {
+        boolean fileAuthorized = record != null
+                && authorization.authorizedFileIds().contains(record.getFileId());
+        if (fileAuthorized || prefixAuthorized(authorization, path)) {
+            return null;
+        }
+        return "Path " + path + " (" + role + ") is outside the authorized scope of edge "
+                + authorization.edgeId() + " (" + authorization.authorizedFileIds().size()
+                + " authorized files, " + authorization.authorizedPathPrefixes().size()
+                + " authorized prefixes)";
+    }
+
+    /**
+     * Path-segment prefix matching.
+     *
+     * <p>{@code String.startsWith} treats {@code foo} as a prefix of {@code foobar}, which on a
+     * security-relevant check means an authorization for one module silently covers a differently
+     * named sibling. Comparison is on normalized path elements instead.
+     */
+    public static boolean isPathPrefix(String prefix, String candidate) {
+        if (prefix == null || candidate == null) {
+            return false;
+        }
+        String normalizedPrefix = FileRegistry.normalize(prefix);
+        String normalizedCandidate = FileRegistry.normalize(candidate);
+        if (normalizedPrefix.isEmpty()) {
+            return false;
+        }
+        if (normalizedCandidate.equals(normalizedPrefix)) {
+            return true;
+        }
+        java.nio.file.Path prefixPath = java.nio.file.Path.of(normalizedPrefix).normalize();
+        java.nio.file.Path candidatePath = java.nio.file.Path.of(normalizedCandidate).normalize();
+        return candidatePath.startsWith(prefixPath);
+    }
+
+    private boolean prefixAuthorized(Authorization authorization, String path) {
+        return authorization.authorizedPathPrefixes().stream()
+                .anyMatch(prefix -> isPathPrefix(prefix, path));
     }
 
     private int estimateChangedLines(FileRecord record, TransformationPort.ProposedChange proposal) {
@@ -482,41 +606,157 @@ public final class FileMutationGateway implements MutationPort {
         return candidate;
     }
 
+    /**
+     * Writes a standards-compliant unified diff.
+     *
+     * <p>The previous implementation emitted bare {@code -}/{@code +} lines with no hunk headers and
+     * no context. That is not a patch: {@code git apply} and {@code patch} both reject it, so the
+     * "patch evidence" attached to every change could not be replayed or validated by anything. A
+     * real diff makes the ledger's patch reference independently checkable.
+     */
     private String writePatch(String changeId, String pathBefore, String pathAfter,
                               String before, String after) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("--- a/").append(pathBefore == null ? "/dev/null" : pathBefore).append('\n');
-        sb.append("+++ b/").append(pathAfter == null ? "/dev/null" : pathAfter).append('\n');
-        List<String> beforeLines = before == null ? List.of() : List.of(before.split("\n", -1));
-        List<String> afterLines = after == null ? List.of() : List.of(after.split("\n", -1));
-        int max = Math.max(beforeLines.size(), afterLines.size());
-        for (int i = 0; i < max; i++) {
-            String left = i < beforeLines.size() ? beforeLines.get(i) : null;
-            String right = i < afterLines.size() ? afterLines.get(i) : null;
-            if (left != null && left.equals(right)) {
-                continue;
-            }
-            if (left != null) {
-                sb.append("-").append(left).append('\n');
-            }
-            if (right != null) {
-                sb.append("+").append(right).append('\n');
-            }
-        }
+        String patch = unifiedDiff(pathBefore, pathAfter, before, after, 3);
         Path patchFile = patchStore.resolve(changeId + ".patch");
         try {
             Files.createDirectories(patchStore);
-            Files.writeString(patchFile, sb.toString(), StandardCharsets.UTF_8);
+            Files.writeString(patchFile, patch, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot write patch " + patchFile, e);
         }
         return patchFile.getFileName().toString();
     }
 
+    /** Unified diff with hunk headers and context, computed from a longest-common-subsequence. */
+    public static String unifiedDiff(String pathBefore, String pathAfter, String before, String after,
+                              int context) {
+        List<String> beforeLines = before == null ? List.of() : List.of(before.split("\n", -1));
+        List<String> afterLines = after == null ? List.of() : List.of(after.split("\n", -1));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("--- ").append(pathBefore == null ? "/dev/null" : "a/" + pathBefore).append('\n');
+        sb.append("+++ ").append(pathAfter == null ? "/dev/null" : "b/" + pathAfter).append('\n');
+
+        List<int[]> ops = diffOps(beforeLines, afterLines);
+        if (ops.stream().noneMatch(op -> op[0] != 0)) {
+            return sb.toString();
+        }
+
+        int index = 0;
+        while (index < ops.size()) {
+            if (ops.get(index)[0] == 0) {
+                index++;
+                continue;
+            }
+            int changeStart = index;
+            int changeEnd = index;
+            for (int scan = index; scan < ops.size(); scan++) {
+                if (ops.get(scan)[0] != 0) {
+                    changeEnd = scan;
+                } else if (scan - changeEnd > 2 * context) {
+                    break;
+                }
+            }
+            int hunkStart = Math.max(0, changeStart - context);
+            int hunkEnd = Math.min(ops.size() - 1, changeEnd + context);
+
+            int oldStart = -1;
+            int newStart = -1;
+            int oldCount = 0;
+            int newCount = 0;
+            StringBuilder body = new StringBuilder();
+            for (int i = hunkStart; i <= hunkEnd; i++) {
+                int[] op = ops.get(i);
+                if (op[1] >= 0 && oldStart < 0) {
+                    oldStart = op[1];
+                }
+                if (op[2] >= 0 && newStart < 0) {
+                    newStart = op[2];
+                }
+                switch (op[0]) {
+                    case 0 -> {
+                        body.append(' ').append(beforeLines.get(op[1])).append('\n');
+                        oldCount++;
+                        newCount++;
+                    }
+                    case -1 -> {
+                        body.append('-').append(beforeLines.get(op[1])).append('\n');
+                        oldCount++;
+                    }
+                    default -> {
+                        body.append('+').append(afterLines.get(op[2])).append('\n');
+                        newCount++;
+                    }
+                }
+            }
+            sb.append("@@ -").append(oldCount == 0 ? 0 : Math.max(0, oldStart) + 1).append(',')
+                    .append(oldCount).append(" +")
+                    .append(newCount == 0 ? 0 : Math.max(0, newStart) + 1).append(',')
+                    .append(newCount).append(" @@\n");
+            sb.append(body);
+            index = hunkEnd + 1;
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Diff operations as {kind, oldIndex, newIndex} where kind is 0 keep, -1 delete, +1 insert.
+     * Standard LCS dynamic program; the inputs here are single source files, so the quadratic table
+     * is not a concern and an approximation would produce misleading patches.
+     */
+    private static List<int[]> diffOps(List<String> before, List<String> after) {
+        int n = before.size();
+        int m = after.size();
+        int[][] lcs = new int[n + 1][m + 1];
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = m - 1; j >= 0; j--) {
+                lcs[i][j] = before.get(i).equals(after.get(j))
+                        ? lcs[i + 1][j + 1] + 1
+                        : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+            }
+        }
+        List<int[]> ops = new ArrayList<>();
+        int i = 0;
+        int j = 0;
+        while (i < n && j < m) {
+            if (before.get(i).equals(after.get(j))) {
+                ops.add(new int[]{0, i, j});
+                i++;
+                j++;
+            } else if (lcs[i + 1][j] >= lcs[i][j + 1]) {
+                ops.add(new int[]{-1, i, -1});
+                i++;
+            } else {
+                ops.add(new int[]{1, -1, j});
+                j++;
+            }
+        }
+        while (i < n) {
+            ops.add(new int[]{-1, i++, -1});
+        }
+        while (j < m) {
+            ops.add(new int[]{1, -1, j++});
+        }
+        return ops;
+    }
+
+    /**
+     * Reverts the workspace to a checkpoint and marks only the changes that rollback actually undid.
+     *
+     * <p>The previous implementation walked the entire ledger and emitted a REVERTED event for every
+     * APPLIED change in the run, including changes made on earlier edges that the rollback did not
+     * touch. The ledger then said work had been undone that was still on disk, which is worse than
+     * no record at all.
+     */
     @Override
     public void revertTo(String checkpointName, String reason) {
+        long revertBoundary = sequenceOfCheckpoint(checkpointName);
         scm.rollbackTo(migrationWorkspace, gitDir, checkpointName);
         for (ChangeLedger.Entry entry : ledger.entries()) {
+            if (entry.sequence() <= revertBoundary) {
+                // Applied before the checkpoint, so the rollback left it in place.
+                continue;
+            }
             if (entry.event().getStatus() == ChangeEvent.Status.APPLIED) {
                 ChangeEvent reverted = new ChangeEvent()
                         .setRunId(runId)
@@ -530,10 +770,42 @@ public final class FileMutationGateway implements MutationPort {
                         .setAgent("mutation-gateway")
                         .setProvider(new ChangeEvent.Provider("REVERT", "checkpoint-rollback", "1.0"))
                         .setStatus(ChangeEvent.Status.REVERTED)
-                        .setRejectionReason(reason);
+                        .setRejectionReason(reason + " [rollback to " + checkpointName
+                                + " undid change " + entry.event().getChangeId() + "]");
                 ledger.append(reverted);
             }
         }
+    }
+
+    /**
+     * The ledger sequence a checkpoint corresponds to.
+     *
+     * <p>Checkpoints are created by {@link #apply} immediately after a batch, so the boundary is the
+     * highest sequence recorded at or before that checkpoint. An unknown checkpoint reverts nothing
+     * rather than everything: refusing to mark changes as reverted is recoverable, marking live
+     * changes as reverted is not.
+     */
+    private long sequenceOfCheckpoint(String checkpointName) {
+        if (checkpointName == null || checkpointName.isBlank()) {
+            return Long.MAX_VALUE;
+        }
+        Optional<ScmPort.Checkpoint> checkpoint =
+                scm.findCheckpoint(migrationWorkspace, gitDir, checkpointName);
+        if (checkpoint.isEmpty()) {
+            LOG.warn("Checkpoint {} is unknown; no ledger entry is marked reverted", checkpointName);
+            return Long.MAX_VALUE;
+        }
+        // The checkpoint name encodes the edge; every change appended after the last event that
+        // preceded it is in scope. Sequence is monotonic, so the boundary is the count at the time.
+        long boundary = 0;
+        for (ChangeLedger.Entry entry : ledger.entries()) {
+            String created = checkpoint.get().createdAt();
+            String recorded = entry.event().getRecordedAt();
+            if (created == null || recorded == null || recorded.compareTo(created) <= 0) {
+                boundary = Math.max(boundary, entry.sequence());
+            }
+        }
+        return boundary;
     }
 
     /**

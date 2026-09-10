@@ -142,8 +142,16 @@ public final class BaselineStage implements Stage {
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
         // ---- environment equivalence contract, established before anything is measured ----------
+        // Ask for the infrastructure the graph says the application needs. Computing the list and
+        // then not asking for it is why nothing was ever provisioned.
+        Map<String, String> environmentRequirements =
+                new LinkedHashMap<>(requirementsFrom(graph, buildModel));
+        for (BuildSystemPort.ModuleModel module : buildModel.modules()) {
+            environmentRequirements.putAll(ValidationSupport.infrastructureRequirements(
+                    module.moduleId(), graph, buildModel));
+        }
         EnvironmentProvider.ProvisionedEnvironment environment = context.environment()
-                .provision("baseline-old", requirementsFrom(graph, buildModel));
+                .provision("baseline-old", environmentRequirements);
         ObjectNode equivalence = Json.obj();
         equivalence.put("provider_mode", environment.mode().name());
         equivalence.put("provider_implementation", environment.providerImplementation());
@@ -152,6 +160,8 @@ public final class BaselineStage implements Stage {
         equivalence.set("attributes", Json.toTree(environment.attributes()));
         equivalence.set("equivalence_gaps", Json.toTree(environment.equivalenceGaps()));
         equivalence.set("endpoints", Json.toTree(environment.endpoints()));
+        equivalence.set("requested_infrastructure", Json.toTree(environmentRequirements));
+        equivalence.put("usable", environment.usable());
         writer.write("environment-equivalence.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), equivalence));
         envelope.environmentFingerprint(environment.fingerprint());
@@ -587,9 +597,50 @@ public final class BaselineStage implements Stage {
     public record TestOutcome(int total, int passed, int failed, int errors, int skipped, List<TestCase> cases) {
     }
 
+    /**
+     * Parses whichever test reports the module's build system produced.
+     *
+     * <p>Maven writes Surefire XML under {@code target/surefire-reports}; Gradle writes JUnit XML
+     * under {@code build/test-results/test}. Reading only the Maven location meant a Gradle module
+     * reported zero tests, and zero tests reads as "nothing regressed".
+     */
+    public static TestOutcome parseTestReports(Path moduleRoot) {
+        TestOutcome maven = parseSurefire(moduleRoot);
+        TestOutcome gradle = parseGradleResults(moduleRoot);
+        if (gradle.total() == 0) {
+            return maven;
+        }
+        if (maven.total() == 0) {
+            return gradle;
+        }
+        List<TestCase> combined = new ArrayList<>(maven.cases());
+        combined.addAll(gradle.cases());
+        return new TestOutcome(maven.total() + gradle.total(), maven.passed() + gradle.passed(),
+                maven.failed() + gradle.failed(), maven.errors() + gradle.errors(),
+                maven.skipped() + gradle.skipped(), combined);
+    }
+
+    /** Parses Gradle's JUnit XML output. Same schema as Surefire, different directory. */
+    public static TestOutcome parseGradleResults(Path moduleRoot) {
+        for (String candidate : List.of("build/test-results/test", "build/test-results")) {
+            Path reports = moduleRoot.resolve(candidate);
+            if (Files.isDirectory(reports)) {
+                TestOutcome outcome = parseJUnitXml(reports);
+                if (outcome.total() > 0) {
+                    return outcome;
+                }
+            }
+        }
+        return new TestOutcome(0, 0, 0, 0, 0, List.of());
+    }
+
     /** Parses Surefire XML reports. Absent reports mean no tests ran, which is itself an observation. */
     public static TestOutcome parseSurefire(Path moduleRoot) {
         Path reports = moduleRoot.resolve("target/surefire-reports");
+        return parseJUnitXml(reports);
+    }
+
+    private static TestOutcome parseJUnitXml(Path reports) {
         List<TestCase> cases = new ArrayList<>();
         int total = 0;
         int failed = 0;

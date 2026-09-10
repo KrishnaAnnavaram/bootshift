@@ -1,6 +1,9 @@
 # Published artifacts. Immutable per run and content-addressed, but regenerable and large.
 # The evidence bundle produced by `bootshift export` is what gets retained, not this tree.
+# Archived planes from earlier runs are kept on disk for audit and ignored for the same reason.
 output/
+output-run-*/
+output-strict-probe/
 
 # Maven build output
 target/

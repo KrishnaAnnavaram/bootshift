@@ -71,5 +71,30 @@ public interface TransformationPort {
 
     boolean handles(String recipeId);
 
+    /**
+     * The capability that actually implements this recipe.
+     *
+     * <p>The planner used to attach "the first AVAILABLE capability whose declared fact types
+     * overlap anything in the run" to every scheduled recipe. That produced plan entries pairing a
+     * Maven POM recipe with a JUnit capability - a claim that a reviewer checking the plan would
+     * find is simply untrue, and a coverage number computed from it means nothing.
+     *
+     * <p>Providers that expose one capability per recipe return it here. The default returns empty,
+     * which the planner records as an explicit "no capability claims this recipe" rather than
+     * silently substituting one.
+     */
+    default java.util.Optional<Capability> capabilityFor(String recipeId, String sourceVersion,
+                                                         String targetVersion) {
+        if (!handles(recipeId)) {
+            return java.util.Optional.empty();
+        }
+        List<Capability> available = capabilities(sourceVersion, targetVersion).stream()
+                .filter(c -> "AVAILABLE".equals(c.status()))
+                .toList();
+        // Exactly one capability means there is no ambiguity to resolve. More than one, and the
+        // provider has to say which, because guessing is what this method exists to stop.
+        return available.size() == 1 ? java.util.Optional.of(available.get(0)) : java.util.Optional.empty();
+    }
+
     TransformationOutcome apply(String recipeId, TransformationRequest request);
 }

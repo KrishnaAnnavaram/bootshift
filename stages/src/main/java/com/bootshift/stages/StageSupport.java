@@ -109,4 +109,22 @@ public final class StageSupport {
         return writer.hashOf("manifest.json") == null
                 ? String.valueOf(writer.hashes().hashCode()) : writer.hashOf("manifest.json");
     }
+
+    /**
+     * Publishes an edge-scoped stage and records where it published into the edge index.
+     *
+     * <p>Publishing advances one {@code latest.json} pointer per stage. In a per-edge loop that
+     * pointer names whichever edge ran last, so a later reader that only follows the pointer sees
+     * one edge and reports it as the migration. Recording the directory here is what lets final
+     * evidence aggregate all of them.
+     */
+    public static String publishForEdge(StageContext context, OutputLayout.StageWriter writer,
+                                        String edgeId, String stageDirectory,
+                                        EdgeIndex.Phase phase, String outcome) {
+        String hash = publish(context, writer);
+        EdgeIndex.open(context)
+                .recordStage(edgeId, stageDirectory, writer.dir(), phase, outcome)
+                .persist();
+        return hash;
+    }
 }

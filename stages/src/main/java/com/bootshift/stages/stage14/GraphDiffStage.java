@@ -121,7 +121,7 @@ public final class GraphDiffStage implements Stage {
                 continue;
             }
             List<Path> sourceRoots = new ArrayList<>();
-            for (String candidate : List.of("src/main/java", "src/test/java", "src/main/kotlin")) {
+            for (String candidate : List.of("src/main/java", "src/test/java")) {
                 Path source = moduleRoot.resolve(candidate);
                 if (Files.isDirectory(source)) {
                     sourceRoots.add(source);
@@ -137,8 +137,11 @@ public final class GraphDiffStage implements Stage {
                     classpath.add(jar);
                 }
             });
+            // Same language level as the baseline graph, so a diff cannot be produced by the two
+            // sides having been parsed as different languages.
             analysisByModule.put(module.moduleId(),
-                    codeModel.analyze(moduleRoot, sourceRoots, classpath));
+                    codeModel.analyze(moduleRoot, sourceRoots, classpath,
+                            module.effectiveJavaRelease(21)));
         }
 
         Map<String, String> configuration = new LinkedHashMap<>();
@@ -242,7 +245,8 @@ public final class GraphDiffStage implements Stage {
             writer.write("last-good-graph.json", lastGood.toNode());
         }
 
-        String hash = StageSupport.publish(context, writer);
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.GRAPH_VERIFIED, "published");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

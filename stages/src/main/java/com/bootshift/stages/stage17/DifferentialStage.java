@@ -10,6 +10,10 @@ import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
+import com.bootshift.ports.approval.ApprovalPort;
+import com.bootshift.ports.approval.DecisionStore;
+import com.bootshift.ports.characterization.Scenario;
+import com.bootshift.ports.characterization.ScenarioObservation;
 import com.bootshift.ports.differential.DifferentialPort;
 import com.bootshift.ports.environment.EnvironmentProvider;
 import com.bootshift.stages.EdgeSupport;
@@ -104,7 +108,11 @@ public final class DifferentialStage implements Stage {
                 "silently-ignored-properties.json");
         JsonNode knowledge = StageSupport.optionalUpstream(context, "08-knowledge",
                 "migration-knowledge.json");
-        JsonNode approvals = StageSupport.optionalUpstream(context, "18-approval", "approval-report.json");
+        // Decisions come from the store, not from Agent 18's published report. Reading the report
+        // made validation depend on the stage that runs after it and derives its gates from
+        // validation's own output, so a legitimately filed decision could not affect the comparison
+        // it was filed for until the whole run was repeated.
+        DecisionStore decisionStore = context.decisions();
 
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId);
@@ -121,7 +129,8 @@ public final class DifferentialStage implements Stage {
                         policyArtifact));
 
         if (!edgePlan.path("differential_required").asBoolean(false)) {
-            String hash = StageSupport.publish(context, writer);
+            String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.DIFFERENTIAL_VALIDATED, "published");
             context.stateMachine().transition(RunState.EDGE_DIFFERENTIAL_VALIDATED, "not required");
             return new StageResult(OUTPUT_DIR, ExitCode.SUCCESS,
                     "Differential validation not required at depth "
@@ -161,7 +170,20 @@ public final class DifferentialStage implements Stage {
             requiredDimensions.add("CONTEXT_CAPABILITY");
         }
 
-        // ---- comparison ---------------------------------------------------------------------------
+        // ---- scenario comparison ------------------------------------------------------------------
+        //
+        // The unit of comparison is the characterization scenario: the same request, executed against
+        // the original application and against the migrated one, captured identically. Comparing
+        // "module plus Actuator dimension" - which is what this stage did while no scenario was ever
+        // executed - compares the shape of two contexts. It cannot see that an endpoint changed
+        // status, that an unauthenticated caller is now let through, or that a response lost a field.
+        List<ObjectNode> scenarioComparisons = new ArrayList<>();
+        ScenarioComparison scenarioOutcome = compareScenarios(context, requiredDimensions,
+                decisionStore, knowledge, unsatisfied, policy, scenarioComparisons);
+
+        // ---- residual module-level comparison -----------------------------------------------------
+        // Kept for the dimensions no scenario covered, so a dimension the plan required is still
+        // accounted for rather than silently absent.
         Map<String, JsonNode> oldByModule = index(baselineRuntime);
         Map<String, JsonNode> newByModule = migratedRuntime == null ? Map.of() : index(migratedRuntime);
         Set<String> modules = new LinkedHashSet<>(oldByModule.keySet());
@@ -172,12 +194,17 @@ public final class DifferentialStage implements Stage {
         List<String> blocking = new ArrayList<>();
 
         for (String dimension : requiredDimensions) {
+            // A dimension already covered by executed scenarios does not need the weaker
+            // module-level fallback; adding it would dilute a real comparison with a metadata one.
+            if (scenarioOutcome.dimensionsCovered().contains(dimension)) {
+                continue;
+            }
             boolean environmentBlocks = !unsatisfied.isEmpty() && dimensionNeedsEquivalence(dimension);
             for (String module : modules) {
                 JsonNode oldSide = oldByModule.get(module);
                 JsonNode newSide = newByModule.get(module);
                 ObjectNode comparison = compare(context, dimension, module, oldSide, newSide, policy,
-                        knowledge, approvals, silentlyIgnored, environmentBlocks, unsatisfied);
+                        knowledge, decisionStore, silentlyIgnored, environmentBlocks, unsatisfied);
                 comparisons.add(comparison);
                 counts.merge(comparison.path("classification").asText(), 1, Integer::sum);
                 String classification = comparison.path("classification").asText();
@@ -188,6 +215,18 @@ public final class DifferentialStage implements Stage {
             }
         }
 
+        // Scenario results come first in the report: they are the strong evidence.
+        comparisons.addAll(0, scenarioComparisons);
+        scenarioComparisons.forEach(c ->
+                counts.merge(c.path("classification").asText(), 1, Integer::sum));
+        scenarioComparisons.forEach(c -> {
+            String classification = c.path("classification").asText();
+            if ("UNEXPLAINED".equals(classification) || "UNEXPECTED".equals(classification)) {
+                blocking.add(classification + " " + c.path("dimension").asText() + " scenario "
+                        + c.path("scenario_id").asText() + ": " + c.path("detail").asText());
+            }
+        });
+
         long notCompared = counts.getOrDefault("NOT_COMPARED", 0);
         if (notCompared > 0) {
             envelope.gap(new Envelope.Gap("GAP-DIFF-001", "DIFFERENTIAL",
@@ -197,6 +236,20 @@ public final class DifferentialStage implements Stage {
 
         ObjectNode report = Json.obj();
         report.put("comparison_count", comparisons.size());
+        report.put("scenario_comparison_count", scenarioComparisons.size());
+        report.put("module_level_comparison_count", comparisons.size() - scenarioComparisons.size());
+        report.set("dimensions_covered_by_scenarios", Json.toTree(scenarioOutcome.dimensionsCovered()));
+        report.set("dimensions_compared_beyond_plan",
+                Json.toTree(scenarioOutcome.dimensionsBeyondPlan()));
+        report.put("scenario_selection_rule", "Every scenario holding a successful observation on "
+                + "both sides is compared. The edge plan's required dimensions decide which "
+                + "dimensions must be accounted for, not which measurements are looked at. A "
+                + "difference is blocking wherever it is found: an unexplained behavioural change in "
+                + "a dimension the plan did not anticipate is exactly the change least likely to "
+                + "have been anticipated.");
+        report.set("scenario_execution_notes", Json.toTree(scenarioOutcome.notes()));
+        report.put("comparison_unit", "characterization scenario; module-level Actuator comparison is "
+                + "a fallback for dimensions no scenario covered and is explicitly weaker evidence");
         report.set("required_dimensions", Json.toTree(requiredDimensions));
         report.set("classification_counts", Json.toTree(counts));
         report.put("normalization_policy_hash", policy.policyHash());
@@ -214,7 +267,8 @@ public final class DifferentialStage implements Stage {
         StageSupport.toEvidence(context, "differential-report", reportArtifact,
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
-        String hash = StageSupport.publish(context, writer);
+        String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
+                com.bootshift.stages.EdgeIndex.Phase.DIFFERENTIAL_VALIDATED, "published");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));
@@ -248,7 +302,7 @@ public final class DifferentialStage implements Stage {
     private ObjectNode compare(StageContext context, String dimension, String module,
                                JsonNode oldSide, JsonNode newSide,
                                DifferentialPort.NormalizationPolicy policy, JsonNode knowledge,
-                               JsonNode approvals, JsonNode silentlyIgnored,
+                               DecisionStore decisionStore, JsonNode silentlyIgnored,
                                boolean environmentBlocks, List<String> unsatisfied) {
         ObjectNode comparison = Json.obj();
         comparison.put("dimension", dimension);
@@ -321,11 +375,16 @@ public final class DifferentialStage implements Stage {
         }
 
         List<String> explanations = explain(differences, knowledge);
-        String approval = approvalFor(approvals, dimension, module);
+        DecisionStore.StoredDecision approval = approvalFor(decisionStore, dimension, module);
         if (approval != null) {
             comparison.put("classification", "EXPECTED");
-            comparison.put("approval_ref", approval);
-            comparison.put("detail", "Difference is covered by a signed intentional-change approval");
+            comparison.put("approval_ref", approval.decision().decisionId());
+            comparison.put("approval_actor", approval.decision().actor());
+            comparison.put("approval_actor_authentication", approval.authentication().name());
+            comparison.put("approval_rationale", approval.decision().rationale());
+            comparison.put("detail", "Difference is covered by a recorded human intentional-change "
+                    + "decision (" + approval.decision().actor() + ", "
+                    + approval.authentication().name() + ")");
             return comparison;
         }
         if (!explanations.isEmpty() && explanations.size() >= differences.size()) {
@@ -452,17 +511,34 @@ public final class DifferentialStage implements Stage {
         return explanations;
     }
 
-    private static String approvalFor(JsonNode approvals, String dimension, String module) {
-        if (approvals == null) {
+    /**
+     * Finds a recorded human decision that covers this dimension and module.
+     *
+     * <p>Only an APPROVED verdict on one of the intentional-change gates counts. A decision on an
+     * unrelated gate, or a DEFERRED one, explains nothing - treating it as an explanation would let
+     * any decision anywhere in the run silence any difference.
+     */
+    private static DecisionStore.StoredDecision approvalFor(DecisionStore store, String dimension,
+                                                            String module) {
+        if (store == null) {
             return null;
         }
-        for (JsonNode decision : approvals.path("decisions")) {
-            if (!"APPROVED".equals(decision.path("verdict").asText())) {
+        for (DecisionStore.StoredDecision stored : store.all()) {
+            ApprovalPort.Decision decision = stored.decision();
+            if (decision.verdict() != ApprovalPort.Verdict.APPROVED) {
                 continue;
             }
-            String scope = decision.path("scope").asText("");
+            boolean intentionalChangeGate = switch (decision.gate()) {
+                case INTENTIONAL_SECURITY_CHANGE, PERSISTENCE_SCHEMA_CHANGE, BUSINESS_OUTCOME_CHANGE,
+                     TEST_EXPECTATION_CHANGE -> true;
+                default -> false;
+            };
+            if (!intentionalChangeGate) {
+                continue;
+            }
+            String scope = decision.scope() == null ? "" : decision.scope();
             if (scope.contains(dimension) && (scope.contains(module) || scope.contains("*"))) {
-                return decision.path("decisionId").asText();
+                return stored;
             }
         }
         return null;
@@ -480,5 +556,207 @@ public final class DifferentialStage implements Stage {
         Map<String, JsonNode> byModule = new LinkedHashMap<>();
         artifact.path("modules").forEach(m -> byModule.put(m.path("module").asText(), m));
         return byModule;
+    }
+
+    // ------------------------------------------------------------------ scenario comparison
+
+    /**
+     * What the scenario comparison produced.
+     *
+     * @param dimensionsCovered dimensions in which at least one scenario was actually compared
+     * @param dimensionsBeyondPlan dimensions compared that the edge plan did not require - free
+     *        evidence, kept because the observations already exist on both sides
+     * @param notes execution notes
+     */
+    record ScenarioComparison(Set<String> dimensionsCovered, Set<String> dimensionsBeyondPlan,
+                              List<String> notes) {
+    }
+
+    /**
+     * Compares OLD and NEW observations of the same scenario.
+     *
+     * <p>Every classification here is reachable and each means something distinct:
+     *
+     * <ul>
+     *   <li>IDENTICAL - the normalized captures agree;</li>
+     *   <li>EXPECTED - they differ, and either a verified migration fact explains the difference or a
+     *       recorded human decision covers it;</li>
+     *   <li>UNEXPECTED - they differ in a way that is a migration defect;</li>
+     *   <li>UNEXPLAINED - they differ and nothing accounts for it;</li>
+     *   <li>NOT_COMPARED - one side did not execute, so there is no comparison, and saying so is the
+     *       only honest option available.</li>
+     * </ul>
+     */
+    private ScenarioComparison compareScenarios(StageContext context, Set<String> requiredDimensions,
+                                                DecisionStore decisionStore, JsonNode knowledge,
+                                                List<String> unsatisfied,
+                                                DifferentialPort.NormalizationPolicy policy,
+                                                List<ObjectNode> out) {
+        Set<String> covered = new LinkedHashSet<>();
+        Set<String> beyondPlan = new LinkedHashSet<>();
+        List<String> notes = new ArrayList<>();
+
+        JsonNode scenarioSource = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-scenarios.json");
+        JsonNode oldObservations = StageSupport.optionalUpstream(context, "10-characterization",
+                "characterization-old-observations.json");
+        JsonNode newObservations = StageSupport.optionalUpstream(context, "16-runtime",
+                "scenario-observations-new.json");
+
+        if (scenarioSource == null) {
+            notes.add("No executable scenarios exist, so no scenario-level comparison was possible");
+            return new ScenarioComparison(covered, beyondPlan, notes);
+        }
+
+        Map<String, ScenarioObservation> oldByScenario = new LinkedHashMap<>();
+        if (oldObservations != null) {
+            for (JsonNode node : oldObservations.path("observations")) {
+                ScenarioObservation observation = ScenarioObservation.fromNode(node);
+                oldByScenario.put(observation.scenarioId(), observation);
+            }
+        }
+        Map<String, ScenarioObservation> newByScenario = new LinkedHashMap<>();
+        if (newObservations != null) {
+            for (JsonNode node : newObservations.path("observations")) {
+                ScenarioObservation observation = ScenarioObservation.fromNode(node);
+                newByScenario.put(observation.scenarioId(), observation);
+            }
+        }
+
+        for (JsonNode node : scenarioSource.path("scenarios")) {
+            Scenario scenario = Scenario.fromNode(node);
+            String dimension = com.bootshift.stages.stage10.ScenarioBuilder
+                    .differentialDimension(scenario.dimension());
+
+            // Every scenario holding an observation on both sides is compared, whether or not this
+            // edge's plan named its dimension.
+            //
+            // The plan's dimension list is derived from the impact set, and the impact set is a
+            // statement about what the harness expects to change - not about what was measured. When
+            // it named only CONTEXT_CAPABILITY, this loop skipped scenarios whose OLD observation had
+            // been frozen against the original application and whose NEW observation had already been
+            // executed against the migrated one: HTTP status codes, security headers, response shapes,
+            // both sides captured, sitting on disk, thrown away. Roughly half the executed oracles
+            // produced no comparison at all, and the dimensions they covered were then reported as
+            // "no comparison executed".
+            //
+            // The frozen dimension list still means something - it says which dimensions this edge is
+            // *required* to account for, and it still drives the module-level fallback and the
+            // coverage statement. It does not decide which measurements are allowed to be looked at.
+            boolean planRequired = requiredDimensions.isEmpty() || requiredDimensions.contains(dimension);
+
+            ObjectNode comparison = Json.obj();
+            comparison.put("scenario_id", scenario.scenarioId());
+            comparison.put("dimension", dimension);
+            comparison.put("plan_required_dimension", planRequired);
+            comparison.put("scenario_dimension", scenario.dimension().name());
+            comparison.put("module", scenario.module());
+            comparison.put("target", scenario.target());
+            comparison.put("scenario_state", scenario.state().name());
+            comparison.put("normalization_policy_hash", policy.policyHash());
+            comparison.put("comparison_unit", "SCENARIO");
+            comparison.put("impact_id", scenario.impactId());
+            comparison.set("knowledge_refs", Json.toTree(scenario.knowledgeRefs()));
+
+            ScenarioObservation oldSide = oldByScenario.get(scenario.scenarioId());
+            ScenarioObservation newSide = newByScenario.get(scenario.scenarioId());
+            comparison.put("old_evidence_ref", oldSide == null ? null : oldSide.rawHash());
+            comparison.put("new_evidence_ref", newSide == null ? null : newSide.rawHash());
+
+            if (!scenario.state().isOracle()) {
+                comparison.put("classification", "NOT_COMPARED");
+                comparison.put("detail", "The scenario never became an oracle (" + scenario.state()
+                        + "): " + scenario.reason());
+                out.add(comparison);
+                continue;
+            }
+            if (oldSide == null || !oldSide.successful()) {
+                comparison.put("classification", "NOT_COMPARED");
+                comparison.put("detail", "No successful observation of the original application: "
+                        + (oldSide == null ? "never executed" : oldSide.failureReason()));
+                out.add(comparison);
+                continue;
+            }
+            if (newSide == null || !newSide.successful()) {
+                comparison.put("classification", "NOT_COMPARED");
+                comparison.put("detail", "No successful observation of the migrated application: "
+                        + (newSide == null ? "never executed" : newSide.failureReason()));
+                out.add(comparison);
+                continue;
+            }
+            if (!unsatisfied.isEmpty() && scenario.dimension().requiresExternalInfrastructure()) {
+                comparison.put("classification", "NOT_COMPARED");
+                comparison.put("detail", "Environment equivalence is not satisfied for a MUST_MATCH "
+                        + "attribute: " + unsatisfied);
+                out.add(comparison);
+                continue;
+            }
+
+            covered.add(dimension);
+            if (!planRequired) {
+                beyondPlan.add(dimension);
+            }
+
+            Normalizer.Applied oldNormalized = Normalizer.normalize(
+                    Json.toTree(oldSide.captured()), dimension);
+            Normalizer.Applied newNormalized = Normalizer.normalize(
+                    Json.toTree(newSide.captured()), dimension);
+            comparison.set("normalization_rules_applied",
+                    Json.toTree(new LinkedHashSet<>(oldNormalized.rulesApplied())));
+
+            List<ObjectNode> differences = diff("", oldNormalized.normalized(),
+                    newNormalized.normalized());
+            comparison.put("difference_count", differences.size());
+            comparison.set("differences", Json.toTree(differences.stream().limit(40).toList()));
+
+            if (differences.isEmpty()) {
+                comparison.put("classification", "IDENTICAL");
+                comparison.put("detail", "The normalized observations of this scenario are identical "
+                        + "on both sides");
+                out.add(comparison);
+                continue;
+            }
+
+            DecisionStore.StoredDecision approval = approvalFor(decisionStore, dimension,
+                    scenario.module());
+            if (approval != null) {
+                comparison.put("classification", "EXPECTED");
+                comparison.put("approval_ref", approval.decision().decisionId());
+                comparison.put("approval_actor", approval.decision().actor());
+                comparison.put("approval_actor_authentication", approval.authentication().name());
+                comparison.put("detail", "Covered by a recorded human intentional-change decision");
+                out.add(comparison);
+                continue;
+            }
+
+            List<String> explanations = explain(differences, knowledge);
+            if (!explanations.isEmpty() && explanations.size() >= differences.size()) {
+                comparison.put("classification", "EXPECTED");
+                comparison.set("explanation_refs", Json.toTree(explanations));
+                comparison.put("detail", "Every difference is explained by a verified migration fact");
+                out.add(comparison);
+                continue;
+            }
+
+            // A security scenario that differs is a defect until something explains it, not merely
+            // an unexplained curiosity: the difference IS the authorization decision changing.
+            boolean securityRelevant = "SECURITY_AUTHORIZATION".equals(dimension);
+            comparison.put("classification", securityRelevant ? "UNEXPECTED" : "UNEXPLAINED");
+            comparison.set("explanation_refs", Json.toTree(explanations));
+            comparison.put("detail", differences.size() + " difference(s) in " + scenario.target()
+                    + (explanations.isEmpty() ? " with no verified migration fact and no recorded "
+                            + "decision to explain them"
+                            : ", of which " + explanations.size() + " are explained")
+                    + (securityRelevant ? ". A change in what an unauthenticated or invalid-credential "
+                            + "caller receives is an authorization change." : ""));
+            out.add(comparison);
+        }
+
+        notes.add(out.size() + " scenario comparison(s) across " + covered.size() + " dimension(s)");
+        if (newObservations == null) {
+            notes.add("The migrated side produced no scenario observations, so every scenario is "
+                    + "NOT_COMPARED");
+        }
+        return new ScenarioComparison(covered, beyondPlan, notes);
     }
 }

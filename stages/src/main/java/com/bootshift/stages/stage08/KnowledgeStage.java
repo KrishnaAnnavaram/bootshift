@@ -108,6 +108,13 @@ public final class KnowledgeStage implements Stage {
         String sourceVersion = target.path("source_version").asText();
         String targetVersion = target.path("landing_version").asText();
 
+        // The frozen path. Facts are attributed to the edges they are actually in force on; a fact
+        // that spans the whole migration says so rather than being offered to every edge as if it
+        // were edge-exact.
+        JsonNode migrationPath = StageSupport.optionalUpstream(context, "06-target",
+                "migration-path.json");
+        List<EdgeSpan> edgeSpans = readEdgeSpans(migrationPath);
+
         VersionSpacePort versionSpace = new MavenCentralVersionSpaceAdapter(context.http());
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
@@ -205,6 +212,7 @@ public final class KnowledgeStage implements Stage {
                         removed++;
                         MigrationFact fact = fact(MigrationFact.Type.ARTIFACT_REMOVED, coordinate)
                                 .versions(sourceVersion, targetVersion)
+                                .component(componentOf(coordinate))
                                 .from(entry.getValue())
                                 .summary(coordinate + " is no longer managed by the target BOM")
                                 .detectionRule("BOM_DIFF_REMOVED")
@@ -220,6 +228,7 @@ public final class KnowledgeStage implements Stage {
                     managedChanged++;
                     MigrationFact fact = fact(MigrationFact.Type.MANAGED_VERSION_CHANGED, coordinate)
                             .versions(sourceVersion, targetVersion)
+                            .component(componentOf(coordinate))
                             .from(entry.getValue()).to(newVersion)
                             .summary(coordinate + " managed version changes from " + entry.getValue()
                                     + " to " + newVersion)
@@ -242,6 +251,65 @@ public final class KnowledgeStage implements Stage {
                     "Managed version and artifact removal facts could not be computed from artifact "
                             + "reality, so documentation candidates cannot be promoted to VERIFIED"));
         }
+
+        // ---------------------------------------------------------- per-edge BOM attribution
+        // The whole-migration BOM diff above says a coordinate changed somewhere between source and
+        // landing. Diffing the BOM at each edge boundary says WHERE, which is what makes a fact
+        // usable as authorization for one edge rather than for all of them. The BOM fetches are
+        // content-addressed and cached, so this costs one request per distinct version.
+        Map<String, List<EdgeSpan>> versionChangeEdges = new LinkedHashMap<>();
+        ObjectNode edgeAttribution = Json.obj();
+        int edgeBomsResolved = 0;
+        if (!edgeSpans.isEmpty()) {
+            Map<String, Map<String, String>> bomByVersion = new LinkedHashMap<>();
+            for (EdgeSpan span : edgeSpans) {
+                for (String version : List.of(span.from(), span.to())) {
+                    if (bomByVersion.containsKey(version)) {
+                        continue;
+                    }
+                    Optional<VersionSpacePort.BomSnapshot> snapshot = versionSpace.bom(
+                            "org.springframework.boot", "spring-boot-dependencies", version);
+                    if (snapshot.isEmpty()) {
+                        continue;
+                    }
+                    Map<String, String> managed = new LinkedHashMap<>();
+                    snapshot.get().entries()
+                            .forEach(e -> managed.put(e.groupId() + ":" + e.artifactId(), e.version()));
+                    bomByVersion.put(version, managed);
+                }
+            }
+            edgeBomsResolved = bomByVersion.size();
+            for (EdgeSpan span : edgeSpans) {
+                Map<String, String> before = bomByVersion.get(span.from());
+                Map<String, String> after = bomByVersion.get(span.to());
+                if (before == null || after == null) {
+                    continue;
+                }
+                for (Map.Entry<String, String> entry : before.entrySet()) {
+                    String coordinate = entry.getKey();
+                    if (!applicationCoordinates.contains(coordinate)) {
+                        continue;
+                    }
+                    String now = after.get(coordinate);
+                    if (now == null || !now.equals(entry.getValue())) {
+                        versionChangeEdges.computeIfAbsent(coordinate, k -> new ArrayList<>()).add(span);
+                    }
+                }
+            }
+            ObjectNode perCoordinate = Json.obj();
+            versionChangeEdges.forEach((coordinate, spans) -> perCoordinate.set(coordinate,
+                    Json.toTree(spans.stream().map(EdgeSpan::edgeId).toList())));
+            edgeAttribution.put("edge_boms_resolved", edgeBomsResolved);
+            edgeAttribution.put("coordinates_attributed", versionChangeEdges.size());
+            edgeAttribution.set("version_change_edges", perCoordinate);
+            edgeAttribution.put("rule", "A fact about an artifact can only be in force on an edge "
+                    + "where that artifact's managed version actually moved.");
+        } else {
+            edgeAttribution.put("edge_boms_resolved", 0);
+            edgeAttribution.put("reason", "No frozen migration path was available, so facts keep "
+                    + "whole-migration validity and are marked SPAN_ONLY");
+        }
+        artifactChannel.set("edge_attribution", edgeAttribution);
 
         // Artifact-existence probes for every coordinate the application declares explicitly.
         int missingAtTarget = 0;
@@ -268,6 +336,7 @@ public final class KnowledgeStage implements Stage {
                 missingAtTarget++;
                 MigrationFact fact = fact(MigrationFact.Type.ARTIFACT_REMOVED, group + ":" + artifact)
                         .versions(sourceVersion, targetVersion)
+                        .component(componentOf(group, artifact))
                         .summary(group + ":" + artifact + " does not resolve at the target version")
                         .detectionRule("ARTIFACT_EXISTENCE_PROBE")
                         .verifyWithArtifactEvidence(existence.detail());
@@ -335,11 +404,14 @@ public final class KnowledgeStage implements Stage {
                     typesRemoved++;
                     MigrationFact removed = fact(MigrationFact.Type.API_REMOVED, change.type())
                             .versions(sourceVersion, targetVersion)
+                            .component(componentOf(parts[0], parts[1]))
                             .summary(change.type() + " is present in " + coordinate + " "
                                     + oldVersion + " and absent in " + newVersion)
                             .detectionRule("PUBLISHED_BYTECODE_DIFF")
                             .verifyWithArtifactEvidence(diff.toolName() + " over "
                                     + coordinate + ":" + oldVersion + " and :" + newVersion);
+                    narrowToVersionChangeEdges(removed, versionChangeEdges.get(coordinate),
+                            sourceVersion, targetVersion);
                     merge(facts, removed);
                     artifactObservations.add(removed.toNode());
                 }
@@ -376,6 +448,9 @@ public final class KnowledgeStage implements Stage {
                     ? MigrationFact.Type.PROPERTY_REMOVED : MigrationFact.Type.PROPERTY_RENAMED;
             MigrationFact fact = fact(type, change.property())
                     .versions(sourceVersion, targetVersion)
+                    .component(componentOfArtifact(change.artifact()))
+                    .validity(sourceVersion, targetVersion,
+                            MigrationFact.ValidityPrecision.SPAN_ONLY)
                     .from(change.property()).to(change.replacement())
                     .summary(change.reason() == null
                             ? change.property() + " is deprecated at the target version"
@@ -404,6 +479,7 @@ public final class KnowledgeStage implements Stage {
 
         // ---------------------------------------------------------- structural facts from the edge
         addStructuralEdgeFacts(facts, sourceVersion, targetVersion, applicationCoordinates);
+        scopeStructuralFactsToBoundary(facts, edgeSpans, sourceVersion, targetVersion);
 
         // ---------------------------------------------------------- optional AI assistance
         ObjectNode aiSection = Json.obj();
@@ -518,6 +594,13 @@ public final class KnowledgeStage implements Stage {
         for (DocumentationPatterns.Extraction extraction : DocumentationPatterns.extract(body)) {
             MigrationFact fact = fact(extraction.type(), extraction.subject())
                     .versions(sourceVersion, targetVersion)
+                    // The document was retrieved for one specific edge, so the candidate it produces
+                    // is in force on that edge only. Carrying the whole migration's span here is what
+                    // let a Boot 3.0 migration guide be offered as authorization for the 3.3 edge.
+                    .validity(document.path("source_version").asText(sourceVersion),
+                            document.path("target_version").asText(targetVersion),
+                            MigrationFact.ValidityPrecision.EDGE_EXACT)
+                    .component(document.path("component").asText("spring-boot"))
                     .from(extraction.subject())
                     .to(extraction.replacement())
                     .summary(extraction.sentence())
@@ -817,5 +900,140 @@ public final class KnowledgeStage implements Stage {
         } catch (RuntimeException e) {
             return 0;
         }
+    }
+
+    // ------------------------------------------------------------------ edge attribution
+
+    /** One edge of the frozen path, reduced to what fact attribution needs. */
+    record EdgeSpan(String edgeId, String edgeClass, String from, String to) {
+    }
+
+    static List<EdgeSpan> readEdgeSpans(JsonNode migrationPath) {
+        List<EdgeSpan> spans = new ArrayList<>();
+        if (migrationPath == null) {
+            return spans;
+        }
+        for (JsonNode edge : migrationPath.path("edges")) {
+            String from = edge.path("fromVersion").asText(null);
+            String to = edge.path("toVersion").asText(null);
+            if (from == null || to == null || from.equals(to)) {
+                continue;
+            }
+            spans.add(new EdgeSpan(edge.path("edgeId").asText(), edge.path("edgeClass").asText(),
+                    from, to));
+        }
+        return spans;
+    }
+
+    /**
+     * Narrows a fact to the edges on which the owning artifact's managed version actually moved.
+     *
+     * <p>A type that disappears between two published jars disappeared on one of the edges that
+     * changed that jar's version. It cannot have disappeared on an edge that did not touch it, so
+     * those edges are excluded. That is a real narrowing from a sound premise, and it is labelled
+     * ARTIFACT_VERSION_WINDOW rather than EDGE_EXACT because it does not identify which one.
+     */
+    static void narrowToVersionChangeEdges(MigrationFact fact, List<EdgeSpan> spans,
+                                           String sourceVersion, String targetVersion) {
+        if (spans == null || spans.isEmpty()) {
+            fact.validity(sourceVersion, targetVersion, MigrationFact.ValidityPrecision.SPAN_ONLY);
+            return;
+        }
+        String low = spans.get(0).from();
+        String high = spans.get(0).to();
+        for (EdgeSpan span : spans) {
+            if (MigrationFact.compare(span.from(), low) < 0) {
+                low = span.from();
+            }
+            if (MigrationFact.compare(span.to(), high) > 0) {
+                high = span.to();
+            }
+            fact.appliesToEdge(span.edgeId());
+        }
+        fact.validity(low, high, spans.size() == 1
+                ? MigrationFact.ValidityPrecision.EDGE_EXACT
+                : MigrationFact.ValidityPrecision.ARTIFACT_VERSION_WINDOW);
+    }
+
+    /**
+     * Binds the structural boundary facts to the major-boundary edge.
+     *
+     * <p>The Jakarta relocation and the language baseline are properties of crossing a major, not of
+     * the migration as a whole. Leaving them span-scoped made every minor edge believe it was
+     * authorized to rewrite namespaces.
+     */
+    static void scopeStructuralFactsToBoundary(Map<String, MigrationFact> facts,
+                                               List<EdgeSpan> spans, String sourceVersion,
+                                               String targetVersion) {
+        EdgeSpan boundary = spans.stream()
+                .filter(s -> "MAJOR_BOUNDARY".equals(s.edgeClass()))
+                .findFirst()
+                .orElse(null);
+        if (boundary == null) {
+            return;
+        }
+        for (MigrationFact fact : facts.values()) {
+            boolean structural = "STRUCTURAL_BOUNDARY".equals(fact.detectionRule())
+                    || "javax.* to jakarta.*".equals(fact.subject())
+                    || (fact.type() == MigrationFact.Type.BASELINE_REQUIREMENT
+                            && "java.version".equals(fact.subject()));
+            if (structural) {
+                fact.validity(boundary.from(), boundary.to(),
+                        MigrationFact.ValidityPrecision.EDGE_EXACT)
+                        .appliesToEdge(boundary.edgeId());
+            }
+        }
+    }
+
+    /** Maps a Maven coordinate to the component a migration fact is about. */
+    static String componentOf(String coordinate) {
+        if (coordinate == null || !coordinate.contains(":")) {
+            return "spring-boot";
+        }
+        String[] parts = coordinate.split(":", 2);
+        return componentOf(parts[0], parts[1]);
+    }
+
+    static String componentOf(String group, String artifact) {
+        String g = group == null ? "" : group;
+        String a = artifact == null ? "" : artifact;
+        if (g.startsWith("org.springframework.boot")) {
+            return "spring-boot";
+        }
+        if (g.startsWith("org.springframework.security")) {
+            return "spring-security";
+        }
+        if (g.startsWith("org.springframework.data")) {
+            return "spring-data";
+        }
+        if (g.startsWith("org.springframework.cloud")) {
+            return "spring-cloud";
+        }
+        if (g.startsWith("org.springframework.batch")) {
+            return "spring-batch";
+        }
+        if (g.startsWith("org.springframework")) {
+            return "spring-framework";
+        }
+        if (g.startsWith("org.hibernate")) {
+            return "hibernate";
+        }
+        if (g.startsWith("com.fasterxml.jackson")) {
+            return "jackson";
+        }
+        if (g.startsWith("jakarta.") || g.startsWith("javax.")) {
+            return "jakarta";
+        }
+        if (g.startsWith("org.apache.tomcat") || a.contains("undertow") || a.contains("jetty")) {
+            return "servlet-container";
+        }
+        return g.isBlank() ? "spring-boot" : g;
+    }
+
+    static String componentOfArtifact(String artifact) {
+        if (artifact == null || artifact.isBlank()) {
+            return "spring-boot";
+        }
+        return artifact.contains(":") ? componentOf(artifact) : componentOf("", artifact);
     }
 }
