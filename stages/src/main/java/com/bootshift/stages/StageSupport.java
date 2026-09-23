@@ -2,10 +2,13 @@ package com.bootshift.stages;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.bootshift.adapters.exec.ProcessRunner;
 import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.evidence.EvidenceManifest;
+import com.bootshift.core.journal.DecisionRecord;
+import com.bootshift.core.journal.StageStepRecord;
 import com.bootshift.core.util.Json;
 
 import java.nio.charset.StandardCharsets;
@@ -24,6 +27,80 @@ public final class StageSupport {
     public static final String SCHEMA_VERSION = "1.0.0";
 
     private StageSupport() {
+    }
+
+    /**
+     * A process runner that reports what it runs to the execution journal.
+     *
+     * <p>Every adapter that shells out already accepts a runner, so attribution is added by handing
+     * them this one rather than by teaching each adapter about runs and stages. A runner built any
+     * other way still works and still enforces every control; it simply records nothing, which is the
+     * right behaviour for a unit test.
+     */
+    public static ProcessRunner runner(StageContext context) {
+        return new ProcessRunner().observedBy(context.journal().commandObserver());
+    }
+
+    /**
+     * Settles a step the stage declared.
+     *
+     * <p>Returns a detached record when there is no attempt in flight, so instrumentation never has
+     * to be guarded by a null check and a stage remains runnable outside a journalled run.
+     */
+    public static StageStepRecord step(StageContext context, String stepId) {
+        return StageExecutionRecorder.step(context, stepId);
+    }
+
+    /** Records a decision against the attempt in flight. */
+    public static void decision(StageContext context, DecisionRecord decision) {
+        context.journal().decision(decision);
+    }
+
+    /** Starts a deterministic decision with the next run-scoped decision id. */
+    public static DecisionRecord.Builder decide(StageContext context, String type, String subject) {
+        return DecisionRecord.deterministic(context.journal().nextDecisionId(), type, subject);
+    }
+
+    /** Records a blind spot on the attempt in flight, when there is one. */
+    public static void blindSpot(StageContext context, String id, String dimension,
+                                 String description, String impact) {
+        var record = context.journal().current();
+        if (record != null) {
+            record.blindSpot(id, dimension, description, impact);
+        }
+    }
+
+    /** Records a fallback on the attempt in flight, when there is one. */
+    public static void fallback(StageContext context, String from, String to, String reason,
+                                String consequence) {
+        var record = context.journal().current();
+        if (record != null) {
+            record.fallback(from, to, reason, consequence);
+        }
+    }
+
+    /** Records a measure in the attempt's mutation summary. */
+    public static void mutationMeasure(StageContext context, String key, Object value) {
+        var record = context.journal().current();
+        if (record != null) {
+            record.mutation(key, value);
+        }
+    }
+
+    /** Records a measure in the attempt's validation summary. */
+    public static void validationMeasure(StageContext context, String key, Object value) {
+        var record = context.journal().current();
+        if (record != null) {
+            record.validation(key, value);
+        }
+    }
+
+    /** Records what the operator should do next, used most by stages that stop. */
+    public static void nextAction(StageContext context, String action) {
+        var record = context.journal().current();
+        if (record != null) {
+            record.nextAction(action);
+        }
     }
 
     public static Envelope envelope(StageContext context, String stageId) {

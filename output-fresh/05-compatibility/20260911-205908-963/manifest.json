@@ -1,0 +1,13 @@
+{
+  "stage" : "05-compatibility",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:59:32.213360300Z",
+  "artifacts" : {
+    "lifecycle-registry.json" : "aa6b295b6f86bd38f1bd5175334cacf1006faf300e34bb053c136c1be6a257e4",
+    "compatibility-registry.json" : "de5e77f1943b2cd70eb0e9af337160a03fa8ba81d5466b410829d0c194c104d4",
+    "artifact-availability.json" : "94e67367b1af90b86068eb32bb8be0ad064707151860fe8eea356f444dc122fb",
+    "internal-components.json" : "bd9646292336ac0b2846508c43bb09aa369da71104f349e2c18e2b9471f43058",
+    "version-space-evidence.json" : "83f5a4bfd1d9ff658d33b3208fcf2b203bbae9d4c59b669ff05b8ae3a8969c01"
+  },
+  "artifact_set_hash" : "b66596eb70d59e9a54eca315cb16e879c098a6bb200029d3eb777a7b5f070952"
+}

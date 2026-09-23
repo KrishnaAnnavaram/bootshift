@@ -1,0 +1,297 @@
+{
+  "pipeline_stage" : "02-build",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:37.471421600Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "plugin_count" : 55,
+  "plugins" : [ {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "configuaration-server"
+  }, {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "department-service"
+  }, {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "discovery-service"
+  }, {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.jacoco",
+    "artifactId" : "jacoco-maven-plugin",
+    "version" : "0.8.7",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "employee-service"
+  }, {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "report-service"
+  }, {
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-maven-plugin",
+    "version" : "2.7.12",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-clean-plugin",
+    "version" : "3.2.0",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-site-plugin",
+    "version" : "3.3",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-compiler-plugin",
+    "version" : "3.10.1",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-war-plugin",
+    "version" : "3.3.2",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-resources-plugin",
+    "version" : "3.2.0",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-surefire-plugin",
+    "version" : "2.22.2",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-install-plugin",
+    "version" : "2.5.2",
+    "module" : "sheduler-service"
+  }, {
+    "groupId" : "org.apache.maven.plugins",
+    "artifactId" : "maven-deploy-plugin",
+    "version" : "2.8.2",
+    "module" : "sheduler-service"
+  } ]
+}

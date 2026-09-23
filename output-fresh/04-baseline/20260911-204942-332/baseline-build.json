@@ -1,0 +1,81 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:50:33.857680300Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "modules_built" : 6,
+  "failures" : 0,
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 5957,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  }, {
+    "module" : "department-service",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 8248,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  }, {
+    "module" : "discovery-service",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 5884,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  }, {
+    "module" : "employee-service",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 11872,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  }, {
+    "module" : "report-service",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 9872,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  }, {
+    "module" : "sheduler-service",
+    "success" : true,
+    "exit_code" : 0,
+    "duration_ms" : 8650,
+    "command" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\runtime-old\\configuaration-server\\mvnw.cmd -B -DskipTests test-compile",
+    "diagnostics" : [ ]
+  } ],
+  "toolchain" : {
+    "required_java_major" : 17,
+    "available" : [ {
+      "version" : "21.0.11",
+      "major" : "21",
+      "home" : "C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot"
+    }, {
+      "version" : "17.0.20.1",
+      "major" : "17",
+      "home" : "C:/Users/annav/tools/jdk-17"
+    } ],
+    "selected_major" : 17,
+    "selected_version" : "17.0.20.1",
+    "selected_home" : "C:/Users/annav/tools/jdk-17",
+    "exact_match" : true
+  }
+}

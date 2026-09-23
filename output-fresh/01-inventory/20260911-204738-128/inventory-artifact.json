@@ -1,0 +1,924 @@
+{
+  "pipeline_stage" : "01-inventory",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:47:38.128134300Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : {
+    "kind" : "PLAIN_DIRECTORY",
+    "rootPath" : "C:/Users/annav/AppData/Local/Temp/bootshift-workspaces/RUN-01M293KJ0RYV603B3JB0CCJJN9/original",
+    "contentManifestHash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b"
+  },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed",
+    "files_discovered" : 99,
+    "modules_discovered" : 6,
+    "signals_recorded" : 104,
+    "rescan" : false,
+    "file_registry_seal" : "b3104303c3acb64fd340c733848a88ac76b26b2a8bc6a42892400ff870a6787d"
+  },
+  "root" : "C:/Users/annav/AppData/Local/Temp/bootshift-workspaces/RUN-01M293KJ0RYV603B3JB0CCJJN9/original",
+  "file_count" : 99,
+  "role_counts" : {
+    "CONFIG_PROPERTIES" : 10,
+    "JAVA_MAIN" : 51,
+    "JAVA_TEST" : 12,
+    "MAVEN_BUILD" : 6,
+    "RESOURCE" : 8,
+    "SETTINGS" : 12
+  },
+  "modules" : [ {
+    "module_id" : "configuaration-server",
+    "file_count" : 7,
+    "total_bytes" : 20751,
+    "java_main" : 1,
+    "java_test" : 1,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 1,
+      "JAVA_MAIN" : 1,
+      "JAVA_TEST" : 1,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 1,
+      "SETTINGS" : 2
+    }
+  }, {
+    "module_id" : "department-service",
+    "file_count" : 16,
+    "total_bytes" : 28004,
+    "java_main" : 8,
+    "java_test" : 1,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 2,
+      "JAVA_MAIN" : 8,
+      "JAVA_TEST" : 1,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 2,
+      "SETTINGS" : 2
+    }
+  }, {
+    "module_id" : "discovery-service",
+    "file_count" : 7,
+    "total_bytes" : 20216,
+    "java_main" : 1,
+    "java_test" : 1,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 1,
+      "JAVA_MAIN" : 1,
+      "JAVA_TEST" : 1,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 1,
+      "SETTINGS" : 2
+    }
+  }, {
+    "module_id" : "employee-service",
+    "file_count" : 32,
+    "total_bytes" : 62474,
+    "java_main" : 18,
+    "java_test" : 7,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 2,
+      "JAVA_MAIN" : 18,
+      "JAVA_TEST" : 7,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 2,
+      "SETTINGS" : 2
+    }
+  }, {
+    "module_id" : "report-service",
+    "file_count" : 21,
+    "total_bytes" : 30978,
+    "java_main" : 14,
+    "java_test" : 1,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 2,
+      "JAVA_MAIN" : 14,
+      "JAVA_TEST" : 1,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 1,
+      "SETTINGS" : 2
+    }
+  }, {
+    "module_id" : "sheduler-service",
+    "file_count" : 16,
+    "total_bytes" : 25223,
+    "java_main" : 9,
+    "java_test" : 1,
+    "build_system" : "MAVEN",
+    "role_counts" : {
+      "CONFIG_PROPERTIES" : 2,
+      "JAVA_MAIN" : 9,
+      "JAVA_TEST" : 1,
+      "MAVEN_BUILD" : 1,
+      "RESOURCE" : 1,
+      "SETTINGS" : 2
+    }
+  } ],
+  "excluded_directories" : [ "target", "build", "out", "bin", ".git", ".idea", ".gradle", ".mvn/wrapper", "node_modules", ".settings", ".vscode" ],
+  "attachments" : [ {
+    "file_id" : "FILE-01M293KMEKR61218YK8DGVCGF7",
+    "path" : "configuaration-server/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMEKJ1Q4WNEYG8J7F10P",
+    "path" : "configuaration-server/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMF7CFD35TD13PQVETBP",
+    "path" : "configuaration-server/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFHTGV1TKC7SBHF4YM3",
+    "path" : "configuaration-server/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFR9RCD69ZD3CZBFBME",
+    "path" : "configuaration-server/src/main/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFRB15PGDGWNFE830H0",
+    "path" : "configuaration-server/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFR1B0831EYCABBQ12P",
+    "path" : "configuaration-server/src/test/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFRZCENXH6NDK9PW0M5",
+    "path" : "department-service/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMFYM1C973YXW63ZRKTW",
+    "path" : "department-service/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMG3JT029NYAY2FTD6W7",
+    "path" : "department-service/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/controller/DepartmentController.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGDNXYE4A6RTBK3FTS2",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/DepartmentServiceApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGEFW8KXW7ASJ1GBZ1P",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/dto/DepartmentResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGEP2KGNZEPR9B230QP",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/model/Department.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGEWWB67S32RY5XQZAQ",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/repository/DepartmentRepository.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGJXR0Q02BGV1Q3VFJE",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/service/DepartmentService.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGN4T35429VFBJ4G69X",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/service/implementation/DepartmentServiceImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGQK20GSF5Z86TK38N3",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/utill/StandardResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "path" : "department-service/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "path" : "department-service/src/main/resources/bootstrap.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGVS6WSGAQZGE03XVB8",
+    "path" : "department-service/src/main/resources/features/departmentTest.feature",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGY3DWZ0QXF58EDMPXK",
+    "path" : "department-service/src/test/java/com/aura/vihanga/departmentservice/DepartmentServiceApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMGY7GMN8QRWJ2EN6D5W",
+    "path" : "discovery-service/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMH0M3CP0T1FZ8MN9MK1",
+    "path" : "discovery-service/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMH69QPJTP4FND9N1Z08",
+    "path" : "discovery-service/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHCA19Y0Z6WYWMB1ZHP",
+    "path" : "discovery-service/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHCBZAHRT6EP02269G2",
+    "path" : "discovery-service/src/main/java/com/aura/vihanga/discoveryservice/DiscoveryServiceApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "path" : "discovery-service/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHH0AZ2A6TEBDYMZEW9",
+    "path" : "discovery-service/src/test/java/com/aura/vihanga/discoveryservice/DiscoveryServiceApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHH2AKD06ZYAENHMBZ1",
+    "path" : "employee-service/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHMQD5CTAV3E92QJ5HJ",
+    "path" : "employee-service/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHS3EPWTNQZEJQYW26W",
+    "path" : "employee-service/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHWB1P07B9KQG6SKZEE",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/advice/EmployeeAdvice.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHWR4M1GX75Q92A6S03",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/config/DepartmentUrlConfiguration.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHW2XHC86DNARV80H2F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/config/WebClientConfig.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/controller/EmployeeController.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJ4RA08EW4B19ZMVT4F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/DepartmentResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJ47NRKYW0F0AWSNQKP",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/EmployeeResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJ4TRNPRVRZV8RK1YQX",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/EmployeeSalaryResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/EmployeeServiceApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJ490X1P7XFZ40GPZ61",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/exception/EmployeeNotFoundException.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJA1HAWMKYGWH5CT0CR",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/model/Employee.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJBW0GEZ4Y5CSGJEZSQ",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/repository/EmployeeRepository.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJCX1TPVP8Y69T22FNH",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/repository/EmployeeSearchRepository.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJD02407SKSET5XQ0Z5",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/EmployeeService.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJDY2BQ44TD7SRYR25Q",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/implementation/EmployeeServiceImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJDY1YK8ESJ4ZH30K3R",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/implementation/ExcelUploadImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJJ030R2JH8F6F4XDW5",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/utill/EmployeeType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJJQ139WTCYMYW8YJ9R",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/utill/GenderType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJJN57E79Z3BJJCKM3H",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/utill/StandardResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "path" : "employee-service/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "path" : "employee-service/src/main/resources/bootstrap.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJP44A4PRCW42ZXF930",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/controller/EmployeeControllerTest.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberConfig.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJRRWQPBWR38A0WPHTM",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberSteps.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJW6EDT7SY36W8TM6VH",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/CucumberIntegrationTest.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJWZTHMHQKF724D7283",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/EmployeeServiceApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJYE7A9HQ01QSSJMCP4",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/repository/EmployeeRepositoryTest.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMJYW9DQ7J350WHQZR8T",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/service/EmployeeServiceTest.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMK09QVVM69S36P9VTAB",
+    "path" : "employee-service/src/test/resources/features/employeeTest.feature",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMK0GR2BR0KTPRKDPBM5",
+    "path" : "report-service/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMK0YCN2BHM72Y0ZH0J8",
+    "path" : "report-service/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMK7CFTXQ2T7SBBH1Z3X",
+    "path" : "report-service/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKC9W1CD4F19T6G7XZF",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/config/DepartmentConfigUrl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEJSA2EMYE246XXSB0",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/config/WebClientConfig.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/controller/EmployeeReportController.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKES019390KSZC93XMK",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/dto/DepartmentResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEBTHA8VS3CYDB6G7X",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/dto/EmployeeResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEQRR7XGRZ8RGDSFPM",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/dto/EmployeeSalaryResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEMN9VJ9Z2AXX6Y42F",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/entity/Employee.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKEQV3WG8EBWP8NZ59P",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/ReportServiceApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKMMCA8QVSNK7A01R1H",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/repository/EmployeeReportRepository.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKMYSQZ11XDMWF4MRDS",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/service/EmployeeReportService.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKN2B7XXN0FV37WC2GW",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/service/implementation/EmployeeReportServiceImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKPWDW3YN69SP9CV0M4",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/utill/EmployeeType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKPJJM02EB2MR74M90C",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/utill/GenderType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKPFTXA0BCA0C8B5G33",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/utill/StandardResponse.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "path" : "report-service/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "path" : "report-service/src/main/resources/bootstrap.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKPRSN0R92P9EHXNE1C",
+    "path" : "report-service/src/test/java/com/aura/vihanga/reportservice/ReportServiceApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKPM5A6AN6P4TR6G60A",
+    "path" : "sheduler-service/.gitignore",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKP13C3HGA6H48PR2SX",
+    "path" : "sheduler-service/mvnw",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMKZM9MR6B5T5JACMV24",
+    "path" : "sheduler-service/mvnw.cmd",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM45PH83FZ7Y1F3KXE3",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/controller/EmployeeSchedulerController.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM49AG28CGFAAZM820B",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/entity/Employee.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM8EYSKH3AZ40XJWNQF",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/repository/EmployeeSchedulerRepository.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM8VNQNGDKWNZ4TQGJV",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/service/EmployeeSchedulerService.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMM84S4V2TZ1D2JNC536",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/service/implementation/EmployeeSchedulerServiceImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMAB58HW0EGKJT7HDN2",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/service/implementation/WomenDaySchedulerImpl.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMASBHGDXCHV15B3YYT",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/ShedulerServiceApplication.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMCBW33PM8N3BZRNXK0",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/utill/EmployeeType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMD5PC37WF8ARZBZXF6",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/utill/GenderType.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMD7JG7F96V8H119FM3",
+    "path" : "sheduler-service/src/main/resources/application.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "path" : "sheduler-service/src/main/resources/bootstrap.properties",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  }, {
+    "file_id" : "FILE-01M293KMMDSZQGEQ8GAZJWTB2D",
+    "path" : "sheduler-service/src/test/java/com/aura/vihanga/shedulerservice/ShedulerServiceApplicationTests.java",
+    "previous_path" : null,
+    "rename_source" : "NONE",
+    "confidence" : 1.0,
+    "newly_allocated" : true,
+    "rule" : "ALLOCATE_NEW"
+  } ]
+}

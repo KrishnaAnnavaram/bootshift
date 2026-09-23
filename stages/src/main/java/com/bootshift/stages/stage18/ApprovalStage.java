@@ -8,6 +8,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Hashing;
@@ -82,11 +83,26 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         return List.of("approval-report.json", "approval-requests.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("APR-001", "Derive approval gates from the evidence so far",
+                        "Gates come from what validation found, not from a fixed checklist"),
+                StepDeclaration.of("APR-002", "Match gates against filed human decisions",
+                        "Decisions arrive from outside the run and are integrity-hashed; the harness never files one for itself"),
+                StepDeclaration.of("APR-003", "Publish the approval report",
+                        "Outstanding requests are listed explicitly"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "APR-001").begin();
         store = context.decisions();
         loadDecisions();
 
+        StageSupport.step(context, "APR-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "APR-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -184,7 +200,10 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         StageSupport.toEvidence(context, "approval-report", reportArtifact,
                 EvidenceManifest.Classification.CONFIDENTIAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
+        StageSupport.step(context, "APR-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "APR-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift report");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

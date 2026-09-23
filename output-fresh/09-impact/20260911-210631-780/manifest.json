@@ -1,0 +1,11 @@
+{
+  "stage" : "09-impact",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:06:34.489818800Z",
+  "artifacts" : {
+    "impact-report.json" : "d4d1e5f89b22ba43f6a52180e2e366672291c32c5cd3f35507b901c99aab086f",
+    "impact-summary.json" : "9f18ffaf255cd72bd729ec59c6f95f0a8d30aefc15387c6e1e27c4aaa6d8344d",
+    "blast-radius.json" : "996dc0163433cac5cfd440fe09f10ba1d47afb24da6413099db20f1cf0737297"
+  },
+  "artifact_set_hash" : "b1293cac918b9ec559d05dba7d1aa7f66eea4fd7538dcfe4b4f0fd5e081bae0b"
+}

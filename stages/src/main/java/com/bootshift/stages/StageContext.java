@@ -7,6 +7,7 @@ import com.bootshift.adapters.scm.GitScmAdapter;
 import com.bootshift.adapters.state.FilesystemRunStateStore;
 import com.bootshift.adapters.telemetry.StructuredTelemetryAdapter;
 import com.bootshift.core.domain.RunContext;
+import com.bootshift.core.journal.RunJournal;
 import com.bootshift.core.policy.HarnessPolicy;
 import com.bootshift.core.state.StateMachine;
 import com.bootshift.core.util.SchemaValidator;
@@ -40,6 +41,7 @@ public final class StageContext {
     private final EnvironmentProvider environment;
     private final Path harnessRoot;
     private final DecisionStore decisions;
+    private final RunJournal journal;
 
     public StageContext(RunContext run,
                         StateMachine stateMachine,
@@ -71,6 +73,11 @@ public final class StageContext {
                         DecisionStore decisions) {
         this.decisions = decisions;
         this.run = run;
+        // Run-scoped, created here so no constructor signature has to carry it and no stage has to
+        // remember to wire it. A resumed run reloads its existing timeline from disk.
+        this.journal = new RunJournal(run.runId(), run.output())
+                .policyHash(run.policy() == null ? null : run.policy().policyHash())
+                .schemaValidator(schemaValidator);
         this.stateMachine = stateMachine;
         this.scm = scm;
         this.runStateStore = runStateStore;
@@ -93,6 +100,17 @@ public final class StageContext {
      */
     public DecisionStore decisions() {
         return decisions;
+    }
+
+    /**
+     * The execution journal for this run.
+     *
+     * <p>Every stage attempt is recorded here whether it succeeds, refuses, fails or throws, and the
+     * record is written beside the stage's own artifacts. Stages settle their declared steps and add
+     * decisions through it; {@code StageExecutor} owns its lifecycle.
+     */
+    public RunJournal journal() {
+        return journal;
     }
 
     /**

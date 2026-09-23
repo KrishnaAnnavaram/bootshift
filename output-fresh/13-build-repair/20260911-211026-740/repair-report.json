@@ -1,0 +1,27 @@
+{
+  "pipeline_stage" : "13-build-repair",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:11:50.284974200Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "ai_enabled" : false,
+  "ai_attempts_used" : 0,
+  "ai_attempt_budget" : 12,
+  "attempts_per_root_cause_budget" : 4,
+  "attempts_per_root_cause" : { },
+  "repair_order" : "verified deterministic rule -> knowledge-grounded template -> optional bounded AI proposal, each verified before the gateway sees it",
+  "ledger_head" : "f3c29169d33faef8bc2f987dca31756156ed62f429a8e3b4bc2f733a8141fb47"
+}

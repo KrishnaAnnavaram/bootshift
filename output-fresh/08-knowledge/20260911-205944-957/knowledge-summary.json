@@ -1,0 +1,39 @@
+{
+  "pipeline_stage" : "08-knowledge",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:06:31.552086400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "by_type" : {
+    "API_REMOVED" : 1034,
+    "API_RENAMED" : 3,
+    "ARTIFACT_REMOVED" : 3,
+    "BASELINE_REQUIREMENT" : 1,
+    "BEHAVIOR_CHANGED_NO_API_CHANGE" : 1,
+    "COMPATIBILITY_REQUIREMENT" : 1,
+    "MANAGED_VERSION_CHANGED" : 105,
+    "PROPERTY_REMOVED" : 154,
+    "PROPERTY_RENAMED" : 389
+  },
+  "by_status" : {
+    "CANDIDATE" : 8,
+    "VERIFIED" : 1683
+  },
+  "by_channel" : {
+    "ARTIFACT" : 1683,
+    "DOCUMENTATION" : 8
+  }
+}

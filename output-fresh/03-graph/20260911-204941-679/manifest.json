@@ -1,0 +1,25 @@
+{
+  "stage" : "03-graph",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:49:41.954453800Z",
+  "artifacts" : {
+    "application-graph.json" : "f7a223fda7e0102926c19bb22f4dc1e9d6df5de8d908cfe717a90aed56b4f7d3",
+    "file-registry.json" : "74125cbe332c476cdfd48469633345b35ed9f6e093ebdfc0a0939a606bb40c1e",
+    "symbol-registry.json" : "360e63f5b9169ad4d641d251eb5b844865fa76b485af052b3a0cd9eb359951ea",
+    "module-graph.json" : "c60ef5d70ac6bfcb78252fb7e3e501adeb27ead0ea8cd95f85f74e70f38dfd00",
+    "file-graph.json" : "1cadab052da945ef1ae0e4bf66ef3f1653a1f0b98b079bd7eb43b8209377401f",
+    "symbol-graph.json" : "8359ff6a4a0f9c26a1ea89c53f989dd6faf3c65781a5a6d6ff0f74263a48b928",
+    "dependency-graph.json" : "20d6dff47d583aef111f8d337d0ed2f0bd178505e4d91149db7b8f1ed0ce61f7",
+    "spring-graph.json" : "df9f2cc42ca167fad83f237de610e58420ed36ed35f8df9151a397135f9f4c5b",
+    "configuration-graph.json" : "6fd9c79f94df7983f0cdedb5d70e2ee74a3e09d9009271d1bd53b289d2b7255b",
+    "persistence-graph.json" : "7db6f51f0e9f04779fd1073e489c26b62637261f6c52f20dcf4ee8b7b45d3e54",
+    "endpoint-graph.json" : "2d0772eec66fa5640ac9f01720cb4c0a62771d13c515fdfba333edaefef94f8f",
+    "test-graph.json" : "026b07d4317c4206f6deefdddbb06a9542e38d2887f29b8dfcedb09d7b40535e",
+    "integration-graph.json" : "34c843991cc9fede292777f158a8ff6b3a941a8b55edadb080edec77b1b88394",
+    "graph-summary.json" : "cbd6ec30fd9a77ceeb5ee0a7075c8fbac0f8e4d30d95c1c631de0cf240238c90",
+    "graph-issues.json" : "59340da0b3d643893ab5d00aa8fd3cde57a0b81cc60926bfacd6e6266d610a19",
+    "graph-verification-report.json" : "fa9af077b5444582d7ae4f41c9bf442a880831148d737cab68f329a6a9f63639",
+    "graph-verification-report.md" : "d0117c5c7498cb730480efc506766b0800b777fbaa251295dd1cb14d4418e194"
+  },
+  "artifact_set_hash" : "2e6d748d34d6126b8d282566f10927fe5c96a8d8aeb53ffe746e76636b7aa1e3"
+}

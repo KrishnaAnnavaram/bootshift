@@ -10,6 +10,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
@@ -105,8 +106,21 @@ public final class TargetResolverStage implements Stage {
                 "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("TGT-001", "Load compatibility registry and build model",
+                        "Candidate targets are drawn from verified lifecycle data, not from a hard-coded list"),
+                StepDeclaration.of("TGT-002", "Filter candidates and select the landing target",
+                        "Every rejected candidate keeps the rule that rejected it, so the choice is auditable"),
+                StepDeclaration.of("TGT-003", "Freeze the migration path",
+                        "Splits the jump into edges at major boundaries and freezes the toolchain for each"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "TGT-001").begin();
         JsonNode lifecycle = StageSupport.requireUpstream(context, "05-compatibility",
                 "lifecycle-registry.json", "Run: harness compatibility");
         JsonNode compatibility = StageSupport.requireUpstream(context, "05-compatibility",
@@ -136,7 +150,8 @@ public final class TargetResolverStage implements Stage {
         // harness. The harness JVM and the application toolchain are separate concerns, and deriving
         // one from the other is how a migration silently acquires a compiler-target change nobody
         // asked for.
-        List<ToolchainProbe.Jdk> installedJdks = new ToolchainProbe().discover();
+        List<ToolchainProbe.Jdk> installedJdks =
+                new ToolchainProbe(StageSupport.runner(context)).discover();
         List<Integer> availableJdks = new ArrayList<>(installedJdks.stream()
                 .map(ToolchainProbe.Jdk::major).distinct().sorted().toList());
         if (availableJdks.isEmpty()) {
@@ -179,6 +194,9 @@ public final class TargetResolverStage implements Stage {
             }
         }
 
+        StageSupport.step(context, "TGT-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "TGT-002").begin();
+        recordTargetDecisions(context, candidates, landing, selectionMode, requestedTarget);
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
                 .stat("candidates_evaluated", candidates.size())
@@ -189,7 +207,10 @@ public final class TargetResolverStage implements Stage {
                     selectionMode, List.of());
             writer.write("target-resolution-report.json",
                     StageSupport.compose(envelope, report));
+            StageSupport.step(context, "TGT-003").begin();
             StageSupport.publish(context, writer);
+            StageSupport.step(context, "TGT-003").succeed("Published and pointer advanced");
+            StageSupport.nextAction(context, "Run: bootshift documentation");
             throw HarnessException.block(buildNoViableTargetExplanation(context, candidates));
         }
 
@@ -260,7 +281,10 @@ public final class TargetResolverStage implements Stage {
         long boundaryEdges = path.stream()
                 .filter(c -> EdgeClass.MAJOR_BOUNDARY.name().equals(c.edgeClass())).count();
         if (boundaryEdges < majorsToCross) {
+            StageSupport.step(context, "TGT-003").begin();
             StageSupport.publish(context, writer);
+            StageSupport.step(context, "TGT-003").succeed("Published and pointer advanced");
+            StageSupport.nextAction(context, "Run: bootshift documentation");
             throw HarnessException.stageFailure(
                     "Migration path is missing a mandatory major boundary: crossing from "
                             + currentVersion + " to " + landing.version() + " spans " + majorsToCross
@@ -281,7 +305,10 @@ public final class TargetResolverStage implements Stage {
         }
         if (landingEdge != null && !com.bootshift.adapters.build.JavaTargetSelector
                 .isLts(landingEdge.edgeJava()) && !context.policy().allowNonLtsJavaLanding()) {
+            StageSupport.step(context, "TGT-003").begin();
             StageSupport.publish(context, writer);
+            StageSupport.step(context, "TGT-003").succeed("Published and pointer advanced");
+            StageSupport.nextAction(context, "Run: bootshift documentation");
             throw HarnessException.block("The only admissible Java target for the landing edge is "
                     + landingEdge.edgeJava() + ", which is not a long-term-support release, and "
                     + "policy allow_non_lts_java_landing is false. "
@@ -296,7 +323,10 @@ public final class TargetResolverStage implements Stage {
                     "Target artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "TGT-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "TGT-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift documentation");
         context.stateMachine().transition(RunState.TARGET_RESOLVED, "landing " + landing.version());
         context.stateMachine().transition(RunState.TARGET_FROZEN, "target frozen");
         context.runStateStore().updateState(context.run().runId(), RunState.TARGET_FROZEN,
@@ -788,5 +818,61 @@ public final class TargetResolverStage implements Stage {
 
     static int compare(String left, String right) {
         return com.bootshift.stages.stage05.CompatibilityStage.compareVersions(left, right);
+    }
+
+    /**
+     * Records why the landing target is the one it is, and why every other candidate is not.
+     *
+     * <p>"Target 3.5.16 was selected" is not auditable. Which candidates existed, which rule
+     * eliminated each of the rest, and what the selection mode was, is - and it costs one record per
+     * candidate. The rejections matter more than the selection: a reviewer disputing this migration
+     * disputes an exclusion far more often than the inclusion.
+     *
+     * <p>Every decision here is {@code DETERMINISTIC_RULE}. Nothing in target selection consults a
+     * model, and the elimination strings are produced by the same evaluation that produced the
+     * artifact, so the journal and the report cannot disagree.
+     */
+    private void recordTargetDecisions(StageContext context, List<Candidate> candidates,
+                                       Candidate landing, String selectionMode,
+                                       String requested) {
+        for (Candidate candidate : candidates) {
+            boolean selected = landing != null && candidate.line().equals(landing.line());
+            var decision = StageSupport.decide(context, "LANDING_TARGET_CANDIDATE",
+                            "Spring Boot " + candidate.line())
+                    .decided(selected ? "SELECTED" : candidate.viable() ? "VIABLE_NOT_CHOSEN"
+                            : "REJECTED")
+                    .confidence(candidate.lifecycleEvidenceQuality())
+                    .policy("selection_mode=" + selectionMode);
+
+            if (selected) {
+                decision.because("Highest-scoring viable candidate under " + selectionMode
+                        + "; score " + candidate.score() + ", support horizon "
+                        + candidate.supportHorizonMonths() + " month(s)");
+            } else if (!candidate.viable()) {
+                decision.because(String.join("; ", candidate.eliminations()));
+            } else {
+                decision.because("Viable, but scored " + candidate.score()
+                        + " against the selected candidate");
+            }
+            candidates.stream()
+                    .filter(other -> !other.line().equals(candidate.line()))
+                    .map(Candidate::line)
+                    .forEach(decision::alternative);
+            // A caution is not a rejection: it becomes an approval gate rather than being decided
+            // here, and recording it keeps that distinction visible.
+            candidate.cautions().forEach(caution ->
+                    decision.evidence("caution: " + caution));
+            StageSupport.decision(context, decision.build());
+        }
+
+        if (landing != null) {
+            StageSupport.decision(context, StageSupport.decide(context, "LANDING_TARGET",
+                            requested == null ? "auto" : requested)
+                    .decided(landing.version())
+                    .because("Selection mode " + selectionMode + " over "
+                            + candidates.size() + " evaluated candidate(s)")
+                    .confidence(landing.lifecycleEvidenceQuality())
+                    .build());
+        }
     }
 }

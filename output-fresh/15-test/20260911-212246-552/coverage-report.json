@@ -1,0 +1,84 @@
+{
+  "pipeline_stage" : "15-test",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:27:36.313982500Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-2-PATCH",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "gate_enabled" : true,
+  "threshold_percentage_points" : 5.0,
+  "note" : "Preserved coverage is not proof of preserved behaviour; an unexplained material drop is nonetheless a migration-regression signal",
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "available" : true,
+    "baseline_available" : true,
+    "instruction_covered_ratio" : 0.375,
+    "baseline_instruction_covered_ratio" : 0.375,
+    "branch_covered_ratio" : 0.0,
+    "detail" : null,
+    "percentage_point_change" : 0.0,
+    "gate_triggered" : false
+  }, {
+    "module" : "department-service",
+    "available" : true,
+    "baseline_available" : true,
+    "instruction_covered_ratio" : 0.0251,
+    "baseline_instruction_covered_ratio" : 0.0251,
+    "branch_covered_ratio" : 0.0,
+    "detail" : null,
+    "percentage_point_change" : 0.0,
+    "gate_triggered" : false
+  }, {
+    "module" : "discovery-service",
+    "available" : true,
+    "baseline_available" : true,
+    "instruction_covered_ratio" : 0.375,
+    "baseline_instruction_covered_ratio" : 0.375,
+    "branch_covered_ratio" : 0.0,
+    "detail" : null,
+    "percentage_point_change" : 0.0,
+    "gate_triggered" : false
+  }, {
+    "module" : "employee-service",
+    "available" : false,
+    "baseline_available" : false,
+    "instruction_covered_ratio" : 0.0,
+    "baseline_instruction_covered_ratio" : 0.0,
+    "branch_covered_ratio" : 0.0,
+    "detail" : "Coverage instrumentation could not attach: Corrupted STDOUT by directly writing to native stream in forked JVM 1. Stream 'FATAL ERROR in native method: processing of -javaagent failed, processJavaStart failed'.. Tests were re-run without the agent so the test outcome is still observed, but no coverage number exists for this module.",
+    "gate_triggered" : false,
+    "gate_note" : "Coverage could not be compared for this module; the gate is reported as not evaluated rather than as passed"
+  }, {
+    "module" : "report-service",
+    "available" : true,
+    "baseline_available" : true,
+    "instruction_covered_ratio" : 0.0215,
+    "baseline_instruction_covered_ratio" : 0.0215,
+    "branch_covered_ratio" : 0.0,
+    "detail" : null,
+    "percentage_point_change" : 0.0,
+    "gate_triggered" : false
+  }, {
+    "module" : "sheduler-service",
+    "available" : true,
+    "baseline_available" : true,
+    "instruction_covered_ratio" : 0.0232,
+    "baseline_instruction_covered_ratio" : 0.0232,
+    "branch_covered_ratio" : 0.0,
+    "detail" : null,
+    "percentage_point_change" : 0.0,
+    "gate_triggered" : false
+  } ]
+}

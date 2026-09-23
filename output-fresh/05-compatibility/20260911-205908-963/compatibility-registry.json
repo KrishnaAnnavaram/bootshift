@@ -1,0 +1,190 @@
+{
+  "pipeline_stage" : "05-compatibility",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:15.194643900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "application_uses_spring_cloud" : true,
+  "current_spring_boot" : "2.7.12",
+  "current_java" : "17",
+  "current_spring_cloud" : "2021.0.7",
+  "running_jdk_major" : 21,
+  "available_jdk_majors" : [ 17, 21 ],
+  "rule" : "Absence of compatibility evidence is UNKNOWN, never compatible",
+  "assertions" : [ {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "2.7",
+    "object" : "2021.0.9",
+    "status" : "ADVISORY",
+    "evidence" : "spring-cloud-starter-parent 2021.0.9 declares spring-boot-starter-parent 2.6 as its parent; it is the newest train built against a Boot version at or below 2.7 within the same major"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "2.7",
+    "object" : "[8, 11, 17]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "2.7",
+    "object" : "2023-11-24",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.0",
+    "object" : "2022.0.5",
+    "status" : "VERIFIED",
+    "evidence" : "spring-cloud-starter-parent 2022.0.5 declares spring-boot-starter-parent 3.0 as its parent, matching this line exactly"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.0",
+    "object" : "[17, 18, 19]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.0",
+    "object" : "2023-11-24",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.1",
+    "object" : "2022.0.5",
+    "status" : "ADVISORY",
+    "evidence" : "spring-cloud-starter-parent 2022.0.5 declares spring-boot-starter-parent 3.0 as its parent; it is the newest train built against a Boot version at or below 3.1 within the same major"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.1",
+    "object" : "[17, 18, 19, 20, 21]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.1",
+    "object" : "2024-05-23",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.2",
+    "object" : "2023.0.5",
+    "status" : "VERIFIED",
+    "evidence" : "spring-cloud-starter-parent 2023.0.5 declares spring-boot-starter-parent 3.2 as its parent, matching this line exactly"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.2",
+    "object" : "[17, 18, 19, 20, 21]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.2",
+    "object" : "2024-12-31",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.3",
+    "object" : "2023.0.6",
+    "status" : "VERIFIED",
+    "evidence" : "spring-cloud-starter-parent 2023.0.6 declares spring-boot-starter-parent 3.3 as its parent, matching this line exactly"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.3",
+    "object" : "[17, 18, 19, 20, 21, 22, 23]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.3",
+    "object" : "2025-06-30",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.4",
+    "object" : "2024.0.3",
+    "status" : "VERIFIED",
+    "evidence" : "spring-cloud-starter-parent 2024.0.3 declares spring-boot-starter-parent 3.4 as its parent, matching this line exactly"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.4",
+    "object" : "[17, 18, 19, 20, 21, 22, 23, 24]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.4",
+    "object" : "2025-12-31",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "3.5",
+    "object" : "2025.0.3",
+    "status" : "VERIFIED",
+    "evidence" : "spring-cloud-starter-parent 2025.0.3 declares spring-boot-starter-parent 3.5 as its parent, matching this line exactly"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "3.5",
+    "object" : "[17, 18, 19, 20, 21, 22, 23, 24, 25]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "3.5",
+    "object" : "2026-06-30",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "4.0",
+    "object" : null,
+    "status" : "UNKNOWN",
+    "evidence" : "No published Spring Cloud starter parent targets this Boot line"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "4.0",
+    "object" : "[17, 18, 19, 20, 21, 22, 23, 24, 25]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "4.0",
+    "object" : "2026-12-31",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_TO_SPRING_CLOUD",
+    "subject" : "4.1",
+    "object" : null,
+    "status" : "UNKNOWN",
+    "evidence" : "No published Spring Cloud starter parent targets this Boot line"
+  }, {
+    "kind" : "SPRING_BOOT_TO_JAVA",
+    "subject" : "4.1",
+    "object" : "[17, 18, 19, 20, 21, 22, 23, 24, 25, 26]",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  }, {
+    "kind" : "SPRING_BOOT_SUPPORT_WINDOW",
+    "subject" : "4.1",
+    "object" : "2027-07-31",
+    "status" : "VERIFIED",
+    "evidence" : "official Spring Boot support policy"
+  } ]
+}

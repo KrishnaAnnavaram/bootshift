@@ -1,0 +1,226 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M293KMDEAJ9WDG12S09X41FF",
+  "stage_id" : "01-inventory",
+  "stage_name" : "InventoryStage",
+  "edge_id" : null,
+  "purpose" : "Discover what repository was received and allocate permanent file identities",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T20:47:37.902532500Z",
+  "finished_at" : "2026-09-11T20:47:38.258019400Z",
+  "duration_ms" : 355,
+  "state_before" : "OSS_POLICY_VERIFIED",
+  "state_after" : "FILE_REGISTRY_SEALED",
+  "status" : "SUCCESS",
+  "summary" : "99 files across 6 module(s); 104 migration signal(s); registry sealed as b3104303c3acb64fd340c733848a88ac76b26b2a8bc6a42892400ff870a6787d (content 3982fd4e3e180eeb)",
+  "attempt_directory" : "20260911-204738-128",
+  "declared_preconditions" : [ "OSS_POLICY_VERIFIED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:OSS_POLICY_VERIFIED",
+    "satisfied" : true,
+    "detail" : "Proven by 00-bootstrap/oss-license-gate.json",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ ],
+  "resolved_inputs" : [ ],
+  "declared_steps" : [ "INV-001", "INV-002", "INV-003", "INV-004", "INV-005", "INV-006", "INV-007", "INV-008", "INV-009" ],
+  "executed_steps" : [ {
+    "step_id" : "INV-001",
+    "sequence" : 1,
+    "name" : "Resolve the scan root",
+    "purpose" : "Prefer the immutable original snapshot over the caller's own directory",
+    "status" : "SUCCESS",
+    "status_reason" : "Scanned the immutable original snapshot",
+    "started_at" : "2026-09-11T20:47:37.902532500Z",
+    "finished_at" : "2026-09-11T20:47:37.902532500Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "INV-002",
+    "sequence" : 2,
+    "name" : "Load or create the file registry",
+    "purpose" : "A rescan reattaches existing identities instead of minting new ones",
+    "status" : "SUCCESS",
+    "status_reason" : "Created a fresh registry",
+    "started_at" : "2026-09-11T20:47:37.902532500Z",
+    "finished_at" : "2026-09-11T20:47:37.902532500Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "rescan" : false,
+      "existing_identities" : 0
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-003",
+    "sequence" : 3,
+    "name" : "Enumerate files",
+    "purpose" : "Walks the tree, applying the directory exclusion list",
+    "status" : "SUCCESS",
+    "status_reason" : "99 file(s) enumerated",
+    "started_at" : "2026-09-11T20:47:37.902532500Z",
+    "finished_at" : "2026-09-11T20:47:37.937286700Z",
+    "duration_ms" : 34,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "files_found" : 99
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-004",
+    "sequence" : 4,
+    "name" : "Classify roles and hash content",
+    "purpose" : "Assigns a FileRole and a SHA-256 to every readable file",
+    "status" : "SUCCESS",
+    "status_reason" : "Every file classified and hashed",
+    "started_at" : "2026-09-11T20:47:37.939300700Z",
+    "finished_at" : "2026-09-11T20:47:38.125532100Z",
+    "duration_ms" : 186,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "roles_assigned" : 6,
+      "unreadable" : 0
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-005",
+    "sequence" : 5,
+    "name" : "Allocate or reattach permanent FILE_IDs",
+    "purpose" : "Identity has to survive a rename, or lineage breaks at the first move",
+    "status" : "SUCCESS",
+    "status_reason" : "99 identity attachment(s)",
+    "started_at" : "2026-09-11T20:47:37.939300700Z",
+    "finished_at" : "2026-09-11T20:47:38.125532100Z",
+    "duration_ms" : 186,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "identities" : 99
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-006",
+    "sequence" : 6,
+    "name" : "Collect migration-relevant signals",
+    "purpose" : "Records where migration-significant constructs appear, by FILE_ID",
+    "status" : "SUCCESS",
+    "status_reason" : "104 migration signal(s)",
+    "started_at" : "2026-09-11T20:47:37.939300700Z",
+    "finished_at" : "2026-09-11T20:47:38.125532100Z",
+    "duration_ms" : 186,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "signals" : 104
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-007",
+    "sequence" : 7,
+    "name" : "Scan for exposed secrets",
+    "purpose" : "Findings are recorded as metadata; no secret value is ever stored",
+    "status" : "SUCCESS",
+    "status_reason" : "0 exposure finding(s); no value stored",
+    "started_at" : "2026-09-11T20:47:37.939300700Z",
+    "finished_at" : "2026-09-11T20:47:38.128134300Z",
+    "duration_ms" : 188,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "findings" : 0
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-008",
+    "sequence" : 8,
+    "name" : "Seal the file registry",
+    "purpose" : "Freezes identity for the run so later stages cannot renumber it",
+    "status" : "SUCCESS",
+    "status_reason" : "Registry sealed",
+    "started_at" : "2026-09-11T20:47:38.128134300Z",
+    "finished_at" : "2026-09-11T20:47:38.128134300Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "seal_hash" : "b3104303c3acb64fd340c733848a88ac76b26b2a8bc6a42892400ff870a6787d"
+    },
+    "error" : null
+  }, {
+    "step_id" : "INV-009",
+    "sequence" : 9,
+    "name" : "Publish inventory artifacts",
+    "purpose" : "Schema-validated, then the pointer advances",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T20:47:38.128134300Z",
+    "finished_at" : "2026-09-11T20:47:38.247835900Z",
+    "duration_ms" : 119,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "artifacts" : 5
+    },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "inventory-artifact.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\inventory-artifact.json",
+    "hash" : "d692405e0e39e4ca11d86fb4c6e3cede684a214c4894731525b166a514493f59"
+  }, {
+    "name" : "file-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\file-registry.json",
+    "hash" : "886d68b23018a84f008b52c9accb80330bd109411176538d5f7e7f3d5cba634d"
+  }, {
+    "name" : "inventory-signals.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\inventory-signals.json",
+    "hash" : "eae4b4cf049f8114e7bdc1e313b2f767a245b602e3d860fa4c961455727cda46"
+  }, {
+    "name" : "inventory-issues.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\inventory-issues.json",
+    "hash" : "36c169d57b7bf06c970cc946de1a712d40519e5ebf270c53fd6202df9d67d2de"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\manifest.json",
+    "hash" : "4718e64e8dbfb253978190a1f96b003e99e49581e13dd9cd1709b45c44770751"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-709284120",
+  "next_action" : "Run: bootshift resolve-build",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

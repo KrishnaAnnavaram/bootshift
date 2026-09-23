@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Edge execution aggregate",
+  "description": "Everything one migration edge did, resolved from the run timeline so every attempt is included rather than only the one the stage pointer names. Derived: every field is a copy of, or a reference to, a stage execution record that already exists.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "edge_id",
+    "generated_at",
+    "stages",
+    "attempts",
+    "result"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "run_id": {"type": ["string", "null"]},
+    "edge_id": {"type": "string"},
+    "generated_at": {"type": "string"},
+    "purpose": {"type": "string"},
+    "plan": {
+      "type": ["object", "null"],
+      "description": "The frozen plan's description of this edge.",
+      "properties": {
+        "edge_class": {"type": ["string", "null"]},
+        "source_state": {"type": ["string", "null"]},
+        "target_state": {"type": ["string", "null"]},
+        "java_version": {"type": ["string", "null"]},
+        "spring_cloud_version": {"type": ["string", "null"]},
+        "validation_depth": {"type": ["string", "null"]},
+        "risk": {"type": ["string", "null"]},
+        "rationale": {"type": ["string", "null"]},
+        "recipes": {"type": "array"},
+        "facts": {"type": "array"},
+        "impacts": {"type": "array"}
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage_id", "attempt_id", "status"],
+        "properties": {
+          "stage_id": {"type": "string"},
+          "attempt_id": {"type": "string"},
+          "status": {"type": "string"},
+          "execution_record": {
+            "type": ["string", "null"],
+            "description": "Path to the authoritative stage-execution.json, referenced rather than inlined."
+          }
+        }
+      }
+    },
+    "stages": {
+      "type": "array",
+      "description": "One entry per edge stage, in execution order. A stage that never ran is present with executed=false, so an edge that stopped early cannot read as an edge whose later validation passed.",
+      "items": {
+        "type": "object",
+        "required": ["stage_id", "executed", "status"],
+        "properties": {
+          "stage_id": {"type": "string"},
+          "executed": {"type": "boolean"},
+          "status": {"type": "string"},
+          "note": {"type": ["string", "null"]},
+          "attempt_id": {"type": ["string", "null"]},
+          "attempt_directory": {"type": ["string", "null"]},
+          "summary": {"type": ["string", "null"]},
+          "duration_ms": {"type": "integer"},
+          "mutation_summary": {"type": ["object", "null"]},
+          "validation_summary": {"type": ["object", "null"]}
+        }
+      }
+    },
+    "attempt_count": {"type": "integer", "minimum": 0},
+    "result": {
+      "type": "string",
+      "enum": ["COMPLETE", "INCOMPLETE", "BLOCKED", "FAILED", "REFUSED", "NOT_STARTED"],
+      "description": "COMPLETE requires every edge stage to have executed successfully. An edge whose later stages simply never ran is INCOMPLETE."
+    },
+    "blocking_reason": {"type": ["string", "null"]}
+  }
+}

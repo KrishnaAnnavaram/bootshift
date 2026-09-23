@@ -7,6 +7,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.adapters.transform.YamlPropertyModel;
 import com.bootshift.core.graph.ApplicationGraph;
@@ -107,8 +108,21 @@ public final class ImpactStage implements Stage {
         return List.of("impact-report.json", "impact-summary.json", "blast-radius.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("IMP-001", "Load verified facts and the application graph",
+                        "Impact is resolved against this repository, not against a generic upgrade guide"),
+                StepDeclaration.of("IMP-002", "Bind facts to files and symbols",
+                        "Graph lookup first, source scanning as a declared fallback, then classification by certainty so a guess is never presented as a match"),
+                StepDeclaration.of("IMP-003", "Publish the impact report",
+                        "Every finding is traceable from fact to symbol to FILE_ID"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "IMP-001").begin();
         JsonNode knowledge = StageSupport.requireUpstream(context, "08-knowledge",
                 "migration-knowledge.json", "Run: harness knowledge");
         JsonNode graphNode = StageSupport.requireUpstream(context, "03-graph", "application-graph.json",
@@ -128,6 +142,8 @@ public final class ImpactStage implements Stage {
         }
         Map<String, String> sourceCache = new LinkedHashMap<>();
 
+        StageSupport.step(context, "IMP-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "IMP-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -247,7 +263,10 @@ public final class ImpactStage implements Stage {
                     "Impact artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "IMP-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "IMP-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift characterize");
         context.stateMachine().transition(RunState.IMPACT_ANALYZED, findings.size() + " finding(s)");
         context.runStateStore().updateState(context.run().runId(), RunState.IMPACT_ANALYZED,
                 "impact analyzed");

@@ -1,0 +1,293 @@
+{
+  "pipeline_stage" : "09-impact",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:06:34.454627100Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "file_count" : 27,
+  "radii" : [ {
+    "file_id" : "FILE-01M293KMFHTGV1TKC7SBHF4YM3",
+    "path" : "configuaration-server/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMHCA19Y0Z6WYWMB1ZHP",
+    "path" : "discovery-service/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberConfig.java",
+    "reached_node_count" : 4,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMJR8VBAWEK2Y479H2JT",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMJR8VBAWEK2Y479H2JT -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps -[EXTENDS]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig"
+    }, {
+      "node" : "FILE:FILE-01M293KMJRRWQPBWR38A0WPHTM",
+      "distance" : 2,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps -[EXTENDS]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -> FILE:FILE-01M293KMJRRWQPBWR38A0WPHTM -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig#testRestTemplate"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMFR9RCD69ZD3CZBFBME",
+    "path" : "configuaration-server/src/main/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplication.java",
+    "reached_node_count" : 2,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMFR9RCD69ZD3CZBFBME",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMFR9RCD69ZD3CZBFBME -[DECLARES]-> TYPE:com.aura.vihanga.configuarationserver.ConfiguarationServerApplication"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.configuarationserver.ConfiguarationServerApplication",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.configuarationserver.ConfiguarationServerApplication -[DECLARES]-> TYPE:com.aura.vihanga.configuarationserver.ConfiguarationServerApplication#main(String[])"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMGDNXYE4A6RTBK3FTS2",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/DepartmentServiceApplication.java",
+    "reached_node_count" : 2,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMGDNXYE4A6RTBK3FTS2",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMGDNXYE4A6RTBK3FTS2 -[DECLARES]-> TYPE:com.aura.vihanga.departmentservice.DepartmentServiceApplication"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.departmentservice.DepartmentServiceApplication",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.departmentservice.DepartmentServiceApplication -[DECLARES]-> TYPE:com.aura.vihanga.departmentservice.DepartmentServiceApplication#main(String[])"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/EmployeeServiceApplication.java",
+    "reached_node_count" : 6,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMJ4SSS0CN1Q53RK5M5S -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -[IMPORTS]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication"
+    }, {
+      "node" : "FILE:FILE-01M293KMJR8VBAWEK2Y479H2JT",
+      "distance" : 2,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -[IMPORTS]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication -> FILE:FILE-01M293KMJR8VBAWEK2Y479H2JT -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+      "distance" : 2,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -[IMPORTS]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication -> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps -[EXTENDS]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig"
+    }, {
+      "node" : "FILE:FILE-01M293KMJRRWQPBWR38A0WPHTM",
+      "distance" : 3,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -[IMPORTS]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication -> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps -[EXTENDS]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig -> FILE:FILE-01M293KMJRRWQPBWR38A0WPHTM -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication#main(String[])"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMKEQV3WG8EBWP8NZ59P",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/ReportServiceApplication.java",
+    "reached_node_count" : 2,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMKEQV3WG8EBWP8NZ59P",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMKEQV3WG8EBWP8NZ59P -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.ReportServiceApplication"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.reportservice.ReportServiceApplication",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.reportservice.ReportServiceApplication -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.ReportServiceApplication#main(String[])"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/controller/EmployeeReportController.java",
+    "reached_node_count" : 3,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMKEQ1R9SRZHCZP5VZ6R -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController#reportService"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController#exportToExcel(HttpServletResponse)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController#exportToExcel(HttpServletResponse) -[HANDLES_ENDPOINT]-> ENDPOINT:GET /api/v1/export"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/controller/EmployeeController.java",
+    "reached_node_count" : 11,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMHWHPP6EQGSEK8QSGK9 -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest -[USES_TYPE]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController"
+    }, {
+      "node" : "FILE:FILE-01M293KMJP44A4PRCW42ZXF930",
+      "distance" : 2,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest -[USES_TYPE]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController -> FILE:FILE-01M293KMJP44A4PRCW42ZXF930 -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#employeeService"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#createEmployee()",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#createEmployee() -[CALLS]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#createEmployee(Employee)"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#createEmployee(Employee)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#createEmployee(Employee) -[HANDLES_ENDPOINT]-> ENDPOINT:POST /api/v1/employee"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#uploadEmployee(MultipartFile)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#uploadEmployee(MultipartFile) -[HANDLES_ENDPOINT]-> ENDPOINT:POST /api/v1/employee/excelUpload"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#searchEmployees(String,String)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#searchEmployees(String,String) -[HANDLES_ENDPOINT]-> ENDPOINT:GET /api/v1/employee/search"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#getEmployee()",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#getEmployee() -[CALLS]-> TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployee(String)"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployee(String)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployee(String) -[HANDLES_ENDPOINT]-> ENDPOINT:GET /api/v1/employee/{id}"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployeeSalary(String)",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployeeSalary(String) -[HANDLES_ENDPOINT]-> ENDPOINT:GET /api/v1/employee/salary/{id}"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMHW2XHC86DNARV80H2F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/config/WebClientConfig.java",
+    "reached_node_count" : 2,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMHW2XHC86DNARV80H2F",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMHW2XHC86DNARV80H2F -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.config.WebClientConfig"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.employeeservice.config.WebClientConfig",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.employeeservice.config.WebClientConfig -[DECLARES]-> TYPE:com.aura.vihanga.employeeservice.config.WebClientConfig#webClient()"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMKEJSA2EMYE246XXSB0",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/config/WebClientConfig.java",
+    "reached_node_count" : 2,
+    "sample_paths" : [ {
+      "node" : "FILE:FILE-01M293KMKEJSA2EMYE246XXSB0",
+      "distance" : 1,
+      "explanation" : "FILE:FILE-01M293KMKEJSA2EMYE246XXSB0 -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.config.WebClientConfig"
+    }, {
+      "node" : "TYPE:com.aura.vihanga.reportservice.config.WebClientConfig",
+      "distance" : 1,
+      "explanation" : "TYPE:com.aura.vihanga.reportservice.config.WebClientConfig -[DECLARES]-> TYPE:com.aura.vihanga.reportservice.config.WebClientConfig#webClientBuilder()"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMEKJ1Q4WNEYG8J7F10P",
+    "path" : "configuaration-server/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMF7CFD35TD13PQVETBP",
+    "path" : "configuaration-server/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMFYM1C973YXW63ZRKTW",
+    "path" : "department-service/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMG3JT029NYAY2FTD6W7",
+    "path" : "department-service/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMH0M3CP0T1FZ8MN9MK1",
+    "path" : "discovery-service/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMH69QPJTP4FND9N1Z08",
+    "path" : "discovery-service/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMHMQD5CTAV3E92QJ5HJ",
+    "path" : "employee-service/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMHS3EPWTNQZEJQYW26W",
+    "path" : "employee-service/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMK0YCN2BHM72Y0ZH0J8",
+    "path" : "report-service/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMK7CFTXQ2T7SBBH1Z3X",
+    "path" : "report-service/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMKP13C3HGA6H48PR2SX",
+    "path" : "sheduler-service/mvnw",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  }, {
+    "file_id" : "FILE-01M293KMKZM9MR6B5T5JACMV24",
+    "path" : "sheduler-service/mvnw.cmd",
+    "reached_node_count" : 0,
+    "sample_paths" : [ ]
+  } ]
+}

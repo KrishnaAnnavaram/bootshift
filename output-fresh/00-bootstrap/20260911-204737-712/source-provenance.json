@@ -1,0 +1,26 @@
+{
+  "pipeline_stage" : "00-bootstrap",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:47:37.761612500Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "provenance" : {
+    "kind" : "PLAIN_DIRECTORY",
+    "contentManifestHash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b",
+    "capturedAt" : "2026-09-11T20:47:36.056019600Z"
+  },
+  "original_snapshot_hash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b"
+}

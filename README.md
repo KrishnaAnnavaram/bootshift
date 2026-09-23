@@ -17,7 +17,222 @@ explaining what changed, why it changed, what it affected, and how it was valida
 
 ---
 
+## Start here
+
+Ten questions, answered before the reference material begins. The numbered sections after the table
+of contents are the deep reference and are unchanged.
+
+### 1. What is Bootshift?
+
+A migration harness for Spring Boot repositories. You point it at a repository; it works out what
+the repository is, decides what to upgrade to and why, performs the change, validates the result
+structurally and behaviourally, and hands you an evidence trail. It runs as a CLI (`bsh`), needs no
+service, and keeps every intermediate result on disk.
+
+### 2. Why does it exist?
+
+Because the hard part of a framework migration is not editing the code — it is being able to say
+afterwards, credibly, what changed and what it did to the application's behaviour. Tools that
+perform the edit and stop leave that question to a human with a diff.
+
+### 3. What problem does it solve?
+
+The gap between *"the build is green"* and *"the application still does what it did"*. Bootshift
+captures the pre-migration behaviour first, migrates, then compares the two sides and refuses to
+call a difference it cannot explain a success.
+
+### 4. High-level architecture
+
+Three planes, and the separation between them is the load-bearing idea:
+
+| Plane | What it holds | Rule |
+| --- | --- | --- |
+| **Artifact plane** | Every stage's published output, under `output/` | The source of truth. A stage that published happened, whatever any cursor says |
+| **Workspace plane** | `original/`, `migration/`, `runtime-old/`, `runtime-new/` | The only place source is ever written; your input directory is read-only for the whole run |
+| **Evidence plane** | Content-addressed evidence store, change ledger, provenance graph | Append-only and hash-chained |
+
+Twenty stages sequence over those planes. The orchestrator holds no migration semantics: every
+stage is independently runnable, and deleting the orchestrator would remove the convenience of
+`bootshift run` and nothing else.
+
+### 5. Complete migration flow
+
+```mermaid
+flowchart TB
+    SRC[Input Spring Boot repository - read only] --> BOOT[00-bootstrap]
+
+    subgraph ANALYSIS[Analysis and planning - no source is written]
+        direction TB
+        A1[01-inventory] --> A2[02-build] --> A3[03-graph] --> A4[04-baseline]
+        A4 --> A5[05-compatibility] --> A6[06-target] --> A7[07-documentation]
+        A7 --> A8[08-knowledge] --> A9[09-impact] --> A10[10-characterization]
+        A10 --> A11[11-plan]
+    end
+
+    BOOT --> A1
+
+    subgraph EDGE[Per migration edge - the only stages that may write source]
+        direction TB
+        T[12-transformation] --> B[13-build-repair] --> G[14-graph-diff]
+        G --> TE[15-test] --> R[16-runtime] --> D[17-differential]
+    end
+
+    A11 --> EDGE
+
+    subgraph FINAL[Finalization]
+        direction TB
+        APP[18-approval] --> EV[19-evidence] --> PROV[20-provenance]
+    end
+
+    EDGE --> FINAL
+
+    REC[StageExecutionRecorder<br/>wraps every attempt at StageExecutor]
+
+    BOOT -.-> REC
+    ANALYSIS -.-> REC
+    EDGE -.-> REC
+    FINAL -.-> REC
+
+    REC --> SD[stage-execution.json<br/>STAGE_DOCUMENT.md<br/>per attempt]
+    SD --> ED[EDGE_DOCUMENT.md<br/>per edge]
+    SD --> RD[RUN_DOCUMENT.md<br/>refreshed after every attempt]
+    ED --> RD
+    RD --> MD[MIGRATION_DOCUMENT.md<br/>written by 19-evidence]
+```
+
+The dotted lines matter: the recorder is not a stage. It wraps `StageExecutor`, which is the single
+door every stage is entered through, so documentation is produced whether a stage succeeds, refuses,
+fails or throws — and in particular whether or not the run ever reaches `19-evidence`.
+
+### 6. What happens when I run it?
+
+```
+bootshift run --repo ../my-service --target auto
+```
+
+Bootstrap snapshots your repository into an external workspace and never touches the original
+again. The analysis half builds an inventory, a resolved build model, a type-resolved application
+graph and a sealed baseline of how the application behaves *before* anything changes. It then picks
+a target, retrieves the official migration documentation, derives verified migration facts, works
+out which of your files those facts actually touch, and freezes a plan that splits the jump into
+edges at major version boundaries.
+
+Each edge then transforms, compiles and repairs, rebuilds the graph, runs the tests, starts the
+application and compares its behaviour against the frozen baseline. An unexplained behavioural
+difference stops the run and asks for a human decision. That is the designed outcome, not a bug.
+
+### 7. What does Bootshift generate?
+
+Four levels of documentation, produced at four different scopes:
+
+| Level | File | Scope | Written when |
+| --- | --- | --- | --- |
+| 1 — Stage | `STAGE_DOCUMENT.md` | One stage attempt | After every attempt, including refusals, failures and crashes |
+| 2 — Edge | `EDGE_DOCUMENT.md` | One migration edge, stages 12–17 | After every edge-scoped attempt |
+| 3 — Run | `RUN_DOCUMENT.md` | Everything so far | Refreshed after every attempt |
+| 4 — Migration | `MIGRATION_DOCUMENT.md` | The whole migration | By `19-evidence`, at finalization |
+
+Levels 1–3 exist from the first stage onwards. Level 4 requires the run to reach finalization, which
+is exactly why the other three exist: a run that stops at `13-build-repair` still has to be
+explainable, and a documentation system that only writes at the end has nothing to say about the
+runs that most need explaining.
+
+Each level has a machine-readable counterpart, and **the JSON is authoritative** — the Markdown is a
+rendering of it and holds no facts of its own:
+
+| Document | Structured source |
+| --- | --- |
+| `STAGE_DOCUMENT.md` | `stage-execution.json` |
+| `EDGE_DOCUMENT.md` | `edge-execution.json` |
+| `RUN_DOCUMENT.md` | `run-timeline.json` plus the published artifact plane |
+| `MIGRATION_DOCUMENT.md` | `migration-result.json`, `evidence-manifest.json`, `documentation-index.json` |
+
+Where they land:
+
+```
+output/
+  RUN_DOCUMENT.md                     level 3
+  run-timeline.json
+  01-inventory/
+    20260910-131046-234/              one immutable directory per attempt
+      inventory-artifact.json
+      stage-execution.json            level 1, structured
+      STAGE_DOCUMENT.md               level 1, human-readable
+      manifest.json
+    journal/<attempt-id>/             attempts that refused before publishing
+    latest.json                       advanced only on success
+  edges/
+    EDGE-2-PATCH/
+      edge-execution.json             level 2, structured
+      EDGE_DOCUMENT.md                level 2, human-readable
+  19-evidence/<attempt>/
+    MIGRATION_DOCUMENT.md             level 4
+    documentation-index.json          every document produced, and every one missing
+```
+
+Design-time contracts — what each stage is *supposed* to do, as opposed to what it *did* — live in
+[`docs/pipeline/contracts/`](docs/pipeline/contracts/), one file per stage, generated from the code
+by `bootshift stages --write-contracts`.
+
+### 8. How does Bootshift prove correctness?
+
+It does not claim correctness. It produces evidence and states its own limits:
+
+- **A sealed baseline.** Behaviour is captured before the migration and frozen. A test that already
+  failed is classified `PRE_EXISTING_FAILURE` and never attributed to the migration.
+- **One writer.** All source mutation goes through `FileMutationGateway`. Nothing else may write,
+  and an ArchUnit rule enforces it.
+- **An append-only, hash-chained change ledger.** Every applied change, and every rejected one.
+- **Differential validation.** Frozen scenarios are executed against both the old and the new
+  application and compared under a hashed normalisation policy. `UNEXPLAINED > 0` blocks.
+- **Declared steps.** Every stage declares its steps before running; a declared step that never
+  executed is reported. Code that is implemented and never invoked has been a real failure here, and
+  it used to leave no trace.
+- **Blind spots and gaps as first-class output.** What the run could not see is published, not
+  omitted.
+- **Human decision gates.** The harness never files a decision for itself.
+
+### 9. Quick start
+
+```bash
+# Build the harness
+mvn clean verify
+
+# Analyse a repository without changing anything
+bootshift run --repo ../my-service --target auto --analysis-only
+
+# Read what happened, while it happens
+cat output/RUN_DOCUMENT.md
+bootshift documents                    # locate every stage and edge document
+
+# Perform the migration
+bootshift run --repo ../my-service --target auto
+
+# One stage at a time, if you prefer
+bootshift inventory --repo ../my-service
+bootshift stages                       # the catalog and its contracts
+```
+
+Requires Java 21 and Maven. The application under migration keeps its own toolchain; Bootshift
+selects and verifies a JDK per edge.
+
+### 10. Documentation index
+
+| Where | What |
+| --- | --- |
+| [`docs/pipeline/contracts/`](docs/pipeline/contracts/) | Per-stage design-time contract, generated from code |
+| [`docs/adr/`](docs/adr/) | Architecture decision records |
+| [`docs/BUILD-AND-REVIEW-REPORT.md`](docs/BUILD-AND-REVIEW-REPORT.md) | Build and review history |
+| [`schemas/`](schemas/) | JSON schemas for every published artifact |
+| [`schemas/journal/`](schemas/journal/) | Schemas for the execution journal |
+| Sections 1–63 below | The complete technical reference |
+
+
+---
+
 ## Table of contents
+
+**[Start here](#start-here)** — what Bootshift is, the complete flow, what it generates, and a quick start.
 
 1. [Project overview](#1-project-overview)
 2. [Why Bootshift exists](#2-why-bootshift-exists)

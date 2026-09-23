@@ -1,0 +1,157 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:55:11.968330200Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "file_count" : 10,
+  "sensitive_property_count" : 0,
+  "files" : [ {
+    "file_id" : "FILE-01M293KMFRB15PGDGWNFE830H0",
+    "path" : "configuaration-server/src/main/resources/application.properties",
+    "sha256" : "68c6ff604d68f5cfcd40cf0425a84439d06037765c08a6ae262fa5c95c8993f9",
+    "properties" : [ {
+      "key" : "server.port",
+      "sensitive" : false,
+      "value" : "8504"
+    }, {
+      "key" : "spring.cloud.config.server.git.uri",
+      "sensitive" : false,
+      "value" : "https://github.com/Vihanga22365/springboot-employee-management-config-store"
+    }, {
+      "key" : "spring.cloud.config.server.git.search-paths",
+      "sensitive" : false,
+      "value" : "*service"
+    }, {
+      "key" : "eureka.client.serviceUrl.defaultZone",
+      "sensitive" : false,
+      "value" : "http://localhost:8761/eureka"
+    }, {
+      "key" : "eureka.client.register-with-eureka",
+      "sensitive" : false,
+      "value" : "true"
+    }, {
+      "key" : "eureka.client.fetch-registry",
+      "sensitive" : false,
+      "value" : "true"
+    }, {
+      "key" : "spring.application.name",
+      "sensitive" : false,
+      "value" : "configuration-service"
+    }, {
+      "key" : "eureka.instance.hostname",
+      "sensitive" : false,
+      "value" : "localhost"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "path" : "department-service/src/main/resources/application.properties",
+    "sha256" : "183db43ae6ff1dff1c0de8727cd84961e7a9efeb273c587d602e64f3ef2d72b8",
+    "properties" : [ {
+      "key" : "spring.application.name",
+      "sensitive" : false,
+      "value" : "department"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "path" : "department-service/src/main/resources/bootstrap.properties",
+    "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1",
+    "properties" : [ {
+      "key" : "spring.cloud.config.uri",
+      "sensitive" : false,
+      "value" : "http://localhost:8504"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "path" : "discovery-service/src/main/resources/application.properties",
+    "sha256" : "5e4faf47de05729e0659338fd0510019d803355d247205faef3a1105afbd4183",
+    "properties" : [ {
+      "key" : "eureka.instance.hostname",
+      "sensitive" : false,
+      "value" : "localhost"
+    }, {
+      "key" : "eureka.client.register-with-eureka",
+      "sensitive" : false,
+      "value" : "false"
+    }, {
+      "key" : "eureka.client.fetch-registry",
+      "sensitive" : false,
+      "value" : "false"
+    }, {
+      "key" : "server.port",
+      "sensitive" : false,
+      "value" : "8761"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "path" : "employee-service/src/main/resources/application.properties",
+    "sha256" : "5f2cf520a9b2060a2a5b98e93f8c5cdaf3705b187358cffc97e0d1275697250c",
+    "properties" : [ {
+      "key" : "logging.level.com.aura.vihanga.employeeservice.controller",
+      "sensitive" : false,
+      "value" : "trace"
+    }, {
+      "key" : "spring.application.name",
+      "sensitive" : false,
+      "value" : "employee"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "path" : "employee-service/src/main/resources/bootstrap.properties",
+    "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1",
+    "properties" : [ {
+      "key" : "spring.cloud.config.uri",
+      "sensitive" : false,
+      "value" : "http://localhost:8504"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "path" : "report-service/src/main/resources/application.properties",
+    "sha256" : "8410931684ac13602966f2ef5c9b3fd53a452fd1f2ffb5712b4082664c22611e",
+    "properties" : [ {
+      "key" : "spring.application.name",
+      "sensitive" : false,
+      "value" : "report"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "path" : "report-service/src/main/resources/bootstrap.properties",
+    "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1",
+    "properties" : [ {
+      "key" : "spring.cloud.config.uri",
+      "sensitive" : false,
+      "value" : "http://localhost:8504"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMMD7JG7F96V8H119FM3",
+    "path" : "sheduler-service/src/main/resources/application.properties",
+    "sha256" : "cbb704ee18f943d62f55b4bc627d43f20d06ec6a6a8cb1dc1f8b2c5d83a41a89",
+    "properties" : [ {
+      "key" : "spring.application.name",
+      "sensitive" : false,
+      "value" : "sheduler"
+    } ]
+  }, {
+    "file_id" : "FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "path" : "sheduler-service/src/main/resources/bootstrap.properties",
+    "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1",
+    "properties" : [ {
+      "key" : "spring.cloud.config.uri",
+      "sensitive" : false,
+      "value" : "http://localhost:8504"
+    } ]
+  } ]
+}

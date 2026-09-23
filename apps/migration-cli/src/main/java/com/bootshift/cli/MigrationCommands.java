@@ -5,6 +5,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.StageResult;
 import com.bootshift.stages.EdgeSupport;
 import com.bootshift.stages.PipelineOrchestrator;
+import com.bootshift.stages.StageContractRenderer;
 import com.bootshift.stages.Stage;
 import com.bootshift.stages.StageContext;
 import com.bootshift.stages.StageSupport;
@@ -17,6 +18,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.io.IOException;
 
 /** Mutating and reporting commands (Agents 12 to 20) plus the whole-pipeline convenience command. */
 final class MigrationCommands {
@@ -231,6 +233,16 @@ final class RunCommand implements Callable<Integer> {
         PipelineOrchestrator.RunOutcome outcome = orchestrator.runAll(target, !analysisOnly);
         System.out.println("  " + outcome.summary());
         System.out.println();
+        // Console stays a summary - the detail belongs in artifacts - but a path someone can open is
+        // the difference between documentation that exists and documentation that gets read.
+        Path runDocument = context.run().output().root()
+                .resolve(com.bootshift.core.journal.RunJournal.RUN_DOCUMENT_FILE);
+        if (java.nio.file.Files.isRegularFile(runDocument)) {
+            System.out.println("  what happened, stage by stage:");
+            System.out.println("    " + runDocument);
+            System.out.println("    bootshift documents   (every stage and edge document)");
+            System.out.println();
+        }
         return outcome.exitCode().code();
     }
 }
@@ -238,8 +250,16 @@ final class RunCommand implements Callable<Integer> {
 @CommandLine.Command(name = "stages", description = "List the stage catalog and its contracts")
 final class StagesCommand implements Callable<Integer> {
 
+    @CommandLine.Option(names = "--write-contracts", description =
+            "Regenerate the canonical stage contracts under docs/pipeline/contracts from the stage "
+                    + "catalog, then exit")
+    boolean writeContracts;
+
     @Override
     public Integer call() {
+        if (writeContracts) {
+            return regenerateContracts();
+        }
         System.out.println();
         System.out.printf("  %-20s %-9s %-4s %s%n", "STAGE", "MUTATING", "AI", "PURPOSE");
         for (Stage stage : PipelineOrchestrator.catalog()) {
@@ -252,6 +272,28 @@ final class StagesCommand implements Callable<Integer> {
         System.out.println("  and both do so exclusively through the FileMutationGateway.");
         System.out.println();
         return 0;
+    }
+
+    /**
+     * Rewrites the design-time stage contracts from the catalog.
+     *
+     * <p>Kept as a flag on `stages` rather than as a command of its own: it answers the same
+     * question the command already answers - what are the stages and what do they promise - and a
+     * separate command would be one more surface for the documentation to drift against.
+     */
+    private Integer regenerateContracts() {
+        Path directory = Path.of(StageContractRenderer.CONTRACTS_DIRECTORY);
+        try {
+            List<Path> written = StageContractRenderer.writeAll(directory);
+            System.out.println();
+            System.out.println("  wrote " + written.size() + " stage contract(s) to " + directory);
+            System.out.println();
+            return 0;
+        } catch (IOException e) {
+            System.err.println("Cannot write stage contracts to " + directory + ": "
+                    + e.getMessage());
+            return ExitCode.STAGE_FAILURE.code();
+        }
     }
 }
 

@@ -1,0 +1,142 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M2948Q60E41CXQP1MNC6VAGY",
+  "stage_id" : "05-compatibility",
+  "stage_name" : "CompatibilityStage",
+  "edge_id" : null,
+  "purpose" : "Build repository-independent Tier-1 compatibility and lifecycle knowledge",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T20:59:08.864803500Z",
+  "finished_at" : "2026-09-11T20:59:32.225663900Z",
+  "duration_ms" : 23360,
+  "state_before" : "BASELINE_SEALED",
+  "state_after" : "COMPATIBILITY_REGISTRY_READY",
+  "status" : "SUCCESS",
+  "summary" : "Current state Spring Boot 2.7.12 / Java 17 / Spring Cloud 2021.0.7; 9 candidate line(s), 0 unavailable, 0 unknown internal component(s)",
+  "attempt_directory" : "20260911-205908-963",
+  "declared_preconditions" : [ "BASELINE_SEALED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:BASELINE_SEALED",
+    "satisfied" : true,
+    "detail" : "Proven by 04-baseline/baseline-manifest.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/build-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/dependency-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "02-build/build-model.json", "02-build/dependency-model.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "02-build/build-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\build-model.json",
+    "present" : true,
+    "hash" : "13f63a0f2464ab7d99a81f55622fd6aab8f3e00c6fdd4c007075856f790f7b2d"
+  }, {
+    "artifact" : "02-build/dependency-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\dependency-model.json",
+    "present" : true,
+    "hash" : "056a8e2147f6e3a9c99aa950ca02c8181c00822b9c499bbe754dd8aea41c06bd"
+  } ],
+  "declared_steps" : [ "CMP-001", "CMP-002", "CMP-003" ],
+  "executed_steps" : [ {
+    "step_id" : "CMP-001",
+    "sequence" : 1,
+    "name" : "Load the build model",
+    "purpose" : "Current Spring Boot, Spring Cloud and Java levels come from the resolved build model",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T20:59:08.902962200Z",
+    "finished_at" : "2026-09-11T20:59:08.963550600Z",
+    "duration_ms" : 60,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "CMP-002",
+    "sequence" : 2,
+    "name" : "Resolve version space and lifecycle facts",
+    "purpose" : "Published versions, support horizons and Spring Cloud trains, from their own sources",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T20:59:08.963550600Z",
+    "finished_at" : "2026-09-11T20:59:32.225663900Z",
+    "duration_ms" : 23262,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "CMP-003",
+    "sequence" : 3,
+    "name" : "Publish the compatibility registry",
+    "purpose" : "UNKNOWN is preserved as UNKNOWN rather than being resolved to compatible",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T20:59:32.213360300Z",
+    "finished_at" : "2026-09-11T20:59:32.213360300Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "compatibility-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\compatibility-registry.json",
+    "hash" : "de5e77f1943b2cd70eb0e9af337160a03fa8ba81d5466b410829d0c194c104d4"
+  }, {
+    "name" : "lifecycle-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\lifecycle-registry.json",
+    "hash" : "aa6b295b6f86bd38f1bd5175334cacf1006faf300e34bb053c136c1be6a257e4"
+  }, {
+    "name" : "artifact-availability.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\artifact-availability.json",
+    "hash" : "94e67367b1af90b86068eb32bb8be0ad064707151860fe8eea356f444dc122fb"
+  }, {
+    "name" : "version-space-evidence.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\version-space-evidence.json",
+    "hash" : "83f5a4bfd1d9ff658d33b3208fcf2b203bbae9d4c59b669ff05b8ae3a8969c01"
+  }, {
+    "name" : "internal-components.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\internal-components.json",
+    "hash" : "bd9646292336ac0b2846508c43bb09aa369da71104f349e2c18e2b9471f43058"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\05-compatibility\\20260911-205908-963\\manifest.json",
+    "hash" : "bce6d5914671ca53d7ad5794d2504f82b664ce1cd63a6bc3d4779c809d566355"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-266362163",
+  "next_action" : "Run: bootshift resolve-target --target auto",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

@@ -34,6 +34,17 @@ public final class BuildSystemResolver {
         this(new MavenBuildAdapter(), new GradleBuildAdapter());
     }
 
+    /**
+     * Builds both adapters over one process runner.
+     *
+     * <p>The runner is where command journalling and the execution controls live, so handing the
+     * resolver a runner keeps Maven and Gradle attributable to the stage that invoked them without
+     * either adapter knowing anything about runs.
+     */
+    public BuildSystemResolver(com.bootshift.adapters.exec.ProcessRunner runner) {
+        this(new MavenBuildAdapter(runner), new GradleBuildAdapter(runner));
+    }
+
     public BuildSystemResolver(MavenBuildAdapter maven, GradleBuildAdapter gradle) {
         this.maven = maven;
         this.gradle = gradle;

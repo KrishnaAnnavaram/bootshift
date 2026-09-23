@@ -1,0 +1,140 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M2949EEMA8V0QZWPQN3K3G2T",
+  "stage_id" : "07-documentation",
+  "stage_name" : "DocumentationStage",
+  "edge_id" : null,
+  "purpose" : "Fetch and content-address the authoritative documents for the frozen migration path",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T20:59:32.692322800Z",
+  "finished_at" : "2026-09-11T20:59:44.913730100Z",
+  "duration_ms" : 12221,
+  "state_before" : "TARGET_FROZEN",
+  "state_after" : "DOCUMENTATION_RETRIEVED",
+  "status" : "SUCCESS",
+  "summary" : "21 document(s) pinned for 7 edge(s); 7 official migration guide(s)",
+  "attempt_directory" : "20260911-205932-757",
+  "declared_preconditions" : [ "TARGET_FROZEN" ],
+  "precondition_results" : [ {
+    "precondition" : "state:TARGET_FROZEN",
+    "satisfied" : true,
+    "detail" : "Proven by 06-target/migration-path.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:06-target/target-state.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:06-target/migration-path.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/build-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "06-target/target-state.json", "06-target/migration-path.json", "02-build/build-model.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "06-target/target-state.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\06-target\\20260911-205932-627\\target-state.json",
+    "present" : true,
+    "hash" : "93b39e231b7ae4b4f3c27ed1d68307dd60e63ba2b017ddebabd418a77b64b245"
+  }, {
+    "artifact" : "06-target/migration-path.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\06-target\\20260911-205932-627\\migration-path.json",
+    "present" : true,
+    "hash" : "513d19c5ddd7089efb6deed239aba6c9bf5a5b5766d58f7a027e48d0f434ee6d"
+  }, {
+    "artifact" : "02-build/build-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\build-model.json",
+    "present" : true,
+    "hash" : "13f63a0f2464ab7d99a81f55622fd6aab8f3e00c6fdd4c007075856f790f7b2d"
+  } ],
+  "declared_steps" : [ "DOC-001", "DOC-002", "DOC-003" ],
+  "executed_steps" : [ {
+    "step_id" : "DOC-001",
+    "sequence" : 1,
+    "name" : "Determine which components and edges need documentation",
+    "purpose" : "Retrieval is driven by the frozen path, not by a fixed list of URLs",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T20:59:32.723886200Z",
+    "finished_at" : "2026-09-11T20:59:32.757885800Z",
+    "duration_ms" : 33,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DOC-002",
+    "sequence" : 2,
+    "name" : "Retrieve and verify authoritative sources",
+    "purpose" : "Allowlist, version applicability and content hash decide acceptance; a failed retrieval is recorded as a failure rather than silently skipped",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T20:59:32.757885800Z",
+    "finished_at" : "2026-09-11T20:59:44.913730100Z",
+    "duration_ms" : 12155,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DOC-003",
+    "sequence" : 3,
+    "name" : "Publish the document registry",
+    "purpose" : "Every accepted document is pinned by hash so a later run can prove what it read",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T20:59:44.901932800Z",
+    "finished_at" : "2026-09-11T20:59:44.905952200Z",
+    "duration_ms" : 4,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "document-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\07-documentation\\20260911-205932-757\\document-registry.json",
+    "hash" : "73948ebbee7aba31ef9fc49e3a555d488ee57d700da8f7c95a695406dfbedd09"
+  }, {
+    "name" : "document-coverage.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\07-documentation\\20260911-205932-757\\document-coverage.json",
+    "hash" : "a743cbb119a78bbe2425b93d215d670741d69874aedbdb98979c7f18dd1f8064"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\07-documentation\\20260911-205932-757\\manifest.json",
+    "hash" : "4f745b55dafa4996b7f093ced9aef227be107b76c3707c369f87573ca9409c6e"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "1036698529",
+  "next_action" : "Run: bootshift knowledge",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

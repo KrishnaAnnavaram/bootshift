@@ -1,9 +1,9 @@
 package com.bootshift.stages;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StageExecutionRecord;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
 
@@ -35,16 +35,21 @@ public final class StageExecutor {
     private StageExecutor() {
     }
 
-    /** Runs a stage after verifying it is legal to run. */
+    /**
+     * Runs a stage after verifying it is legal to run, recording everything it did.
+     *
+     * <p>Precondition verification moved into {@link StageExecutionRecorder} so that a refusal is
+     * documented rather than merely returned: the operator who needs to know which precondition
+     * failed is the same operator staring at an exit code of 2.
+     */
     public static StageResult run(Stage stage, StageContext context) {
-        Precondition check = verify(stage, context);
-        if (!check.satisfied()) {
-            return StageResult.failure(stage.id(), ExitCode.STRUCTURED_REFUSAL,
-                    "Stage " + stage.id() + " cannot run yet: " + check.violations().size()
-                            + " precondition(s) unsatisfied",
-                    concat(check.violations(), check.remediation()));
-        }
-        return stage.execute(context);
+        return run(stage, context, StageExecutionRecord.Trigger.PIPELINE, null);
+    }
+
+    /** Runs a stage, recording why it was entered. */
+    public static StageResult run(Stage stage, StageContext context,
+                                  StageExecutionRecord.Trigger trigger, String triggerDetail) {
+        return StageExecutionRecorder.record(stage, context, trigger, triggerDetail);
     }
 
     /**
@@ -253,12 +258,6 @@ public final class StageExecutor {
             case EVIDENCE_SEALED -> "Run: bootshift report";
             default -> "Run the stage that reaches " + required;
         };
-    }
-
-    private static List<String> concat(List<String> first, List<String> second) {
-        List<String> all = new ArrayList<>(first);
-        second.stream().distinct().forEach(r -> all.add("remediation: " + r));
-        return all;
     }
 
     /** Throws rather than returning, for callers that treat a refusal as fatal. */

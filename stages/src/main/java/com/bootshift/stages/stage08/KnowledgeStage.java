@@ -9,6 +9,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Ids;
@@ -96,8 +97,21 @@ public final class KnowledgeStage implements Stage {
                 "knowledge-summary.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("KNW-001", "Load documents and artifact metadata",
+                        "Facts are derived from published artifacts and official documents, never from a model"),
+                StepDeclaration.of("KNW-002", "Derive and verify migration facts",
+                        "A fact becomes VERIFIED only when a verification channel confirms it; the rest stay CANDIDATE and are visible as such"),
+                StepDeclaration.of("KNW-003", "Publish migration knowledge",
+                        "Each fact carries the channel and evidence that justify its status"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "KNW-001").begin();
         JsonNode target = StageSupport.requireUpstream(context, "06-target", "target-state.json",
                 "Run: harness resolve-target --target auto");
         JsonNode documents = StageSupport.requireUpstream(context, "07-documentation",
@@ -116,6 +130,8 @@ public final class KnowledgeStage implements Stage {
         List<EdgeSpan> edgeSpans = readEdgeSpans(migrationPath);
 
         VersionSpacePort versionSpace = new MavenCentralVersionSpaceAdapter(context.http());
+        StageSupport.step(context, "KNW-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "KNW-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -350,7 +366,8 @@ public final class KnowledgeStage implements Stage {
         // describe the packaging around a dependency; only javap over the two jars says what types
         // the application can still reference. Skipping it is how an edge reaches the compiler with
         // a knowledge base that reported near-total coverage: nothing had looked inside the jars.
-        ApiDiffPort apiDiff = new JavapApiDiffAdapter();
+        ApiDiffPort apiDiff = new JavapApiDiffAdapter(StageSupport.runner(context),
+                java.util.Set.of(), 800);
         ObjectNode apiDiffSummary = Json.obj();
         apiDiffSummary.put("tool", apiDiff.name());
         apiDiffSummary.put("available", apiDiff.available());
@@ -558,7 +575,10 @@ public final class KnowledgeStage implements Stage {
                     "Knowledge artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "KNW-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "KNW-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift impact");
         context.stateMachine().transition(RunState.KNOWLEDGE_VERIFIED,
                 verified + " verified fact(s)");
         context.runStateStore().updateState(context.run().runId(), RunState.KNOWLEDGE_VERIFIED,

@@ -1,0 +1,12 @@
+{
+  "stage" : "14-graph-diff",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:22:46.144389200Z",
+  "artifacts" : {
+    "application-graph-current.json" : "010f443728c2c103a686d6825bcc0c0dcd404c6dd0caf03864c760afdb5e2dc9",
+    "graph-diff.json" : "d44e112ef1824183f20a3b3a6f57bbfe33409cd8ca17d3571e18e07146739ce1",
+    "scope-assertion.json" : "dc85a064145d8f57b60c733606f7a58852ffa5a1e6b395d0394eba51cc75d1ac",
+    "last-good-graph.json" : "3cf58380051e089e1ee4ad32150926b66d2c4e74a2723f7710168164d2ff3cd4"
+  },
+  "artifact_set_hash" : "c4e2b1b2b9c7f5529eae46405f426f07207151b45b0a4b8e9fb5e9e11b0ed4fa"
+}

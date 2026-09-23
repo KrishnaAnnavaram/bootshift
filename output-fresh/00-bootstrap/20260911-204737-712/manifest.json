@@ -1,0 +1,11 @@
+{
+  "stage" : "00-bootstrap",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:47:37.791340300Z",
+  "artifacts" : {
+    "bootstrap.json" : "252ceecb954491e0c4abd4f22213620f1d0901c481027ff4f90005d33152438b",
+    "source-provenance.json" : "b7f90095315d45fee3f75085f6208163e5dd90e5158f3eebf05309263f6832ee",
+    "oss-license-gate.json" : "48d4ae514ab585e100d0c7dffd0db746393cdf7cd7ce4429948d9ca857a2aa03"
+  },
+  "artifact_set_hash" : "7db2aeba0dd758737192ed06174f7f643ea224395a32d419920f301243a5a9b2"
+}

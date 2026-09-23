@@ -25,7 +25,11 @@ final class InventoryCommand implements Callable<Integer> {
     public Integer call() {
         StageContext context = options.context();
         if (context.run().output().resolveLatestDir(RunBootstrap.OUTPUT_DIR) == null) {
-            StageResult bootstrap = new RunBootstrap(context).execute();
+            StageResult bootstrap = com.bootshift.stages.StageExecutionRecorder.record(
+                    RunBootstrap.OUTPUT_DIR, "RunBootstrap", RunBootstrap.PURPOSE,
+                    RunBootstrap.OUTPUT_DIR, RunBootstrap.STEPS, context,
+                    com.bootshift.core.journal.StageExecutionRecord.Trigger.CLI,
+                    () -> new RunBootstrap(context).execute());
             StageRunner.print(bootstrap, context);
             if (!bootstrap.succeeded()) {
                 return bootstrap.exitCode().code();

@@ -11,6 +11,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.EdgeType;
@@ -108,8 +109,21 @@ public final class BaselineStage implements Stage {
         this.runRuntime = runRuntime;
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("BAS-001", "Load graph, build model and registry",
+                        "The baseline is measured against the structures the analysis half already established"),
+                StepDeclaration.of("BAS-002", "Capture the immutable baseline",
+                        "Toolchain selection, build, tests and runtime starts on the pre-migration tree, plus the pre-existing failures that must never be attributed to the migration"),
+                StepDeclaration.of("BAS-003", "Seal and publish the baseline manifest",
+                        "Once sealed the baseline cannot be re-measured; every later comparison binds to this hash"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "BAS-001").begin();
         JsonNode buildNode = StageSupport.requireUpstream(context, "02-build", "build-model.json",
                 "Run: harness resolve-build --repo <path>");
         JsonNode dependencyNode = StageSupport.requireUpstream(context, "02-build",
@@ -138,6 +152,8 @@ public final class BaselineStage implements Stage {
                 com.bootshift.stages.bootstrap.RunBootstrap.SNAPSHOT_EXCLUDES);
         Path evidenceLogs = context.run().runWorkspace().resolve("baseline-logs");
 
+        StageSupport.step(context, "BAS-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "BAS-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -172,7 +188,7 @@ public final class BaselineStage implements Stage {
         // ---- toolchain selection -----------------------------------------------------------------
         // The original application must be observed on a JDK it supports. Building Spring Boot 2.7 on
         // JDK 21 would fail inside an old annotation processor and tell us nothing about the migration.
-        ToolchainProbe toolchainProbe = new ToolchainProbe();
+        ToolchainProbe toolchainProbe = new ToolchainProbe(StageSupport.runner(context));
         List<ToolchainProbe.Jdk> availableJdks = toolchainProbe.discover();
         int requiredJava = requiredJavaMajor(buildNode, buildModel);
         java.util.Optional<ToolchainProbe.Jdk> selectedJdk =
@@ -209,7 +225,7 @@ public final class BaselineStage implements Stage {
         String javaHomeOverride = selectedJdk.map(jdk -> jdk.home().toString()).orElse(null);
 
         // ---- build dimension --------------------------------------------------------------------
-        MavenBuildAdapter maven = new MavenBuildAdapter();
+        MavenBuildAdapter maven = new MavenBuildAdapter(StageSupport.runner(context));
         ObjectNode buildObservation = Json.obj();
         ArrayNode moduleBuilds = Json.arr();
         int buildFailures = 0;
@@ -312,7 +328,8 @@ public final class BaselineStage implements Stage {
         List<RuntimeProbePort.ProbeResult> probeResults = new ArrayList<>();
         int started = 0;
         if (runRuntime) {
-            SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(evidenceLogs);
+            SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(
+                    StageSupport.runner(context), evidenceLogs);
             for (BuildSystemPort.ModuleModel module : buildModel.modules()) {
                 Path moduleRoot = moduleRoot(root, module);
                 if (!Files.isDirectory(moduleRoot)) {
@@ -431,7 +448,10 @@ public final class BaselineStage implements Stage {
                     "Baseline artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "BAS-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "BAS-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift compatibility");
         context.stateMachine().transition(RunState.BASELINE_CAPTURED,
                 totalTests + " tests, " + started + " module(s) started");
         context.stateMachine().recordBaselineSeal(baselineHash);

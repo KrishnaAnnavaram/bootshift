@@ -1,0 +1,11 @@
+{
+  "stage" : "13-build-repair",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:11:50.284974200Z",
+  "artifacts" : {
+    "build-report.json" : "daa2906541d79943f7807b16b88477c08653a1aa23f3b78097b0cd281a4f552b",
+    "repair-report.json" : "12242114d531199e19995ae43d8afa4fb1228247e5f8de2bb23db83e7d8224f5",
+    "diagnostics.json" : "a29e71c998267400f3bbb9b07d414e72512f14e049258c00d287cbe1b895e1d8"
+  },
+  "artifact_set_hash" : "d4e2b6e7e193e4ad3b74126555b0220336e2793949ad93323fa44acf2856cb22"
+}

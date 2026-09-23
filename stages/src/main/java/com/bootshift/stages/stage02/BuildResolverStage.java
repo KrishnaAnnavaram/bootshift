@@ -6,6 +6,8 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
+import com.bootshift.core.journal.StepStatus;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
@@ -77,9 +79,28 @@ public final class BuildResolverStage implements Stage {
     }
 
     @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("BLD-001", "Load the inventory artifact",
+                        "The build model is resolved over files inventory already gave identity to"),
+                StepDeclaration.of("BLD-002", "Detect the build system",
+                        "Maven, Gradle or a mixed composite; never flattened to one"),
+                StepDeclaration.of("BLD-003", "Resolve the effective build model",
+                        "Invokes the build tool so the model is authoritative, not descriptor-guessed"),
+                StepDeclaration.of("BLD-004", "Classify dependency resolution",
+                        "An unresolved coordinate makes version-space analysis unreliable"),
+                StepDeclaration.of("BLD-005", "Derive Java levels and frameworks",
+                        "Records the level each module declares, not the newest available"),
+                StepDeclaration.of("BLD-006", "Publish the build, dependency and BOM models",
+                        "One serialized contract every later stage rehydrates through"));
+    }
+
+    @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "BLD-001").begin();
         StageSupport.requireUpstream(context, "01-inventory", "inventory-artifact.json",
                 "Run: harness inventory --repo <path>");
+        StageSupport.step(context, "BLD-001").succeed("Inventory artifact resolved");
 
         Path root = context.run().originalWorkspace();
         if (!Files.isDirectory(root)) {
@@ -87,20 +108,55 @@ public final class BuildResolverStage implements Stage {
         }
         Path evidenceSink = context.run().runWorkspace().resolve("build-evidence");
 
-        BuildSystemResolver resolver = new BuildSystemResolver();
+        StageSupport.step(context, "BLD-002").begin();
+        BuildSystemResolver resolver = new BuildSystemResolver(StageSupport.runner(context));
         BuildSystemPort.Kind detected = resolver.detect(root);
         if (detected == BuildSystemPort.Kind.UNKNOWN) {
+            StageSupport.step(context, "BLD-002")
+                    .fail("No Maven or Gradle build was found under " + root, null);
+            StageSupport.nextAction(context,
+                    "Point the harness at a directory containing a pom.xml or build.gradle");
             return StageResult.failure(OUTPUT_DIR, ExitCode.STRUCTURED_REFUSAL,
                     "No Maven or Gradle build was found under " + root,
                     List.of("Expected a pom.xml, build.gradle or per-service module directories"));
         }
+        StageSupport.step(context, "BLD-002").detail("kind", detected.name())
+                .succeed("Detected " + detected.name());
 
+        StageSupport.step(context, "BLD-003").begin();
         BuildSystemPort.BuildModel merged = resolver.resolve(root, evidenceSink);
+        if (merged.authoritative()) {
+            StageSupport.step(context, "BLD-003").detail("modules", merged.modules().size())
+                    .succeed("Resolved by invoking the build tool");
+        } else {
+            // A descriptor-derived model is a different kind of evidence and has to say so.
+            StageSupport.fallback(context, "build tool invocation", "descriptor parsing",
+                    merged.degradedReason(),
+                    "The dependency graph is derived from descriptors and may omit transitives");
+            StageSupport.step(context, "BLD-003").detail("modules", merged.modules().size())
+                    .degrade("Build tool unavailable: " + merged.degradedReason());
+        }
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
 
+        StageSupport.step(context, "BLD-004").begin();
         long unresolved = merged.dependencies().stream()
                 .filter(d -> !"RESOLVED".equals(d.resolutionStatus()))
                 .count();
+        StageSupport.step(context, "BLD-004")
+                .detail("dependencies", merged.dependencies().size())
+                .detail("unresolved", unresolved)
+                .finish(unresolved > 0 ? StepStatus.DEGRADED : StepStatus.SUCCESS,
+                        unresolved + " unresolved coordinate(s)");
+        if (!merged.authoritative()) {
+            StageSupport.blindSpot(context, "BS-BUILD-001", "BUILD_MODEL",
+                    "The build tool could not be invoked, so the dependency graph is "
+                            + "descriptor-derived", merged.degradedReason());
+        }
+        if (unresolved > 0) {
+            StageSupport.blindSpot(context, "GAP-BUILD-001", "DEPENDENCY_RESOLUTION",
+                    unresolved + " dependency coordinate(s) were not resolved by the build tool",
+                    "Version-space and impact analysis for those coordinates is unreliable");
+        }
 
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
                 .stat("build_systems", resolver.bindings(root).size())
@@ -130,8 +186,13 @@ public final class BuildResolverStage implements Stage {
         // One serialized contract, written by the codec. Every later stage rehydrates through the
         // same codec instead of rebuilding a partial copy that silently loses managed versions,
         // plugins, repositories, resolution issues and toolchain details.
+        StageSupport.step(context, "BLD-005").begin();
         ObjectNode buildModel = BuildModelCodec.encode(merged);
         buildModel.set("java_versions", Json.toTree(javaVersions(merged)));
+        StageSupport.step(context, "BLD-005")
+                .detail("java_versions", javaVersions(merged).size())
+                .succeed("Java levels and frameworks derived");
+        StageSupport.step(context, "BLD-006").begin();
         buildModel.set("frameworks", Json.toTree(detectFrameworks(merged)));
         buildModel.put("detected_kind", detected.name());
         buildModel.put("build_model_fingerprint", BuildModelCodec.fingerprint(merged));
@@ -176,11 +237,15 @@ public final class BuildResolverStage implements Stage {
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
         if (!writer.validationErrors().isEmpty()) {
+            StageSupport.step(context, "BLD-006")
+                    .fail("Artifacts failed schema validation; the pointer was not advanced", null);
             return StageResult.failure(OUTPUT_DIR, ExitCode.STAGE_FAILURE,
                     "Build model failed schema validation", writer.validationErrors());
         }
 
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "BLD-006").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift graph");
         context.stateMachine().transition(RunState.BUILD_RESOLVED,
                 merged.modules().size() + " modules resolved");
         context.runStateStore().updateState(context.run().runId(), RunState.BUILD_RESOLVED,

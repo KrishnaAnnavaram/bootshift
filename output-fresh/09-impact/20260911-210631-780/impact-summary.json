@@ -1,0 +1,36 @@
+{
+  "pipeline_stage" : "09-impact",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:06:34.449913800Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "by_classification" : {
+    "DEFINITELY_AFFECTED" : 502,
+    "POSSIBLY_AFFECTED" : 4,
+    "UNAFFECTED_WITHIN_OBSERVED_COVERAGE" : 1566
+  },
+  "affected_files_by_module" : {
+    "configuaration-server" : 4,
+    "department-service" : 4,
+    "discovery-service" : 3,
+    "employee-service" : 7,
+    "report-service" : 6,
+    "sheduler-service" : 3
+  },
+  "required_validation_dimensions" : {
+    "CONTEXT_CAPABILITY" : 506
+  }
+}

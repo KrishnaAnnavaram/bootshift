@@ -40,6 +40,7 @@ import picocli.CommandLine;
                 EvidenceCommand.class,
                 GapsCommand.class,
                 BlindSpotsCommand.class,
+                DocumentsCommand.class,
                 CommandLine.HelpCommand.class
         })
 public final class BootshiftCli implements Runnable {

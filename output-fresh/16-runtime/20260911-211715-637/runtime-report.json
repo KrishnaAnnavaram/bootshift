@@ -1,0 +1,387 @@
+{
+  "pipeline_stage" : "16-runtime",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:17:15.637155600Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09",
+  "blind_spots" : [ {
+    "id" : "BS-RUNTIME-CONFIGUARATION-SERVER",
+    "dimension" : "RUNTIME",
+    "description" : "Module configuaration-server did not start after migration",
+    "reason" : "PROCESS_EXITED: APPLICATION FAILED TO START"
+  }, {
+    "id" : "BS-RUNTIME-EMPLOYEE-SERVICE",
+    "dimension" : "RUNTIME",
+    "description" : "Module employee-service did not start after migration",
+    "reason" : "TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]"
+  } ],
+  "gaps" : [ {
+    "id" : "GAP-ENV-892",
+    "dimension" : "ENVIRONMENT",
+    "description" : "NO_OCI_RUNTIME: no rootless OCI runtime daemon (podman/docker/nerdctl) answered, so infrastructure dependencies cannot be provisioned by the harness. Any dimension requiring a database, broker or cache is recorded as NOT_COMPARED rather than assumed equivalent.",
+    "impact" : "Runtime observations affected by this attribute are weaker evidence"
+  } ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed",
+    "modules_started" : 4,
+    "silently_ignored_properties" : 0
+  },
+  "modules_started" : 4,
+  "modules_attempted" : 6,
+  "environment_mode" : "MANAGED",
+  "environment_provider" : "bootshift-managed-jvm",
+  "environment_fingerprint_value" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09",
+  "equivalence_gaps" : [ "NO_OCI_RUNTIME: no rootless OCI runtime daemon (podman/docker/nerdctl) answered, so infrastructure dependencies cannot be provisioned by the harness. Any dimension requiring a database, broker or cache is recorded as NOT_COMPARED rather than assumed equivalent." ],
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "started" : false,
+    "failure_reason" : "PROCESS_EXITED: APPLICATION FAILED TO START",
+    "duration_ms" : 2053,
+    "observation_count" : 0,
+    "bound_property_count" : 0,
+    "observations" : [ ],
+    "unobservable" : [ "CONTEXT: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "BEANS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "CONDITIONS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "PROFILES: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "REQUEST_MAPPINGS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "HEALTH: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "CONFIG_BINDING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SECURITY_FILTER_CHAIN: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "PERSISTENCE: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "MESSAGING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SCHEDULING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "BATCH: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "EXTERNAL_CLIENT: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SERIALIZATION: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START" ]
+  }, {
+    "module" : "department-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 12738,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "department-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:53714",
+      "data" : {
+        "base_url" : "http://127.0.0.1:53714",
+        "artifact" : "department-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "4a43dc8a078f652d6b4d7e19fd5620a3041b928fd3601831268a39db4c64a45b",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17\\bin\\java.exe",
+        "java_home" : "C:/Users/annav/tools/jdk-17",
+        "port" : 53714,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "department-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "9c315424690f0bd36e302661ac7bd4f3b1aa7b75d2e6b0bc991c9b7a720541f4"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "department-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "d5570d63a6c57ec34676b4d29a090c26e3f8894d29d90e1ea4dd2e532e954dfb"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "department-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "4d9afd1ba0f0f9d84b576c5f432d7d4d8ed393df2fa0e54f8b6e24f5f942fb5b"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "department-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "1683fee7cc8a19a4029f47fd3b184155b8fff5a2a70acc6f03ac0cf204a63365"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "department-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "39edd0986a0bfabbe0e5e905863d1ba7fb6eb5a74ceb07b983b6f507b0175cd8"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "department-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "discovery-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 19526,
+    "observation_count" : 7,
+    "bound_property_count" : 267,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "discovery-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:62312",
+      "data" : {
+        "base_url" : "http://127.0.0.1:62312",
+        "artifact" : "discovery-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "c55e9b938b906bd70bedd3b723e2d9067ec15c366fe793e89d9b5743f3208318",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17\\bin\\java.exe",
+        "java_home" : "C:/Users/annav/tools/jdk-17",
+        "port" : 62312,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_UP",
+        "health_status" : "UP",
+        "readiness_detail" : "/actuator/health reported status UP",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "eureka.client.enabled=true", "eureka.server.wait-time-in-ms-when-sync-empty=0" ],
+        "environment_fingerprint" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=UP",
+        "raw_hash" : "f55df70dbdd5cc31333ccbfa981fc414e9d05564a6cf9fa36fd7dd3140d9cc0a"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "008c7dbea64e5e91bc6f3c702ff24bc63cd1a24ef26e418e9bf7721c595d978a"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "8eb50b78ca24ff8ad3c70ee580bc874c80b98f0861480e69e13ced8157256c99"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=2",
+        "raw_hash" : "744b4ae7c885e83ee3fbe573022e39cac1c4ebc859d98c92c5324f939f6446ef"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "8e1ddc4ff3c4aed060e0b392d2aabafccb317f7ba5cdce0d5bd5622d6d6e3972"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 267
+      },
+      "successful" : true
+    } ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "employee-service",
+    "started" : false,
+    "failure_reason" : "TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]",
+    "duration_ms" : 90788,
+    "observation_count" : 0,
+    "bound_property_count" : 0,
+    "observations" : [ ],
+    "unobservable" : [ "CONTEXT: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "BEANS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "CONDITIONS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "PROFILES: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "REQUEST_MAPPINGS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "HEALTH: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "CONFIG_BINDING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SECURITY_FILTER_CHAIN: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "PERSISTENCE: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "MESSAGING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SCHEDULING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "BATCH: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "EXTERNAL_CLIENT: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SERIALIZATION: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]" ]
+  }, {
+    "module" : "report-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 18873,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "report-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:60807",
+      "data" : {
+        "base_url" : "http://127.0.0.1:60807",
+        "artifact" : "report-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "f499a1d2d411b76398ba2493e89199ed90358598fa1875151db5313ff2f478a0",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17\\bin\\java.exe",
+        "java_home" : "C:/Users/annav/tools/jdk-17",
+        "port" : 60807,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "report-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "fb71beb022e10b07113ab330d3324872b5f1bdc111b3798187f51606a6704b99"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "report-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "66dd68609300038fd2e640239da38545ac53aa61499e62b7b508b58e22eb7041"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "report-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "b3278223d9519785d45b9b3ee37e6dd1ef09c43baff2adbcaad366d94ac23f40"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "report-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "cf5a89414058af8545cbc4a918e79ec07e2dcc89911a527d5fc533906cb6d572"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "report-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "ccffee407eee287471d7213d9396907bb88c50eac5f84ba4c1266d9f94110622"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "report-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "sheduler-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 14781,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "sheduler-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:60862",
+      "data" : {
+        "base_url" : "http://127.0.0.1:60862",
+        "artifact" : "sheduler-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "83750087255445f5a8ab58adbcbadefdb42ac8e47c67022f3e8de4adf15b2879",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17\\bin\\java.exe",
+        "java_home" : "C:/Users/annav/tools/jdk-17",
+        "port" : 60862,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "e0f97f6217d27fc337553bb3288e6f833f54c3a15a83669bf219588dafa9bd09"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "eb3efbb9a737b77b46f681ee1fbe9376007526aece5888b5de8d612680b51d64"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "94c3cf89d5d452de860ea5d1d5c104a5f703ce6ecbe4b45e72cd7da39b8b2335"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "b16d87e4f9474e32a6c4b54ac985af3786d89c268796526eaf50f090c846def6"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "e3f707cf53532ef87bba97ef0a26e6e51359ad434e1c5a834f689e5b018f0524"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "570c341f8874816f2c39e0609c6ce3e46d4d0bf1469d6acc65ce56ccbf46ed5d"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "unobservable" : [ ]
+  } ],
+  "note" : "Successful context startup is one runtime observation, not migration success (R19)"
+}

@@ -7,6 +7,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.identity.FileRecord;
 import com.bootshift.core.identity.FileRegistry;
 import com.bootshift.core.ledger.ChangeEvent;
@@ -100,8 +101,23 @@ public final class ProvenanceStage implements Stage {
                 "gaps.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("PRV-001", "Load evidence, ledger and lineage",
+                        "Provenance is assembled from records that already exist"),
+                StepDeclaration.of("PRV-002", "Build the provenance graph",
+                        "Connects file, symbol, fact, decision, validation and gap lineage"),
+                StepDeclaration.of("PRV-003", "Publish the provenance graph",
+                        "Supports asking why a specific file changed and what authorized it"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "PRV-001").begin();
+        StageSupport.step(context, "PRV-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "PRV-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -134,7 +150,9 @@ public final class ProvenanceStage implements Stage {
         ObjectNode gaps = collect(context, "gaps");
         writer.write("gaps.json", StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), gaps));
 
+        StageSupport.step(context, "PRV-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "PRV-003").succeed("Published and pointer advanced");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

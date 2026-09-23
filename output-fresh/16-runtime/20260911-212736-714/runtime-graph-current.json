@@ -1,0 +1,84 @@
+{
+  "pipeline_stage" : "16-runtime",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:31:24.707322900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-2-PATCH",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "layer" : "RUNTIME_OBSERVATION",
+  "edge_count" : 280,
+  "rule" : "Runtime edges never overwrite static relationships. Both layers coexist so a report can say whether a relationship was inferred or observed (R27).",
+  "edges" : [ {
+    "from" : "MODULE:department-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME_OBSERVATION:department-service:CONTEXT",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-4291729e114cfe0d6232fbe0fc799e2e01b17ccdb1db524b74e292a0cd3d455f"
+  }, {
+    "from" : "MODULE:department-service",
+    "type" : "ACTUALLY_INJECTED",
+    "to" : "RUNTIME_OBSERVATION:department-service:BEANS",
+    "evidence_ref" : "EV-RUNTIME-BEANS-41d2daa18bc1b02a51178650b74cde796051102477f0b517161ba09590f883d5"
+  }, {
+    "from" : "MODULE:department-service",
+    "type" : "ACTUALLY_HANDLES_ENDPOINT",
+    "to" : "RUNTIME_OBSERVATION:department-service:REQUEST_MAPPINGS",
+    "evidence_ref" : "EV-RUNTIME-REQUEST-MAPPINGS-66e38da24f5fcff449892ec3853bc8652039c97ad790490dbaa36695c7e8ef3a"
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME_OBSERVATION:discovery-service:CONTEXT",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-0ad32a291aeed040428feed2f4ea202d22ee65a7238c4144b19bbe06147c9e02"
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_INJECTED",
+    "to" : "RUNTIME_OBSERVATION:discovery-service:BEANS",
+    "evidence_ref" : "EV-RUNTIME-BEANS-41d1738b3cabc2124ff4f62f1eeded47d425378f51e6c7c235125a96cd80b712"
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_HANDLES_ENDPOINT",
+    "to" : "RUNTIME_OBSERVATION:discovery-service:REQUEST_MAPPINGS",
+    "evidence_ref" : "EV-RUNTIME-REQUEST-MAPPINGS-434385ca71ca9dbf754194d956853dc4af0639e88be1364397d394912a6877b9"
+  }, {
+    "from" : "MODULE:report-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME_OBSERVATION:report-service:CONTEXT",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-ac30386f3408c845fdbc1837c9a9a60c4ec8a4b344fb1222f879048ae2822020"
+  }, {
+    "from" : "MODULE:report-service",
+    "type" : "ACTUALLY_INJECTED",
+    "to" : "RUNTIME_OBSERVATION:report-service:BEANS",
+    "evidence_ref" : "EV-RUNTIME-BEANS-15983dfadeb2a3bfd01ab6240954f60584b903f7301f3044d46235c3f9836e01"
+  }, {
+    "from" : "MODULE:report-service",
+    "type" : "ACTUALLY_HANDLES_ENDPOINT",
+    "to" : "RUNTIME_OBSERVATION:report-service:REQUEST_MAPPINGS",
+    "evidence_ref" : "EV-RUNTIME-REQUEST-MAPPINGS-99d6ed3bdc6337d2b8a59349282907fed4bd23c4fb004e573cc5911fb1ac6700"
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME_OBSERVATION:sheduler-service:CONTEXT",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-37ef7fc57624e5285ff7520bd4372ffa7845fcbb67d333da386f7146f7e180cc"
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "type" : "ACTUALLY_INJECTED",
+    "to" : "RUNTIME_OBSERVATION:sheduler-service:BEANS",
+    "evidence_ref" : "EV-RUNTIME-BEANS-95b2bf3490a0ca84dbd5434b7f50e77f6dc45e5ed4ea265688b58815cec0e8cf"
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "type" : "ACTUALLY_HANDLES_ENDPOINT",
+    "to" : "RUNTIME_OBSERVATION:sheduler-service:REQUEST_MAPPINGS",
+    "evidence_ref" : "EV-RUNTIME-REQUEST-MAPPINGS-5b55d46e18fae92ab2b69b48fcd244a16bb991226b1ca86f6b55300090ca6c75"
+  } ]
+}

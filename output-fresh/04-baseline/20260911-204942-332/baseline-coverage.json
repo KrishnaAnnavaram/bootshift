@@ -1,0 +1,64 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:55:11.963819900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "measured" : true,
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "available" : true,
+    "instruction_covered_ratio" : 0.375,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.3333,
+    "detail" : null
+  }, {
+    "module" : "department-service",
+    "available" : true,
+    "instruction_covered_ratio" : 0.0251,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.098,
+    "detail" : null
+  }, {
+    "module" : "discovery-service",
+    "available" : true,
+    "instruction_covered_ratio" : 0.375,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.3333,
+    "detail" : null
+  }, {
+    "module" : "employee-service",
+    "available" : false,
+    "instruction_covered_ratio" : 0.0,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.0,
+    "detail" : "Coverage instrumentation could not attach: Corrupted STDOUT by directly writing to native stream in forked JVM 1. Stream 'FATAL ERROR in native method: processing of -javaagent failed, processJavaStart failed'.. Tests were re-run without the agent so the test outcome is still observed, but no coverage number exists for this module."
+  }, {
+    "module" : "report-service",
+    "available" : true,
+    "instruction_covered_ratio" : 0.0215,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.0851,
+    "detail" : null
+  }, {
+    "module" : "sheduler-service",
+    "available" : true,
+    "instruction_covered_ratio" : 0.0232,
+    "branch_covered_ratio" : 0.0,
+    "line_covered_ratio" : 0.1176,
+    "detail" : null
+  } ]
+}

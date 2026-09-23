@@ -1,0 +1,13 @@
+{
+  "stage" : "10-characterization",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:10:21.851587400Z",
+  "artifacts" : {
+    "characterization-report.json" : "cb0ad5b597be2f0a6754ad2ce0a7a1d62d15e7f5be9f3c1c9ee4acfeccbe8847",
+    "characterization-contracts.json" : "30475cb8381d558f8dd1c84b5c5525bc256d1a350ea41d530bb59633b9558fc9",
+    "characterization-scenarios.json" : "841e790982dcf9d7c75fc0d5cab829112a434f8fbcc1126fbd8da7c045c27944",
+    "characterization-old-observations.json" : "d4d76e8830472e66792ff5edb1939e0ed31f4fcd03b85bb11c444d0f0886c4b3",
+    "characterization-gaps.json" : "bcb29f4815338f06896d7eb1f25d1f9de948092ea4d01ee3301c31628c20f435"
+  },
+  "artifact_set_hash" : "ed055390af100eef3633d683ce7d9274343240e4f92e6e44d1c4e21a4f709030"
+}

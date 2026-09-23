@@ -1,0 +1,77 @@
+{
+  "pipeline_stage" : "05-compatibility",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:15.632423900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "probe" : "spring-boot-starter-parent POM existence",
+  "unavailable_count" : 0,
+  "candidates" : [ {
+    "line" : "2.7",
+    "version" : "2.7.18",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/2.7.18/spring-boot-starter-parent-2.7.18.pom"
+  }, {
+    "line" : "3.0",
+    "version" : "3.0.13",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.0.13/spring-boot-starter-parent-3.0.13.pom"
+  }, {
+    "line" : "3.1",
+    "version" : "3.1.12",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.1.12/spring-boot-starter-parent-3.1.12.pom"
+  }, {
+    "line" : "3.2",
+    "version" : "3.2.12",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.2.12/spring-boot-starter-parent-3.2.12.pom"
+  }, {
+    "line" : "3.3",
+    "version" : "3.3.13",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.3.13/spring-boot-starter-parent-3.3.13.pom"
+  }, {
+    "line" : "3.4",
+    "version" : "3.4.13",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.4.13/spring-boot-starter-parent-3.4.13.pom"
+  }, {
+    "line" : "3.5",
+    "version" : "3.5.16",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/3.5.16/spring-boot-starter-parent-3.5.16.pom"
+  }, {
+    "line" : "4.0",
+    "version" : "4.0.8",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/4.0.8/spring-boot-starter-parent-4.0.8.pom"
+  }, {
+    "line" : "4.1",
+    "version" : "4.1.1",
+    "exists" : true,
+    "repository" : "https://repo1.maven.org/maven2",
+    "detail" : "POM present at https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-starter-parent/4.1.1/spring-boot-starter-parent-4.1.1.pom"
+  } ]
+}

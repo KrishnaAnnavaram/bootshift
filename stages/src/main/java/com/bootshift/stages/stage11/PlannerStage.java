@@ -14,6 +14,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.policy.ValidationDepth;
 import com.bootshift.core.state.RunState;
@@ -88,8 +89,21 @@ public final class PlannerStage implements Stage {
                 "transformation-capability-registry.json", "residual-report.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("PLN-001", "Load facts, impacts and the frozen path",
+                        "The plan is assembled from verified knowledge and measured impact"),
+                StepDeclaration.of("PLN-002", "Compute coverage and build the edge plan",
+                        "Facts with a transformer, facts without one and unknowns are counted separately, so deterministic coverage can never be read as knowledge completeness"),
+                StepDeclaration.of("PLN-003", "Freeze the plan",
+                        "Recipes, ordering, validation depth and toolchain stop being negotiable here"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "PLN-001").begin();
         JsonNode target = StageSupport.requireUpstream(context, "06-target", "target-state.json",
                 "Run: harness resolve-target --target auto");
         JsonNode path = StageSupport.requireUpstream(context, "06-target", "migration-path.json",
@@ -127,6 +141,8 @@ public final class PlannerStage implements Stage {
                 .map(com.bootshift.adapters.build.ToolchainProbe.Jdk::major)
                 .distinct().sorted().toList();
 
+        StageSupport.step(context, "PLN-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "PLN-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -325,7 +341,10 @@ public final class PlannerStage implements Stage {
             blockedPlan.set("reconciliation", Json.toTree(reconciliationDecisions));
             writer.write("edge-plan.json",
                     StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR), blockedPlan));
+            StageSupport.step(context, "PLN-003").begin();
             StageSupport.publish(context, writer);
+            StageSupport.step(context, "PLN-003").succeed("Published and pointer advanced");
+            StageSupport.nextAction(context, "Run: bootshift migrate");
             throw HarnessException.block("A mandatory migration checkpoint would be skipped and policy "
                     + "forbids collapsing it: " + reconciliationDecisions);
         }
@@ -377,7 +396,10 @@ public final class PlannerStage implements Stage {
                     "Plan artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "PLN-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "PLN-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift migrate");
         // Seed the execution index from the frozen plan so every planned edge is visible to
         // resumption and to final evidence, including edges that never run.
         com.bootshift.stages.EdgeIndex.open(context).seedFromPlan(edgeArtifact).persist();

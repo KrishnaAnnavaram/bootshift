@@ -11,6 +11,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.identity.FileRecord;
 import com.bootshift.core.identity.FileRegistry;
 import com.bootshift.core.ledger.ChangeEvent;
@@ -63,6 +64,11 @@ public final class BuildRepairStage implements Stage {
     }
 
     @Override
+    public String edgeId() {
+        return edgeId;
+    }
+
+    @Override
     public String id() {
         return OUTPUT_DIR;
     }
@@ -108,8 +114,21 @@ public final class BuildRepairStage implements Stage {
         return List.of("build-report.json", "repair-report.json", "diagnostics.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("RPR-001", "Resolve the frozen toolchain",
+                        "Compiling on a different JDK than the edge froze would produce evidence about the wrong toolchain"),
+                StepDeclaration.of("RPR-002", "Compile and repair within budget",
+                        "Diagnostics are clustered by root cause; repairs are deterministic, and an AI proposal is verified deterministically before the gateway is ever asked"),
+                StepDeclaration.of("RPR-003", "Publish the build and repair record",
+                        "Records why repair stopped, which matters as much as whether it succeeded"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "RPR-001").begin();
         JsonNode edgePlanArtifact = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         JsonNode edgePlan = EdgeSupport.findEdge(edgePlanArtifact, edgeId);
@@ -132,10 +151,13 @@ public final class BuildRepairStage implements Stage {
         // The toolchain this edge froze, resolved to a concrete JDK and then verified by asking the
         // binary what it is. Re-deriving a JDK here is what let the plan say one thing and the
         // compile happen on another.
-        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel,
+                StageSupport.runner(context));
         EdgeToolchain.Verification toolchainVerification = toolchain.verify();
         String javaHome = toolchain.resolved().javaHome();
         int requiredJava = toolchain.resolved().frozenMajor();
+        StageSupport.step(context, "RPR-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "RPR-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId).mutating(true);
 
@@ -349,8 +371,11 @@ public final class BuildRepairStage implements Stage {
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
                         diagnosticsArtifact));
 
+        StageSupport.step(context, "RPR-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.COMPILED, "published");
+        StageSupport.step(context, "RPR-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift validate --edge <edge>");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

@@ -1,0 +1,148 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M295KXC5BP978Z6FF8KHQ8WD",
+  "stage_id" : "14-graph-diff",
+  "stage_name" : "GraphDiffStage",
+  "edge_id" : "EDGE-2-PATCH",
+  "purpose" : "Rebuild the static graph and assert that every change stayed inside authorized scope",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:22:44.229246200Z",
+  "finished_at" : "2026-09-11T21:22:46.367571900Z",
+  "duration_ms" : 2138,
+  "state_before" : "EDGE_COMPLETE",
+  "state_after" : "EDGE_COMPLETE",
+  "status" : "SUCCESS",
+  "summary" : "Edge EDGE-2-PATCH graph COMPLETE: +0/-0 nodes, +0/-0 edges, 0 symbol(s) changed; scope OK",
+  "attempt_directory" : "20260911-212246-099",
+  "declared_preconditions" : [ "EDGE_COMPILED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:EDGE_COMPILED",
+    "satisfied" : true,
+    "detail" : "No artifact proof declared for this state",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:13-build-repair/build-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:11-plan/edge-plan.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/build-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "13-build-repair/build-report.json", "11-plan/edge-plan.json", "02-build/build-model.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "13-build-repair/build-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\13-build-repair\\20260911-212157-428\\build-report.json",
+    "present" : true,
+    "hash" : "5fa2deb696f46e20c2ffcafce36d8092aa6523d043aa56577b0aba5d939ca552"
+  }, {
+    "artifact" : "11-plan/edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "present" : true,
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "artifact" : "02-build/build-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\build-model.json",
+    "present" : true,
+    "hash" : "13f63a0f2464ab7d99a81f55622fd6aab8f3e00c6fdd4c007075856f790f7b2d"
+  } ],
+  "declared_steps" : [ "SCP-001", "SCP-002", "SCP-003" ],
+  "executed_steps" : [ {
+    "step_id" : "SCP-001",
+    "sequence" : 1,
+    "name" : "Rebuild the application graph after mutation",
+    "purpose" : "The post-migration graph is rebuilt, never patched",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:22:44.245386200Z",
+    "finished_at" : "2026-09-11T21:22:46.099271600Z",
+    "duration_ms" : 1853,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "SCP-002",
+    "sequence" : 2,
+    "name" : "Compare graphs and verify scope",
+    "purpose" : "Changed files are checked against the authorized set; anything outside it is a scope violation, not an incidental edit",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:22:46.099271600Z",
+    "finished_at" : "2026-09-11T21:22:46.367571900Z",
+    "duration_ms" : 268,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "SCP-003",
+    "sequence" : 3,
+    "name" : "Publish the graph diff and scope report",
+    "purpose" : "Structural change is separated from behavioural change",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:22:46.144389200Z",
+    "finished_at" : "2026-09-11T21:22:46.146929300Z",
+    "duration_ms" : 2,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "application-graph-current.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-212246-099\\application-graph-current.json",
+    "hash" : "010f443728c2c103a686d6825bcc0c0dcd404c6dd0caf03864c760afdb5e2dc9"
+  }, {
+    "name" : "graph-diff.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-212246-099\\graph-diff.json",
+    "hash" : "d44e112ef1824183f20a3b3a6f57bbfe33409cd8ca17d3571e18e07146739ce1"
+  }, {
+    "name" : "scope-assertion.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-212246-099\\scope-assertion.json",
+    "hash" : "dc85a064145d8f57b60c733606f7a58852ffa5a1e6b395d0394eba51cc75d1ac"
+  }, {
+    "name" : "last-good-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-212246-099\\last-good-graph.json",
+    "hash" : "3cf58380051e089e1ee4ad32150926b66d2c4e74a2723f7710168164d2ff3cd4"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-212246-099\\manifest.json",
+    "hash" : "d3f9d2b561ee32facdfa19cd32427e0edafd391e97e09635eddad0edd679e2aa"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-1014085234",
+  "next_action" : "Run: bootshift validate --edge <edge>",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

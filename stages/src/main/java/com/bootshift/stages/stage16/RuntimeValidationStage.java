@@ -10,6 +10,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.EdgeType;
@@ -61,6 +62,11 @@ public final class RuntimeValidationStage implements Stage {
     }
 
     @Override
+    public String edgeId() {
+        return edgeId;
+    }
+
+    @Override
     public String id() {
         return OUTPUT_DIR;
     }
@@ -98,8 +104,21 @@ public final class RuntimeValidationStage implements Stage {
                 "silently-ignored-properties.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("RUN-001", "Prepare the runtime workspace and toolchain",
+                        "The migrated tree is started on the JDK the edge froze"),
+                StepDeclaration.of("RUN-002", "Start modules and execute frozen scenarios",
+                        "Missing infrastructure is recorded as NOT_AVAILABLE; it is never counted as a pass"),
+                StepDeclaration.of("RUN-003", "Publish the runtime report",
+                        "Observed, failed and unavailable stay distinguishable"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "RUN-001").begin();
         JsonNode edgePlanArtifact = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         JsonNode edgePlan = EdgeSupport.findEdge(edgePlanArtifact, edgeId);
@@ -133,12 +152,16 @@ public final class RuntimeValidationStage implements Stage {
         // The frozen edge toolchain, not a hardcoded 17 and not whatever java is on PATH. The
         // application must be packaged and started on the JDK the edge selected, or the runtime
         // observation is about a different toolchain than the one being migrated to.
-        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel,
+                StageSupport.runner(context));
         EdgeToolchain.Verification toolchainVerification = toolchain.verify();
         String javaHome = toolchain.resolved().javaHome();
-        MavenBuildAdapter maven = new MavenBuildAdapter();
-        SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(logs);
+        MavenBuildAdapter maven = new MavenBuildAdapter(StageSupport.runner(context));
+        SpringProcessRuntimeProbe probe = new SpringProcessRuntimeProbe(
+                StageSupport.runner(context), logs);
 
+        StageSupport.step(context, "RUN-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "RUN-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId)
                 .environmentFingerprint(environment.fingerprint());
@@ -268,8 +291,11 @@ public final class RuntimeValidationStage implements Stage {
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
                         scenarioArtifact));
 
+        StageSupport.step(context, "RUN-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.RUNTIME_VALIDATED, "published");
+        StageSupport.step(context, "RUN-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift validate --edge <edge>");
         context.stateMachine().transition(RunState.EDGE_RUNTIME_VALIDATED,
                 started + " module(s) started");
         context.stateMachine().transition(RunState.EDGE_RUNTIME_GRAPH_ENRICHED,

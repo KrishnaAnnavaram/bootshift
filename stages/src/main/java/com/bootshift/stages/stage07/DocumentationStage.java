@@ -8,6 +8,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
@@ -77,8 +78,21 @@ public final class DocumentationStage implements Stage {
         return List.of("document-registry.json", "document-coverage.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("DOC-001", "Determine which components and edges need documentation",
+                        "Retrieval is driven by the frozen path, not by a fixed list of URLs"),
+                StepDeclaration.of("DOC-002", "Retrieve and verify authoritative sources",
+                        "Allowlist, version applicability and content hash decide acceptance; a failed retrieval is recorded as a failure rather than silently skipped"),
+                StepDeclaration.of("DOC-003", "Publish the document registry",
+                        "Every accepted document is pinned by hash so a later run can prove what it read"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "DOC-001").begin();
         JsonNode target = StageSupport.requireUpstream(context, "06-target", "target-state.json",
                 "Run: harness resolve-target --target auto");
         JsonNode path = StageSupport.requireUpstream(context, "06-target", "migration-path.json",
@@ -101,6 +115,8 @@ public final class DocumentationStage implements Stage {
         HttpDocumentationAdapter documentation = new HttpDocumentationAdapter(context.http(),
                 context.run().runWorkspace().resolve("documents"));
 
+        StageSupport.step(context, "DOC-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "DOC-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -281,7 +297,10 @@ public final class DocumentationStage implements Stage {
                     "Only previously pinned documents are available to the knowledge engine"));
         }
 
+        StageSupport.step(context, "DOC-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "DOC-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift knowledge");
         context.stateMachine().transition(RunState.DOCUMENTATION_RETRIEVED,
                 retrieved.size() + " document(s) pinned");
         context.runStateStore().updateState(context.run().runId(), RunState.DOCUMENTATION_RETRIEVED,

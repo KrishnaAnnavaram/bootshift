@@ -1,0 +1,154 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M295JDE9JBKRDVSRHMQE65AJ",
+  "stage_id" : "17-differential",
+  "stage_name" : "DifferentialStage",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "purpose" : "Compare original and migrated behaviour for the required dimensions",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:21:55.145497400Z",
+  "finished_at" : "2026-09-11T21:21:55.426180900Z",
+  "duration_ms" : 280,
+  "state_before" : "EDGE_RUNTIME_GRAPH_ENRICHED",
+  "state_after" : "EDGE_DIFFERENTIAL_VALIDATED",
+  "status" : "SUCCESS",
+  "summary" : "Edge EDGE-1-PREP-TEST: 82 comparison(s) across 1 dimension(s); {IDENTICAL=36, NOT_COMPARED=46}",
+  "attempt_directory" : "20260911-212155-178",
+  "declared_preconditions" : [ "EDGE_RUNTIME_GRAPH_ENRICHED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:EDGE_RUNTIME_GRAPH_ENRICHED",
+    "satisfied" : true,
+    "detail" : "No artifact proof declared for this state",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:11-plan/edge-plan.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:10-characterization/characterization-contracts.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:04-baseline/baseline-runtime.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:16-runtime/runtime-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "11-plan/edge-plan.json", "10-characterization/characterization-contracts.json", "04-baseline/baseline-runtime.json", "16-runtime/runtime-report.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "11-plan/edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "present" : true,
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "artifact" : "10-characterization/characterization-contracts.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-contracts.json",
+    "present" : true,
+    "hash" : "30475cb8381d558f8dd1c84b5c5525bc256d1a350ea41d530bb59633b9558fc9"
+  }, {
+    "artifact" : "04-baseline/baseline-runtime.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\04-baseline\\20260911-204942-332\\baseline-runtime.json",
+    "present" : true,
+    "hash" : "66cd94939775ab08390a81eb66710a99e84eb63fa3bdfab3e685b5dfe8db23d8"
+  }, {
+    "artifact" : "16-runtime/runtime-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\16-runtime\\20260911-211715-637\\runtime-report.json",
+    "present" : true,
+    "hash" : "5b83a832a07c2cf932bad3a245fabde121856666441e16a34a19806e9fd1ff0f"
+  } ],
+  "declared_steps" : [ "DIF-001", "DIF-002", "DIF-003" ],
+  "executed_steps" : [ {
+    "step_id" : "DIF-001",
+    "sequence" : 1,
+    "name" : "Load frozen observations from both sides",
+    "purpose" : "A comparison needs a successful observation on OLD and on NEW",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:21:55.162530800Z",
+    "finished_at" : "2026-09-11T21:21:55.178518100Z",
+    "duration_ms" : 15,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DIF-002",
+    "sequence" : 2,
+    "name" : "Normalise and compare",
+    "purpose" : "Normalisation is policy-driven and hashed, so a difference cannot be explained away by changing the rules afterwards",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:21:55.178518100Z",
+    "finished_at" : "2026-09-11T21:21:55.426180900Z",
+    "duration_ms" : 247,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DIF-003",
+    "sequence" : 3,
+    "name" : "Publish the differential report",
+    "purpose" : "An unexplained difference blocks; that is the point of the stage",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:21:55.202683400Z",
+    "finished_at" : "2026-09-11T21:21:55.210778500Z",
+    "duration_ms" : 8,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "differential-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-212155-178\\differential-report.json",
+    "hash" : "98a18227dec4a8525bdfc984ac04943be86f7dedadd8ca88efdfd67e07ff92b9"
+  }, {
+    "name" : "normalization-policy.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-212155-178\\normalization-policy.json",
+    "hash" : "283a5bd7299899bfaeb81be43ddf6701dfada76b44c7f16094d62b438f1e869e"
+  }, {
+    "name" : "environment-equivalence-check.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-212155-178\\environment-equivalence-check.json",
+    "hash" : "0fdd5837733d1a5db7d916fb193131e94d8777a7805f790117294730b3556440"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-212155-178\\manifest.json",
+    "hash" : "9a2c4aae62fe1e0975a6e8afc00957807e8cf41dd2240e51022c29c7f895677e"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-530823312",
+  "next_action" : "Run: bootshift approve",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

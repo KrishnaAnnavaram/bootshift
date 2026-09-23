@@ -1,0 +1,154 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M2965WEJAND58F0PASTQANF8",
+  "stage_id" : "17-differential",
+  "stage_name" : "DifferentialStage",
+  "edge_id" : "EDGE-2-PATCH",
+  "purpose" : "Compare original and migrated behaviour for the required dimensions",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:32:33.106283100Z",
+  "finished_at" : "2026-09-11T21:32:33.299891700Z",
+  "duration_ms" : 193,
+  "state_before" : "EDGE_COMPLETE",
+  "state_after" : "BLOCKED",
+  "status" : "BLOCKED",
+  "summary" : "Edge EDGE-2-PATCH: 1 unexplained behavioural difference(s)",
+  "attempt_directory" : "20260911-213233-154",
+  "declared_preconditions" : [ "EDGE_RUNTIME_GRAPH_ENRICHED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:EDGE_RUNTIME_GRAPH_ENRICHED",
+    "satisfied" : true,
+    "detail" : "No artifact proof declared for this state",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:11-plan/edge-plan.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:10-characterization/characterization-contracts.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:04-baseline/baseline-runtime.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:16-runtime/runtime-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "11-plan/edge-plan.json", "10-characterization/characterization-contracts.json", "04-baseline/baseline-runtime.json", "16-runtime/runtime-report.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "11-plan/edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "present" : true,
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "artifact" : "10-characterization/characterization-contracts.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-contracts.json",
+    "present" : true,
+    "hash" : "30475cb8381d558f8dd1c84b5c5525bc256d1a350ea41d530bb59633b9558fc9"
+  }, {
+    "artifact" : "04-baseline/baseline-runtime.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\04-baseline\\20260911-204942-332\\baseline-runtime.json",
+    "present" : true,
+    "hash" : "66cd94939775ab08390a81eb66710a99e84eb63fa3bdfab3e685b5dfe8db23d8"
+  }, {
+    "artifact" : "16-runtime/runtime-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\16-runtime\\20260911-212736-714\\runtime-report.json",
+    "present" : true,
+    "hash" : "3f4ce123c12b439433a99d86eb96c4a2c481f616dbad081322285f8056bdba5a"
+  } ],
+  "declared_steps" : [ "DIF-001", "DIF-002", "DIF-003" ],
+  "executed_steps" : [ {
+    "step_id" : "DIF-001",
+    "sequence" : 1,
+    "name" : "Load frozen observations from both sides",
+    "purpose" : "A comparison needs a successful observation on OLD and on NEW",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:32:33.120501800Z",
+    "finished_at" : "2026-09-11T21:32:33.154075700Z",
+    "duration_ms" : 33,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DIF-002",
+    "sequence" : 2,
+    "name" : "Normalise and compare",
+    "purpose" : "Normalisation is policy-driven and hashed, so a difference cannot be explained away by changing the rules afterwards",
+    "status" : "BLOCKED",
+    "status_reason" : "Edge EDGE-2-PATCH: 1 unexplained behavioural difference(s)",
+    "started_at" : "2026-09-11T21:32:33.154075700Z",
+    "finished_at" : "2026-09-11T21:32:33.299891700Z",
+    "duration_ms" : 145,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "DIF-003",
+    "sequence" : 3,
+    "name" : "Publish the differential report",
+    "purpose" : "An unexplained difference blocks; that is the point of the stage",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:32:33.284087400Z",
+    "finished_at" : "2026-09-11T21:32:33.291855400Z",
+    "duration_ms" : 7,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ "UNEXPLAINED CONFIGURATION_BINDING scenario SCN-00047: 1 difference(s) in /actuator/configprops with no verified migration fact and no recorded decision to explain them" ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "differential-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-213233-154\\differential-report.json",
+    "hash" : "df0d08917f68e2d0dfc5d2d74774a41feb5fc10f8d3019ed2882f9d10f6837d4"
+  }, {
+    "name" : "normalization-policy.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-213233-154\\normalization-policy.json",
+    "hash" : "296432adcd77d52e861b311b9038acb4142c6129255828fb0cddef089b7fb703"
+  }, {
+    "name" : "environment-equivalence-check.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-213233-154\\environment-equivalence-check.json",
+    "hash" : "cd7a14a702dfa1050ba43ba8720111c07532c1d1b2728703b192d5b9f8fdaf81"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\17-differential\\20260911-213233-154\\manifest.json",
+    "hash" : "8d807a809214f2a0e865835801d33ba2f8bc6ef60de825aae1fe648376bb2429"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-1596411896",
+  "next_action" : "This stage is blocked by the active policy. Read section 18, then either change the policy deliberately or accept that the migration cannot proceed as specified.",
+  "stop_reason" : "Edge EDGE-2-PATCH: 1 unexplained behavioural difference(s)",
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

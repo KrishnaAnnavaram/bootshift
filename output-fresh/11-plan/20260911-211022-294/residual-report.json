@@ -1,0 +1,98 @@
+{
+  "pipeline_stage" : "11-plan",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:10:22.374973400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "verified_fact_count" : 1683,
+  "deterministically_covered" : 1143,
+  "deterministic_coverage" : 0.6791,
+  "coverage_by_fact_type" : {
+    "API_REMOVED" : {
+      "fact_count" : 1029,
+      "covered" : 490,
+      "uncovered" : 539,
+      "type_claimed_by_a_capability" : true
+    },
+    "API_RENAMED" : {
+      "fact_count" : 1,
+      "covered" : 1,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "ARTIFACT_REMOVED" : {
+      "fact_count" : 3,
+      "covered" : 3,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "BASELINE_REQUIREMENT" : {
+      "fact_count" : 1,
+      "covered" : 1,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "BEHAVIOR_CHANGED_NO_API_CHANGE" : {
+      "fact_count" : 1,
+      "covered" : 0,
+      "uncovered" : 1,
+      "type_claimed_by_a_capability" : false
+    },
+    "COMPATIBILITY_REQUIREMENT" : {
+      "fact_count" : 1,
+      "covered" : 1,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "MANAGED_VERSION_CHANGED" : {
+      "fact_count" : 105,
+      "covered" : 105,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "PROPERTY_REMOVED" : {
+      "fact_count" : 153,
+      "covered" : 153,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    },
+    "PROPERTY_RENAMED" : {
+      "fact_count" : 389,
+      "covered" : 389,
+      "uncovered" : 0,
+      "type_claimed_by_a_capability" : true
+    }
+  },
+  "metric_scope" : "Deterministic coverage is the fraction of VERIFIED facts for which an AVAILABLE transformer exists. It measures rule availability for the facts the harness KNOWS about. It does not measure whether the fact set is complete: a required change nobody discovered is not counted as uncovered, it is not counted at all. Knowledge completeness is reported separately by the artifact channel's api_diff coverage.",
+  "policy_no_escalation_threshold" : 0.9,
+  "policy_one_level_threshold" : 0.6,
+  "note" : "Residual is not a failure. It is exactly what the bounded compile-repair and differential layers exist to manage.",
+  "residual" : [ {
+    "fact_type" : "API_REMOVED",
+    "fact_count" : 539,
+    "knowledge_ids" : [ "MK-00118", "MK-00607", "MK-00608", "MK-00609", "MK-00610", "MK-00611", "MK-00612", "MK-00613", "MK-00614", "MK-00615", "MK-00616", "MK-00617", "MK-00618", "MK-00619", "MK-00620", "MK-00621", "MK-00622", "MK-00623", "MK-00624", "MK-00625", "MK-00626", "MK-00627", "MK-00628", "MK-00629", "MK-00630", "MK-00631", "MK-00632", "MK-00633", "MK-00634", "MK-00635", "MK-00636", "MK-00637", "MK-00638", "MK-00639", "MK-00640", "MK-00641", "MK-00642", "MK-00643", "MK-00644", "MK-00645", "MK-00646", "MK-00647", "MK-00648", "MK-00649", "MK-00650", "MK-00651", "MK-00652", "MK-00653", "MK-00654", "MK-00655", "MK-00656", "MK-00657", "MK-00658", "MK-00659", "MK-00660", "MK-00661", "MK-00662", "MK-00663", "MK-00664", "MK-00665", "MK-00666", "MK-00667", "MK-00668", "MK-00669", "MK-00670", "MK-00671", "MK-00672", "MK-00673", "MK-00674", "MK-00675", "MK-00676", "MK-00677", "MK-00678", "MK-00679", "MK-00680", "MK-00681", "MK-00682", "MK-00683", "MK-00684", "MK-00685", "MK-00686", "MK-00687", "MK-00688", "MK-00689", "MK-00690", "MK-00691", "MK-00692", "MK-00693", "MK-00694", "MK-00695", "MK-00696", "MK-00697", "MK-00698", "MK-00699", "MK-00700", "MK-00701", "MK-00702", "MK-00703", "MK-00704", "MK-00705", "MK-00706", "MK-00707", "MK-00708", "MK-00709", "MK-00710", "MK-00711", "MK-00712", "MK-00713", "MK-00714", "MK-00715", "MK-00716", "MK-00717", "MK-00718", "MK-00719", "MK-00720", "MK-00721", "MK-00722", "MK-00723", "MK-00724", "MK-00725", "MK-00726", "MK-00727", "MK-00728", "MK-00729", "MK-00730", "MK-00731", "MK-00732", "MK-00733", "MK-00734", "MK-00735", "MK-00736", "MK-00737", "MK-00738", "MK-00739", "MK-00740", "MK-00741", "MK-00742", "MK-00743", "MK-00744", "MK-00745", "MK-00746", "MK-00747", "MK-00748", "MK-00749", "MK-00750", "MK-00751", "MK-00752", "MK-00753", "MK-00754", "MK-00755", "MK-00756", "MK-00757", "MK-00758", "MK-00759", "MK-00760", "MK-00761", "MK-00762", "MK-00763", "MK-00764", "MK-00765", "MK-00766", "MK-00767", "MK-00768", "MK-00769", "MK-00770", "MK-00771", "MK-00772", "MK-00773", "MK-00774", "MK-00775", "MK-00776", "MK-00777", "MK-00778", "MK-00779", "MK-00780", "MK-00781", "MK-00782", "MK-00783", "MK-00784", "MK-00785", "MK-00786", "MK-00787", "MK-00788", "MK-00789", "MK-00790", "MK-00791", "MK-00792", "MK-00793", "MK-00794", "MK-00795", "MK-00796", "MK-00797", "MK-00798", "MK-00799", "MK-00800", "MK-00801", "MK-00802", "MK-00803", "MK-00804", "MK-00805", "MK-00806", "MK-00807", "MK-00808", "MK-00809", "MK-00810", "MK-00811", "MK-00812", "MK-00813", "MK-00814", "MK-00815", "MK-00816", "MK-00817", "MK-00818", "MK-00819", "MK-00820", "MK-00821", "MK-00822", "MK-00823", "MK-00824", "MK-00825", "MK-00826", "MK-00827", "MK-00828", "MK-00829", "MK-00830", "MK-00831", "MK-00832", "MK-00833", "MK-00834", "MK-00835", "MK-00836", "MK-00837", "MK-00838", "MK-00839", "MK-00840", "MK-00841", "MK-00842", "MK-00843", "MK-00844", "MK-00845", "MK-00846", "MK-00847", "MK-00848", "MK-00849", "MK-00850", "MK-00851", "MK-00852", "MK-00853", "MK-00854", "MK-00855", "MK-00856", "MK-00857", "MK-00858", "MK-00859", "MK-00860", "MK-00861", "MK-00862", "MK-00863", "MK-00864", "MK-00865", "MK-00866", "MK-00867", "MK-00868", "MK-00869", "MK-00870", "MK-00871", "MK-00872", "MK-00873", "MK-00874", "MK-00875", "MK-00876", "MK-00877", "MK-00878", "MK-00879", "MK-00880", "MK-00881", "MK-00882", "MK-00883", "MK-00884", "MK-00885", "MK-00886", "MK-00887", "MK-00888", "MK-00889", "MK-00890", "MK-00891", "MK-00892", "MK-00893", "MK-00894", "MK-00895", "MK-00896", "MK-00897", "MK-00898", "MK-00899", "MK-00900", "MK-00901", "MK-00902", "MK-00903", "MK-00904", "MK-00905", "MK-00906", "MK-00907", "MK-00908", "MK-00909", "MK-00910", "MK-00911", "MK-00912", "MK-00913", "MK-00914", "MK-00915", "MK-00916", "MK-00917", "MK-00918", "MK-00919", "MK-00920", "MK-00921", "MK-00922", "MK-00923", "MK-00924", "MK-00925", "MK-00926", "MK-00927", "MK-00928", "MK-00929", "MK-00930", "MK-00931", "MK-00932", "MK-00933", "MK-00934", "MK-00935", "MK-00936", "MK-00937", "MK-00938", "MK-00939", "MK-00940", "MK-00941", "MK-00942", "MK-00943", "MK-00944", "MK-00945", "MK-00946", "MK-00947", "MK-00948", "MK-00949", "MK-00950", "MK-00951", "MK-00952", "MK-00953", "MK-00954", "MK-00955", "MK-00956", "MK-00957", "MK-00958", "MK-00959", "MK-00960", "MK-00961", "MK-00962", "MK-00963", "MK-00964", "MK-00965", "MK-00966", "MK-00967", "MK-00968", "MK-00969", "MK-00970", "MK-00971", "MK-00972", "MK-00973", "MK-00974", "MK-00975", "MK-00976", "MK-00977", "MK-00978", "MK-00979", "MK-00980", "MK-00981", "MK-00982", "MK-00983", "MK-00984", "MK-00985", "MK-00986", "MK-00987", "MK-00988", "MK-00989", "MK-00990", "MK-00991", "MK-00992", "MK-00993", "MK-00994", "MK-00995", "MK-00996", "MK-00997", "MK-00998", "MK-00999", "MK-01000", "MK-01001", "MK-01002", "MK-01003", "MK-01004", "MK-01005", "MK-01006", "MK-01007", "MK-01008", "MK-01009", "MK-01010", "MK-01011", "MK-01012", "MK-01013", "MK-01014", "MK-01015", "MK-01016", "MK-01017", "MK-01018", "MK-01019", "MK-01020", "MK-01021", "MK-01022", "MK-01023", "MK-01024", "MK-01025", "MK-01026", "MK-01027", "MK-01028", "MK-01029", "MK-01030", "MK-01031", "MK-01032", "MK-01033", "MK-01034", "MK-01035", "MK-01036", "MK-01037", "MK-01038", "MK-01039", "MK-01040", "MK-01041", "MK-01042", "MK-01043", "MK-01044", "MK-01045", "MK-01046", "MK-01047", "MK-01048", "MK-01049", "MK-01050", "MK-01051", "MK-01052", "MK-01053", "MK-01054", "MK-01055", "MK-01056", "MK-01057", "MK-01058", "MK-01059", "MK-01060", "MK-01061", "MK-01062", "MK-01063", "MK-01064", "MK-01065", "MK-01066", "MK-01067", "MK-01068", "MK-01069", "MK-01070", "MK-01071", "MK-01072", "MK-01073", "MK-01074", "MK-01075", "MK-01076", "MK-01077", "MK-01078", "MK-01079", "MK-01080", "MK-01081", "MK-01082", "MK-01083", "MK-01084", "MK-01085", "MK-01086", "MK-01087", "MK-01088", "MK-01089", "MK-01090", "MK-01091", "MK-01092", "MK-01093", "MK-01094", "MK-01095", "MK-01096", "MK-01097", "MK-01098", "MK-01099", "MK-01100", "MK-01101", "MK-01102", "MK-01103", "MK-01104", "MK-01105", "MK-01106", "MK-01107", "MK-01108", "MK-01109", "MK-01110", "MK-01111", "MK-01112", "MK-01113", "MK-01114", "MK-01115", "MK-01116", "MK-01117", "MK-01118", "MK-01119", "MK-01120", "MK-01121", "MK-01122", "MK-01123", "MK-01124", "MK-01125", "MK-01126", "MK-01127", "MK-01128", "MK-01129", "MK-01130", "MK-01131", "MK-01132", "MK-01133", "MK-01134", "MK-01135", "MK-01136", "MK-01137", "MK-01138", "MK-01139", "MK-01140", "MK-01141", "MK-01142", "MK-01143", "MK-01144" ],
+    "example_subjects" : [ "reactor.test.StepVerifierExtensionsKt", "ch.qos.logback.classic.boolex.JaninoEventEvaluator", "ch.qos.logback.classic.db.names.ColumnName", "ch.qos.logback.classic.db.names.DBNameResolver", "ch.qos.logback.classic.db.names.DefaultDBNameResolver", "ch.qos.logback.classic.db.names.SimpleDBNameResolver", "ch.qos.logback.classic.db.names.TableName", "ch.qos.logback.classic.jmx.JMXConfigurator", "ch.qos.logback.classic.jmx.JMXConfiguratorMBean", "ch.qos.logback.classic.jmx.MBeanUtil", "ch.qos.logback.classic.joran.action.EvaluatorAction", "ch.qos.logback.classic.joran.action.JMXConfiguratorAction", "ch.qos.logback.classic.joran.action.ReceiverAction", "ch.qos.logback.classic.net.ReceiverBase", "ch.qos.logback.classic.net.SSLSocketReceiver", "ch.qos.logback.classic.net.SocketReceiver", "ch.qos.logback.classic.net.server.RemoteAppenderClient", "ch.qos.logback.classic.net.server.RemoteAppenderServerListener", "ch.qos.logback.classic.net.server.RemoteAppenderServerRunner", "ch.qos.logback.classic.net.server.RemoteAppenderStreamClient", "ch.qos.logback.classic.net.server.SSLServerSocketAppender", "ch.qos.logback.classic.net.server.SSLServerSocketReceiver", "ch.qos.logback.classic.net.server.ServerSocketAppender", "ch.qos.logback.classic.net.server.ServerSocketReceiver", "ch.qos.logback.classic.sift.AppenderFactoryUsingJoran" ],
+    "reason" : "A capability declares this fact type but none claims these subjects",
+    "consequence" : "Counted as residual, which raises the planned validation depth for affected edges"
+  }, {
+    "fact_type" : "BEHAVIOR_CHANGED_NO_API_CHANGE",
+    "fact_count" : 1,
+    "knowledge_ids" : [ "MK-01691" ],
+    "example_subjects" : [ "spring.factories" ],
+    "reason" : "No AVAILABLE deterministic capability handles this fact type",
+    "consequence" : "Counted as residual, which raises the planned validation depth for affected edges"
+  } ]
+}

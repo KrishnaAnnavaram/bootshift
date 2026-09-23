@@ -1,0 +1,11 @@
+{
+  "stage" : "17-differential",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:32:33.284087400Z",
+  "artifacts" : {
+    "normalization-policy.json" : "296432adcd77d52e861b311b9038acb4142c6129255828fb0cddef089b7fb703",
+    "environment-equivalence-check.json" : "cd7a14a702dfa1050ba43ba8720111c07532c1d1b2728703b192d5b9f8fdaf81",
+    "differential-report.json" : "df0d08917f68e2d0dfc5d2d74774a41feb5fc10f8d3019ed2882f9d10f6837d4"
+  },
+  "artifact_set_hash" : "540137675d5fd7a3a0a10724e13b3703984978413f2ff42a3380f3befec81538"
+}

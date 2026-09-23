@@ -1,0 +1,359 @@
+{
+  "pipeline_stage" : "03-graph",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:41.918077400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "view" : "IntegrationGraph",
+  "node_count" : 13,
+  "edge_count" : 23,
+  "nodes" : [ {
+    "id" : "TYPE:com.aura.vihanga.shedulerservice.service.implementation.WomenDaySchedulerImpl#printWomenDayMessage()",
+    "type" : "METHOD",
+    "name" : "printWomenDayMessage",
+    "fqn" : "com.aura.vihanga.shedulerservice.service.implementation.WomenDaySchedulerImpl.printWomenDayMessage",
+    "module" : "sheduler-service",
+    "packageName" : "com.aura.vihanga.shedulerservice.service.implementation",
+    "fileId" : "FILE-01M293KMMAB58HW0EGKJT7HDN2",
+    "symbolId" : "SYM-01M293QD4JDZT3SRPJ4Q5C4AJY",
+    "signature" : "void printWomenDayMessage()",
+    "lineStart" : 19,
+    "lineEnd" : 29,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "Scheduled(cron = \"0 0 0 8 3 *\")" ],
+    "properties" : { }
+  }, {
+    "id" : "EXTERNAL:scheduler",
+    "type" : "EXTERNAL_SYSTEM",
+    "name" : "scheduler",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "MODULE:configuaration-server",
+    "type" : "MODULE",
+    "name" : "configuaration-server",
+    "fqn" : "com.aura.vihanga:configuaration-server",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "CONFIG_SERVER",
+    "name" : "spring-cloud-config",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "DISCOVERY:eureka",
+    "type" : "DISCOVERY_SERVER",
+    "name" : "eureka",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "MODULE:department-service",
+    "type" : "MODULE",
+    "name" : "department-service",
+    "fqn" : "com.aura.vihanga:department-service",
+    "module" : "department-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "MODULE:discovery-service",
+    "type" : "MODULE",
+    "name" : "discovery-service",
+    "fqn" : "com.aura.vihanga:discovery-service",
+    "module" : "discovery-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "MODULE:employee-service",
+    "type" : "MODULE",
+    "name" : "employee-service",
+    "fqn" : "com.aura.vihanga:employee-service",
+    "module" : "employee-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "MODULE:report-service",
+    "type" : "MODULE",
+    "name" : "report-service",
+    "fqn" : "com.aura.vihanga:report-service",
+    "module" : "report-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "MODULE:sheduler-service",
+    "type" : "MODULE",
+    "name" : "sheduler-service",
+    "fqn" : "com.aura.vihanga:sheduler-service",
+    "module" : "sheduler-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "packaging" : "war",
+      "java_version" : "17",
+      "parent" : "org.springframework.boot:spring-boot-starter-parent:2.7.12",
+      "version" : "0.0.1-SNAPSHOT"
+    }
+  }, {
+    "id" : "CONFIG_SERVER:config-server",
+    "type" : "CONFIG_SERVER",
+    "name" : "config-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "DISCOVERY_SERVER:eureka",
+    "type" : "DISCOVERY_SERVER",
+    "name" : "eureka",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "EXTERNAL_SYSTEM:mongodb",
+    "type" : "EXTERNAL_SYSTEM",
+    "name" : "mongodb",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  } ],
+  "edges" : [ {
+    "from" : "TYPE:com.aura.vihanga.shedulerservice.service.implementation.WomenDaySchedulerImpl#printWomenDayMessage()",
+    "to" : "EXTERNAL:scheduler",
+    "type" : "CALLS_EXTERNAL_SERVICE",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "mechanism" : "scheduled"
+    }
+  }, {
+    "from" : "MODULE:configuaration-server",
+    "to" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:configuaration-server",
+    "to" : "DISCOVERY:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:department-service",
+    "to" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:discovery-service",
+    "to" : "DISCOVERY:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:employee-service",
+    "to" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:report-service",
+    "to" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "to" : "CONFIG_SERVER:spring-cloud-config",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "MODULE:configuaration-server",
+    "to" : "CONFIG_SERVER:config-server",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-config-server:3.1.7"
+    }
+  }, {
+    "from" : "MODULE:configuaration-server",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.6"
+    }
+  }, {
+    "from" : "MODULE:department-service",
+    "to" : "EXTERNAL_SYSTEM:mongodb",
+    "type" : "CALLS_EXTERNAL_SERVICE",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.boot:spring-boot-starter-data-mongodb:2.7.12"
+    }
+  }, {
+    "from" : "MODULE:department-service",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.6"
+    }
+  }, {
+    "from" : "MODULE:department-service",
+    "to" : "CONFIG_SERVER:config-server",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-config:3.1.7"
+    }
+  }, {
+    "from" : "MODULE:discovery-service",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:3.1.6"
+    }
+  }, {
+    "from" : "MODULE:employee-service",
+    "to" : "EXTERNAL_SYSTEM:mongodb",
+    "type" : "CALLS_EXTERNAL_SERVICE",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.boot:spring-boot-starter-data-mongodb:2.7.12"
+    }
+  }, {
+    "from" : "MODULE:employee-service",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.6"
+    }
+  }, {
+    "from" : "MODULE:employee-service",
+    "to" : "CONFIG_SERVER:config-server",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-config:3.1.7"
+    }
+  }, {
+    "from" : "MODULE:report-service",
+    "to" : "EXTERNAL_SYSTEM:mongodb",
+    "type" : "CALLS_EXTERNAL_SERVICE",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.boot:spring-boot-starter-data-mongodb:2.7.12"
+    }
+  }, {
+    "from" : "MODULE:report-service",
+    "to" : "CONFIG_SERVER:config-server",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-config:3.1.7"
+    }
+  }, {
+    "from" : "MODULE:report-service",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.6"
+    }
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "to" : "EXTERNAL_SYSTEM:mongodb",
+    "type" : "CALLS_EXTERNAL_SERVICE",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.boot:spring-boot-starter-data-mongodb:2.7.12"
+    }
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "to" : "CONFIG_SERVER:config-server",
+    "type" : "READS_FROM_CONFIG_SERVER",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-config:3.1.7"
+    }
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "to" : "DISCOVERY_SERVER:eureka",
+    "type" : "REGISTERS_WITH_DISCOVERY",
+    "view" : "IntegrationGraph",
+    "confidence" : 1.0,
+    "properties" : {
+      "evidence" : "resolved dependency org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.1.6"
+    }
+  } ]
+}

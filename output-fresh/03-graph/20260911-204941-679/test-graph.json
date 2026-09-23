@@ -1,0 +1,397 @@
+{
+  "pipeline_stage" : "03-graph",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:41.917014800Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "view" : "TestGraph",
+  "node_count" : 14,
+  "edge_count" : 18,
+  "nodes" : [ {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "type" : "TEST",
+    "name" : "EmployeeControllerTest",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMJP44A4PRCW42ZXF930",
+    "symbolId" : "SYM-01M293QD46W0FVXPZ7WMZ3EP2E",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "lineStart" : 22,
+    "lineEnd" : 75,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "SpringBootTest" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController",
+    "type" : "CONTROLLER",
+    "name" : "EmployeeController",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3PR6NE3QZS6KTG0Y68",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.controller.EmployeeController",
+    "lineStart" : 23,
+    "lineEnd" : 90,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "RestController", "RequestMapping(\"api/v1\")", "Slf4j" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeService",
+    "type" : "INTERFACE",
+    "name" : "EmployeeService",
+    "fqn" : "com.aura.vihanga.employeeservice.service.EmployeeService",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.service",
+    "fileId" : "FILE-01M293KMJD02407SKSET5XQ0Z5",
+    "symbolId" : "SYM-01M293QD44J83REQAJ6QA5J5H8",
+    "signature" : "INTERFACE com.aura.vihanga.employeeservice.service.EmployeeService",
+    "lineStart" : 13,
+    "lineEnd" : 23,
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.model.Employee",
+    "type" : "MONGODB_DOCUMENT",
+    "name" : "Employee",
+    "fqn" : "com.aura.vihanga.employeeservice.model.Employee",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.model",
+    "fileId" : "FILE-01M293KMJA1HAWMKYGWH5CT0CR",
+    "symbolId" : "SYM-01M293QD41ZQ96HAN9SR5FFZ8K",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.model.Employee",
+    "lineStart" : 12,
+    "lineEnd" : 26,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "Document(value = \"employee\")", "NoArgsConstructor", "AllArgsConstructor", "Data", "Builder" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.exception.EmployeeNotFoundException",
+    "type" : "CLASS",
+    "name" : "EmployeeNotFoundException",
+    "fqn" : "com.aura.vihanga.employeeservice.exception.EmployeeNotFoundException",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.exception",
+    "fileId" : "FILE-01M293KMJ490X1P7XFZ40GPZ61",
+    "symbolId" : "SYM-01M293QD4118G1BJD6100RXBSH",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.exception.EmployeeNotFoundException",
+    "lineStart" : 3,
+    "lineEnd" : 23,
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.dto.EmployeeResponse",
+    "type" : "CLASS",
+    "name" : "EmployeeResponse",
+    "fqn" : "com.aura.vihanga.employeeservice.dto.EmployeeResponse",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.dto",
+    "fileId" : "FILE-01M293KMJ47NRKYW0F0AWSNQKP",
+    "symbolId" : "SYM-01M293QD3P36P2911W2ZGMGRT8",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.dto.EmployeeResponse",
+    "lineStart" : 10,
+    "lineEnd" : 22,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "NoArgsConstructor", "AllArgsConstructor", "Data", "Builder" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.departmentservice.utill.StandardResponse",
+    "type" : "CLASS",
+    "name" : "StandardResponse",
+    "fqn" : "com.aura.vihanga.departmentservice.utill.StandardResponse",
+    "module" : "department-service",
+    "packageName" : "com.aura.vihanga.departmentservice.utill",
+    "fileId" : "FILE-01M293KMGQK20GSF5Z86TK38N3",
+    "symbolId" : "SYM-01M293QD3PD0B2QT0SBZEZQC01",
+    "signature" : "CLASS com.aura.vihanga.departmentservice.utill.StandardResponse",
+    "lineStart" : 7,
+    "lineEnd" : 14,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "NoArgsConstructor", "AllArgsConstructor", "Data" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+    "type" : "TEST",
+    "name" : "CucumberConfig",
+    "fqn" : "com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.cucumberglue",
+    "fileId" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "symbolId" : "SYM-01M293QD46ST64AD6GV69NHTCC",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+    "lineStart" : 15,
+    "lineEnd" : 33,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "ContextConfiguration(classes = Application.class,loader = SpringBootContextLoader.class)", "SpringBootTest(classes = EmployeeServiceApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication",
+    "type" : "CONFIGURATION_CLASS",
+    "name" : "EmployeeServiceApplication",
+    "fqn" : "com.aura.vihanga.employeeservice.EmployeeServiceApplication",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice",
+    "fileId" : "FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+    "symbolId" : "SYM-01M293QD410P35257YM3MJVYNW",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.EmployeeServiceApplication",
+    "lineStart" : 9,
+    "lineEnd" : 22,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "SpringBootApplication", "EnableEurekaClient" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "type" : "TEST",
+    "name" : "CucumberSteps",
+    "fqn" : "com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.cucumberglue",
+    "fileId" : "FILE-01M293KMJRRWQPBWR38A0WPHTM",
+    "symbolId" : "SYM-01M293QD4803Z6WH02P1BPMDND",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "lineStart" : 20,
+    "lineEnd" : 131,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+    "type" : "TEST",
+    "name" : "EmployeeRepositoryTest",
+    "fqn" : "com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.repository",
+    "fileId" : "FILE-01M293KMJYE7A9HQ01QSSJMCP4",
+    "symbolId" : "SYM-01M293QD49QF149XVEVQV0D286",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+    "lineStart" : 18,
+    "lineEnd" : 56,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "RunWith(SpringRunner.class)", "DataMongoTest" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepository",
+    "type" : "REPOSITORY",
+    "name" : "EmployeeRepository",
+    "fqn" : "com.aura.vihanga.employeeservice.repository.EmployeeRepository",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.repository",
+    "fileId" : "FILE-01M293KMJBW0GEZ4Y5CSGJEZSQ",
+    "symbolId" : "SYM-01M293QD43B6QE0AETRJV920JZ",
+    "signature" : "INTERFACE com.aura.vihanga.employeeservice.repository.EmployeeRepository",
+    "lineStart" : 7,
+    "lineEnd" : 9,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "Repository" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "type" : "TEST",
+    "name" : "EmployeeServiceTest",
+    "fqn" : "com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.service",
+    "fileId" : "FILE-01M293KMJYW9DQ7J350WHQZR8T",
+    "symbolId" : "SYM-01M293QD498GZJ3PMG0GVAG9E9",
+    "signature" : "CLASS com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "lineStart" : 25,
+    "lineEnd" : 85,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "SpringBootTest" ],
+    "properties" : { }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.departmentservice.dto.DepartmentResponse",
+    "type" : "CLASS",
+    "name" : "DepartmentResponse",
+    "fqn" : "com.aura.vihanga.departmentservice.dto.DepartmentResponse",
+    "module" : "department-service",
+    "packageName" : "com.aura.vihanga.departmentservice.dto",
+    "fileId" : "FILE-01M293KMGEFW8KXW7ASJ1GBZ1P",
+    "symbolId" : "SYM-01M293QD3P0MDQFCJAHE8RHNS6",
+    "signature" : "CLASS com.aura.vihanga.departmentservice.dto.DepartmentResponse",
+    "lineStart" : 8,
+    "lineEnd" : 16,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "Data", "NoArgsConstructor", "AllArgsConstructor", "Builder" ],
+    "properties" : { }
+  } ],
+  "edges" : [ {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeService",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.model.Employee",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.exception.EmployeeNotFoundException",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.dto.EmployeeResponse",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+    "to" : "TYPE:com.aura.vihanga.departmentservice.utill.StandardResponse",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.EmployeeServiceApplication",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.model.Employee",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "to" : "TYPE:com.aura.vihanga.departmentservice.utill.StandardResponse",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberSteps",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.cucumberglue.CucumberConfig",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepository",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.model.Employee",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeService",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.repository.EmployeeRepository",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.departmentservice.dto.DepartmentResponse",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.model.Employee",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.dto.EmployeeResponse",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+    "to" : "TYPE:com.aura.vihanga.employeeservice.exception.EmployeeNotFoundException",
+    "type" : "COVERED_BY_TEST",
+    "view" : "TestGraph",
+    "confidence" : 0.7,
+    "properties" : {
+      "basis" : "type reference from test source"
+    }
+  } ]
+}

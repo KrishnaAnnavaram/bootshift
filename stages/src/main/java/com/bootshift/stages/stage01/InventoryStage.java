@@ -10,6 +10,8 @@ import com.bootshift.core.domain.StageResult;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.identity.FileRegistry;
 import com.bootshift.core.identity.FileRole;
+import com.bootshift.core.journal.StepDeclaration;
+import com.bootshift.core.journal.StepStatus;
 import com.bootshift.core.security.SensitiveValues;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Hashing;
@@ -144,14 +146,56 @@ public final class InventoryStage implements Stage {
     }
 
     @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("INV-001", "Resolve the scan root",
+                        "Prefer the immutable original snapshot over the caller's own directory"),
+                StepDeclaration.of("INV-002", "Load or create the file registry",
+                        "A rescan reattaches existing identities instead of minting new ones"),
+                StepDeclaration.of("INV-003", "Enumerate files",
+                        "Walks the tree, applying the directory exclusion list"),
+                StepDeclaration.of("INV-004", "Classify roles and hash content",
+                        "Assigns a FileRole and a SHA-256 to every readable file"),
+                StepDeclaration.of("INV-005", "Allocate or reattach permanent FILE_IDs",
+                        "Identity has to survive a rename, or lineage breaks at the first move"),
+                StepDeclaration.of("INV-006", "Collect migration-relevant signals",
+                        "Records where migration-significant constructs appear, by FILE_ID"),
+                StepDeclaration.of("INV-007", "Scan for exposed secrets",
+                        "Findings are recorded as metadata; no secret value is ever stored"),
+                StepDeclaration.of("INV-008", "Seal the file registry",
+                        "Freezes identity for the run so later stages cannot renumber it"),
+                StepDeclaration.of("INV-009", "Publish inventory artifacts",
+                        "Schema-validated, then the pointer advances"));
+    }
+
+    @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "INV-001").begin();
         Path candidate = context.run().originalWorkspace();
         final Path root = Files.isDirectory(candidate) ? candidate : context.run().sourceRoot();
+        if (!Files.isDirectory(candidate)) {
+            // Scanning the input directory instead of the snapshot means every later hash is taken
+            // against a tree the harness does not control.
+            StageSupport.fallback(context, "original workspace snapshot", "source root",
+                    "The original workspace snapshot is not present",
+                    "File hashes are taken from a tree that can change under the run");
+            StageSupport.step(context, "INV-001").degrade("Scanned the source root directly");
+        } else {
+            StageSupport.step(context, "INV-001").succeed("Scanned the immutable original snapshot");
+        }
 
+        StageSupport.step(context, "INV-002").begin();
         FileRegistry registry = loadOrCreateRegistry(context);
         boolean rescan = registry.size() > 0;
+        StageSupport.step(context, "INV-002")
+                .detail("rescan", rescan)
+                .detail("existing_identities", registry.size())
+                .succeed(rescan ? "Reattaching to an existing registry" : "Created a fresh registry");
 
+        StageSupport.step(context, "INV-003").begin();
         List<Path> files = enumerate(root);
+        StageSupport.step(context, "INV-003").detail("files_found", files.size())
+                .succeed(files.size() + " file(s) enumerated");
         List<String> relativePaths = files.stream()
                 .map(p -> FileRegistry.normalize(root.relativize(p).toString()))
                 .toList();
@@ -163,6 +207,10 @@ public final class InventoryStage implements Stage {
         Map<String, Integer> roleCounts = new TreeMap<>();
         List<ObjectNode> attachments = new ArrayList<>();
 
+        StageSupport.step(context, "INV-004").begin();
+        StageSupport.step(context, "INV-005").begin();
+        StageSupport.step(context, "INV-006").begin();
+        StageSupport.step(context, "INV-007").begin();
         for (Path file : files) {
             String relative = FileRegistry.normalize(root.relativize(file).toString());
             FileRole role = classify(relative);
@@ -203,8 +251,28 @@ public final class InventoryStage implements Stage {
             }
         }
 
-        String sealHash = registry.seal();
+        long unreadable = issues.stream()
+                .filter(i -> "UNREADABLE".equals(i.path("kind").asText())).count();
+        StageSupport.step(context, "INV-004").detail("roles_assigned", roleCounts.size())
+                .detail("unreadable", unreadable)
+                .finish(unreadable > 0 ? StepStatus.DEGRADED : StepStatus.SUCCESS,
+                        unreadable > 0 ? unreadable + " file(s) could not be read"
+                                : "Every file classified and hashed");
+        StageSupport.step(context, "INV-005").detail("identities", attachments.size())
+                .succeed(attachments.size() + " identity attachment(s)");
+        StageSupport.step(context, "INV-006").detail("signals", signals.size())
+                .succeed(signals.size() + " migration signal(s)");
+        long secretFindings = issues.stream()
+                .filter(i -> i.path("kind").asText().startsWith("SECRET")).count();
+        StageSupport.step(context, "INV-007").detail("findings", secretFindings)
+                .succeed(secretFindings + " exposure finding(s); no value stored");
 
+        StageSupport.step(context, "INV-008").begin();
+        String sealHash = registry.seal();
+        StageSupport.step(context, "INV-008").detail("seal_hash", sealHash)
+                .succeed("Registry sealed");
+
+        StageSupport.step(context, "INV-009").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
                 .repoState(repoState(context, root))
@@ -259,12 +327,24 @@ public final class InventoryStage implements Stage {
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
         if (!writer.validationErrors().isEmpty()) {
+            StageSupport.step(context, "INV-009")
+                    .fail("Artifacts failed schema validation; the pointer was not advanced", null);
+            StageSupport.nextAction(context,
+                    "Fix the schema violations reported above, then re-run: bootshift inventory");
             return StageResult.failure(OUTPUT_DIR, ExitCode.STAGE_FAILURE,
                     "Inventory artifacts failed schema validation; latest.json was not advanced",
                     writer.validationErrors());
         }
 
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "INV-009").detail("artifacts", outputArtifacts().size())
+                .succeed("Published and pointer advanced");
+        if (unreadable > 0) {
+            StageSupport.blindSpot(context, "GAP-INV-001", "INVENTORY",
+                    unreadable + " file(s) could not be read during inventory",
+                    "Those files have no identity and are invisible to every later stage");
+        }
+        StageSupport.nextAction(context, "Run: bootshift resolve-build");
         context.stateMachine().transition(RunState.INVENTORY_COMPLETE,
                 files.size() + " files inventoried");
         context.stateMachine().transition(RunState.FILE_REGISTRY_SEALED, "registry seal " + sealHash);

@@ -7,6 +7,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.GraphNode;
@@ -106,8 +107,21 @@ public final class CharacterizationStage implements Stage {
                 "characterization-gaps.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("CHR-001", "Identify unprotected behaviour",
+                        "Behaviour with no test covering it is what a differential later has to speak for"),
+                StepDeclaration.of("CHR-002", "Execute scenarios against the pre-migration application",
+                        "A scenario is frozen only when it actually ran on OLD; anything else is NOT_EXECUTED"),
+                StepDeclaration.of("CHR-003", "Publish characterization scenarios",
+                        "The frozen observations become the oracle the migration is compared against"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "CHR-001").begin();
         JsonNode impact = StageSupport.requireUpstream(context, "09-impact", "impact-report.json",
                 "Run: harness impact");
         JsonNode graphNode = StageSupport.requireUpstream(context, "03-graph", "application-graph.json",
@@ -118,6 +132,8 @@ public final class CharacterizationStage implements Stage {
                 "baseline-tests.json");
 
         ApplicationGraph graph = ApplicationGraph.fromNode(graphNode);
+        StageSupport.step(context, "CHR-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "CHR-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -273,7 +289,10 @@ public final class CharacterizationStage implements Stage {
                     "Characterization artifacts failed schema validation", writer.validationErrors());
         }
 
+        StageSupport.step(context, "CHR-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "CHR-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift plan");
         context.stateMachine().transition(RunState.CHARACTERIZATION_COMPLETE,
                 contracts.size() + " contract(s)");
         context.runStateStore().updateState(context.run().runId(),

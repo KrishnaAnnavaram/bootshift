@@ -1,0 +1,51 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:08.775547700Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : {
+    "baselineManifestHash" : "dd491b5a6685134a0264091fc63ff464409afe4bf587009244c272426dc4ef4e",
+    "originalTreeHash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b",
+    "sealed" : true
+  },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "original_tree_hash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b",
+  "old_workspace_hash" : "f48b7888b0016061a2d693686412a2d04822aa14c81c506114f9392c6bc8687b",
+  "old_workspace_matches_original" : true,
+  "source_commit" : null,
+  "file_registry_seal" : "b3104303c3acb64fd340c733848a88ac76b26b2a8bc6a42892400ff870a6787d",
+  "sealed_environment_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0",
+  "environment_mode" : "MANAGED",
+  "observation_hashes" : {
+    "build" : "7ed4463e32404f66eb92300fb7a3657d0907158dec7398c38be5f17e67167ee9",
+    "configuration" : "69eccfd88de99ad4ed0db5fc53ecc5f15c22dfbb4a24c67824848aeb29569243",
+    "coverage" : "e64a91317f371a5ad363cb262905390ff670b4869c4c445f440f4c0d2dea0b06",
+    "runtime" : "26bda4db2b65b98e4c2e15cdc9eb5545cfc2b50f3af933216293f5ee26a54975",
+    "runtime_graph" : "e1b1d5f20924ca4e486e6b9a1e7b0fa38ea030df1447def6c5688bc50d88f380",
+    "static_graph" : "f1a0c6a5322831aecd2af14263cb05e4068471fe2030edb3418870621381f5df",
+    "tests" : "b956468b18d096d2e72a5aa1ac9db8a3f1c68ac32d057db13ea487c4838178ac",
+    "toolchain" : "bbcb3bdffd6a83ab8102290278d6b0926c9508c481e0d0db9a5efdb516aa2846"
+  },
+  "tool_digests" : {
+    "build_tool" : "Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)",
+    "coverage" : "org.jacoco:jacoco-maven-plugin:0.8.12",
+    "harness" : "bootshift 1.0.0",
+    "jdk" : "21.0.11 Microsoft"
+  },
+  "normalization_policy_hash" : "0b44c7da0ce4fe33d100658a1778a7d7038e8724575e68c7cd9d440d70518182",
+  "sealed" : true,
+  "sealed_at" : "2026-09-11T20:59:08.773087500Z",
+  "baseline_manifest_hash" : "dd491b5a6685134a0264091fc63ff464409afe4bf587009244c272426dc4ef4e"
+}

@@ -15,6 +15,7 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.identity.FileRecord;
 import com.bootshift.core.identity.FileRegistry;
 import com.bootshift.core.ledger.ChangeEvent;
@@ -54,6 +55,11 @@ public final class TransformationStage implements Stage {
 
     public TransformationStage(String edgeId) {
         this.edgeId = edgeId;
+    }
+
+    @Override
+    public String edgeId() {
+        return edgeId;
     }
 
     @Override
@@ -97,8 +103,21 @@ public final class TransformationStage implements Stage {
         return List.of("transformation-report.json", "proposed-changes.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("TRF-001", "Load the frozen plan and open the mutation gateway",
+                        "Only recipes the plan scheduled may run, and only through the gateway"),
+                StepDeclaration.of("TRF-002", "Apply scheduled recipes",
+                        "Every proposal is hashed before and after; the gateway decides, the recipe does not"),
+                StepDeclaration.of("TRF-003", "Publish the transformation record",
+                        "Applied, rejected and residual are recorded separately"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "TRF-001").begin();
         if (!context.stateMachine().baselineSealed()) {
             throw HarnessException.block(
                     "Transformation refused: the baseline is not sealed. No source mutation is legal "
@@ -118,6 +137,8 @@ public final class TransformationStage implements Stage {
         Path workspace = context.run().migrationWorkspace();
         EdgeSupport.checkpoint(context, edgeId, "start", "Edge " + edgeId + " start");
 
+        StageSupport.step(context, "TRF-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "TRF-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId).mutating(true);
 
@@ -300,8 +321,11 @@ public final class TransformationStage implements Stage {
         writer.write("proposed-changes.json",
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId), proposals));
 
+        StageSupport.step(context, "TRF-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.TRANSFORMED, "published");
+        StageSupport.step(context, "TRF-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift validate --edge <edge>");
         context.stateMachine().transition(RunState.EDGE_TRANSFORMED,
                 batch.applied() + " change(s) applied on " + edgeId);
         context.runStateStore().updateState(context.run().runId(), RunState.EDGE_TRANSFORMED,

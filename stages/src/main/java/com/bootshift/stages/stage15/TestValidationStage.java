@@ -9,6 +9,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
 import com.bootshift.ports.approval.ApprovalPort;
@@ -65,6 +66,11 @@ public final class TestValidationStage implements Stage {
     }
 
     @Override
+    public String edgeId() {
+        return edgeId;
+    }
+
+    @Override
     public String id() {
         return OUTPUT_DIR;
     }
@@ -100,8 +106,21 @@ public final class TestValidationStage implements Stage {
         return List.of("test-report.json", "coverage-report.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("TST-001", "Resolve the toolchain and baseline results",
+                        "Two baselines: the sealed pre-migration run and the edge-local previous state"),
+                StepDeclaration.of("TST-002", "Run tests and classify outcomes",
+                        "A pre-existing failure and a migration-caused regression are different findings and are never merged"),
+                StepDeclaration.of("TST-003", "Publish the test report",
+                        "Deleted, disabled and weakened tests are reported, not just pass counts"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "TST-001").begin();
         JsonNode edgePlanArtifact = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         JsonNode edgePlan = EdgeSupport.findEdge(edgePlanArtifact, edgeId);
@@ -132,11 +151,14 @@ public final class TestValidationStage implements Stage {
 
         // Java 17 was hardcoded here. An edge that froze a different major therefore ran its tests
         // on a JDK the plan did not select, and the resulting pass or fail described that JDK.
-        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel);
+        EdgeToolchain toolchain = EdgeToolchain.forEdge(edgePlan, buildModel,
+                StageSupport.runner(context));
         EdgeToolchain.Verification toolchainVerification = toolchain.verify();
         String javaHome = toolchain.resolved().javaHome();
-        MavenBuildAdapter maven = new MavenBuildAdapter();
+        MavenBuildAdapter maven = new MavenBuildAdapter(StageSupport.runner(context));
 
+        StageSupport.step(context, "TST-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "TST-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId);
 
@@ -304,8 +326,11 @@ public final class TestValidationStage implements Stage {
                 StageSupport.compose(StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId),
                         coverageReport));
 
+        StageSupport.step(context, "TST-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.TESTED, "published");
+        StageSupport.step(context, "TST-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift validate --edge <edge>");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

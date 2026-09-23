@@ -1,0 +1,158 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M294X8E6CGZXM1FCZS6KEF8H",
+  "stage_id" : "11-plan",
+  "stage_name" : "PlannerStage",
+  "edge_id" : null,
+  "purpose" : "Plan and freeze how the frozen migration path will actually be executed",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:10:21.894565600Z",
+  "finished_at" : "2026-09-11T21:10:24.822891Z",
+  "duration_ms" : 2928,
+  "state_before" : "CHARACTERIZATION_COMPLETE",
+  "state_after" : "PLAN_FROZEN",
+  "status" : "SUCCESS",
+  "summary" : "8 edge(s) frozen, deterministic coverage 0.6791, 1 differential dimension(s) required",
+  "attempt_directory" : "20260911-211022-294",
+  "declared_preconditions" : [ "CHARACTERIZATION_COMPLETE" ],
+  "precondition_results" : [ {
+    "precondition" : "state:CHARACTERIZATION_COMPLETE",
+    "satisfied" : true,
+    "detail" : "Proven by 10-characterization/characterization-scenarios.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:06-target/migration-path.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:08-knowledge/migration-knowledge.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:09-impact/impact-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:10-characterization/characterization-contracts.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "06-target/migration-path.json", "08-knowledge/migration-knowledge.json", "09-impact/impact-report.json", "10-characterization/characterization-contracts.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "06-target/migration-path.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\06-target\\20260911-205932-627\\migration-path.json",
+    "present" : true,
+    "hash" : "513d19c5ddd7089efb6deed239aba6c9bf5a5b5766d58f7a027e48d0f434ee6d"
+  }, {
+    "artifact" : "08-knowledge/migration-knowledge.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\08-knowledge\\20260911-205944-957\\migration-knowledge.json",
+    "present" : true,
+    "hash" : "eb2230ecf64f1038ddebbe0446693d652537a4cb366f55272d3f42ffd590bf9b"
+  }, {
+    "artifact" : "09-impact/impact-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\impact-report.json",
+    "present" : true,
+    "hash" : "d4d1e5f89b22ba43f6a52180e2e366672291c32c5cd3f35507b901c99aab086f"
+  }, {
+    "artifact" : "10-characterization/characterization-contracts.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-contracts.json",
+    "present" : true,
+    "hash" : "30475cb8381d558f8dd1c84b5c5525bc256d1a350ea41d530bb59633b9558fc9"
+  } ],
+  "declared_steps" : [ "PLN-001", "PLN-002", "PLN-003" ],
+  "executed_steps" : [ {
+    "step_id" : "PLN-001",
+    "sequence" : 1,
+    "name" : "Load facts, impacts and the frozen path",
+    "purpose" : "The plan is assembled from verified knowledge and measured impact",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:10:21.947113100Z",
+    "finished_at" : "2026-09-11T21:10:22.294862700Z",
+    "duration_ms" : 347,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "PLN-002",
+    "sequence" : 2,
+    "name" : "Compute coverage and build the edge plan",
+    "purpose" : "Facts with a transformer, facts without one and unknowns are counted separately, so deterministic coverage can never be read as knowledge completeness",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:10:22.294862700Z",
+    "finished_at" : "2026-09-11T21:10:24.822891Z",
+    "duration_ms" : 2528,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "PLN-003",
+    "sequence" : 3,
+    "name" : "Freeze the plan",
+    "purpose" : "Recipes, ordering, validation depth and toolchain stop being negotiable here",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:10:24.811072300Z",
+    "finished_at" : "2026-09-11T21:10:24.811072300Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ "2 fact type(s) have no deterministic capability; deterministic coverage is 0.6791" ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "migration-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\migration-plan.json",
+    "hash" : "4ecadf88eb84ff4c47c296959e5ec31cd84f2446b2745990431619d7458e4d41"
+  }, {
+    "name" : "edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "name" : "transformation-capability-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\transformation-capability-registry.json",
+    "hash" : "ef511705b13b8b54c70f6512bb200b0bfcd9ab6d0977669fd8663f123a814be2"
+  }, {
+    "name" : "residual-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\residual-report.json",
+    "hash" : "6f79de967bd2f6f6d735e25c1400e14f2e050f7304cdbc04639fa8eb8f87cc69"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\manifest.json",
+    "hash" : "83c685f3b005835580db68a8d3e3f07d7c8ed7cfb84a16fcf7976af8b58e64da"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-1794655711",
+  "next_action" : "Run: bootshift migrate",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

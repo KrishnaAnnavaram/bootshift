@@ -1,5 +1,6 @@
 package com.bootshift.adapters.exec;
 
+import com.bootshift.core.journal.CommandObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,14 +91,31 @@ public final class ProcessRunner {
 
     private final Set<String> allowlist;
     private final int maxOutputLines;
+    private final CommandObserver observer;
 
     public ProcessRunner() {
         this(DEFAULT_ALLOWLIST, 20000);
     }
 
     public ProcessRunner(Set<String> allowlist, int maxOutputLines) {
+        this(allowlist, maxOutputLines, CommandObserver.NONE);
+    }
+
+    public ProcessRunner(Set<String> allowlist, int maxOutputLines, CommandObserver observer) {
         this.allowlist = allowlist;
         this.maxOutputLines = maxOutputLines;
+        this.observer = observer == null ? CommandObserver.NONE : observer;
+    }
+
+    /**
+     * Returns a runner with the same controls that reports what it runs to the execution journal.
+     *
+     * <p>Additive on purpose. A runner constructed without an observer behaves exactly as before, so
+     * the adapters and tests that build one directly are unaffected, and nothing about the allowlist,
+     * the environment sanitisation or the tree termination changes.
+     */
+    public ProcessRunner observedBy(CommandObserver commandObserver) {
+        return new ProcessRunner(allowlist, maxOutputLines, commandObserver);
     }
 
     public static Set<String> defaultAllowlist() {
@@ -140,8 +158,12 @@ public final class ProcessRunner {
         try {
             process = builder.start();
         } catch (IOException e) {
+            // A command that never started is still a command that was attempted, and "the tool was
+            // not on this machine" is one of the more common real reasons a stage degrades.
+            Instant failed = Instant.now();
+            journal(command, workingDirectory, start, failed, -1, false, 0, 1, logSink, environment);
             return new Result(-1, List.of(), List.of("Cannot start process: " + e.getMessage()),
-                    Duration.between(start, Instant.now()), false, String.join(" ", command));
+                    Duration.between(start, failed), false, String.join(" ", command));
         }
 
         Thread outThread = drain(process.getInputStream(), stdout);
@@ -170,15 +192,38 @@ public final class ProcessRunner {
         join(outThread);
         join(errThread);
 
+        Instant finish = Instant.now();
         Result result = new Result(exitCode, List.copyOf(stdout), List.copyOf(stderr),
-                Duration.between(start, Instant.now()), timedOut, String.join(" ", command));
+                Duration.between(start, finish), timedOut, String.join(" ", command));
         if (logSink != null) {
             writeLog(logSink, result);
         }
         if (timedOut) {
             LOG.warn("Command timed out after {}: {}", timeout, result.command());
         }
+        journal(command, workingDirectory, start, finish, exitCode, timedOut,
+                stdout.size(), stderr.size(), logSink, environment);
         return result;
+    }
+
+    /**
+     * Reports a finished command to the observer.
+     *
+     * <p>Wrapped, and deliberately so: a build result that took four minutes to produce must not be
+     * lost because the journal had a bad day. Only variable <em>names</em> are handed over - the
+     * values are exactly what must never be written down.
+     */
+    private void journal(List<String> command, Path workingDirectory, Instant start, Instant finish,
+                         int exitCode, boolean timedOut, int stdoutLines, int stderrLines,
+                         Path logSink, Map<String, String> environment) {
+        try {
+            observer.observe(new CommandObserver.CommandObservation(
+                    List.copyOf(command), workingDirectory, start, finish, exitCode, timedOut,
+                    stdoutLines, stderrLines, logSink,
+                    environment == null ? Set.of() : Set.copyOf(environment.keySet())));
+        } catch (RuntimeException e) {
+            LOG.warn("Command journalling failed: {}", e.getMessage());
+        }
     }
 
     private Thread drain(java.io.InputStream stream, List<String> sink) {

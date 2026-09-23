@@ -4,6 +4,9 @@
 output/
 output-run-*/
 output-strict-probe/
+# Verification runs of the harness against ./src, kept out of git for the same reason: they are
+# large, regenerable, and the evidence bundle is what gets retained rather than the raw tree.
+output-journal-*/
 
 # Maven build output
 target/

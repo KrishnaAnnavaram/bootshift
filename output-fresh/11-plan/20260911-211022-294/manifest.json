@@ -1,0 +1,12 @@
+{
+  "stage" : "11-plan",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:10:24.811072300Z",
+  "artifacts" : {
+    "transformation-capability-registry.json" : "ef511705b13b8b54c70f6512bb200b0bfcd9ab6d0977669fd8663f123a814be2",
+    "residual-report.json" : "6f79de967bd2f6f6d735e25c1400e14f2e050f7304cdbc04639fa8eb8f87cc69",
+    "edge-plan.json" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225",
+    "migration-plan.json" : "4ecadf88eb84ff4c47c296959e5ec31cd84f2446b2745990431619d7458e4d41"
+  },
+  "artifact_set_hash" : "49ff0d3ca2acf94b089cf4d3f9dcd5f32b975b08fff8dec9f5a72cd393f87653"
+}

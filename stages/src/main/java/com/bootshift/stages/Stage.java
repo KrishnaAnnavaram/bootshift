@@ -1,6 +1,7 @@
 package com.bootshift.stages;
 
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.state.RunState;
 
 import java.util.List;
@@ -36,6 +37,18 @@ public interface Stage {
         return false;
     }
 
+    /**
+     * The migration edge this stage instance acts on, or {@code null} for the analysis half.
+     *
+     * <p>Edge-scoped stages already hold this; exposing it lets cross-cutting infrastructure attribute
+     * an attempt to an edge without knowing which concrete stage it is looking at. Without it, a
+     * per-edge loop's six stages are indistinguishable from six unrelated attempts in any record kept
+     * outside the stages themselves.
+     */
+    default String edgeId() {
+        return null;
+    }
+
     /** States that must already have been reached for this stage to be legal. */
     List<RunState> preconditions();
 
@@ -49,6 +62,20 @@ public interface Stage {
 
     /** Artifacts this stage publishes. */
     List<String> outputArtifacts();
+
+    /**
+     * The steps this stage intends to perform, in order.
+     *
+     * <p>Declared here rather than accumulated during execution, so that a step which never runs is
+     * still present in the record. The execution journal marks each one as the stage settles it, and
+     * anything left {@link com.bootshift.core.journal.StepStatus#PENDING} at the end is reported as a
+     * declared capability that was not exercised.
+     *
+     * <p>Empty means the stage has not been instrumented, which is itself visible in its document.
+     */
+    default List<StepDeclaration> declaredSteps() {
+        return List.of();
+    }
 
     StageResult execute(StageContext context);
 }

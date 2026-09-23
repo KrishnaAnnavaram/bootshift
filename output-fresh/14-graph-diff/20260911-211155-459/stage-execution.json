@@ -1,0 +1,148 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M294ZYT6ZPC69CXAFB04E1CN",
+  "stage_id" : "14-graph-diff",
+  "stage_name" : "GraphDiffStage",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "purpose" : "Rebuild the static graph and assert that every change stayed inside authorized scope",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:11:50.342331300Z",
+  "finished_at" : "2026-09-11T21:11:56.057371100Z",
+  "duration_ms" : 5715,
+  "state_before" : "EDGE_COMPILED",
+  "state_after" : "EDGE_SCOPE_VERIFIED",
+  "status" : "SUCCESS",
+  "summary" : "Edge EDGE-1-PREP-TEST graph COMPLETE: +0/-0 nodes, +0/-0 edges, 0 symbol(s) changed; scope OK",
+  "attempt_directory" : "20260911-211155-459",
+  "declared_preconditions" : [ "EDGE_COMPILED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:EDGE_COMPILED",
+    "satisfied" : true,
+    "detail" : "No artifact proof declared for this state",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:13-build-repair/build-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:11-plan/edge-plan.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/build-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "13-build-repair/build-report.json", "11-plan/edge-plan.json", "02-build/build-model.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "13-build-repair/build-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\13-build-repair\\20260911-211026-740\\build-report.json",
+    "present" : true,
+    "hash" : "daa2906541d79943f7807b16b88477c08653a1aa23f3b78097b0cd281a4f552b"
+  }, {
+    "artifact" : "11-plan/edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "present" : true,
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "artifact" : "02-build/build-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\build-model.json",
+    "present" : true,
+    "hash" : "13f63a0f2464ab7d99a81f55622fd6aab8f3e00c6fdd4c007075856f790f7b2d"
+  } ],
+  "declared_steps" : [ "SCP-001", "SCP-002", "SCP-003" ],
+  "executed_steps" : [ {
+    "step_id" : "SCP-001",
+    "sequence" : 1,
+    "name" : "Rebuild the application graph after mutation",
+    "purpose" : "The post-migration graph is rebuilt, never patched",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:11:50.372729700Z",
+    "finished_at" : "2026-09-11T21:11:55.459443800Z",
+    "duration_ms" : 5086,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "SCP-002",
+    "sequence" : 2,
+    "name" : "Compare graphs and verify scope",
+    "purpose" : "Changed files are checked against the authorized set; anything outside it is a scope violation, not an incidental edit",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:11:55.459443800Z",
+    "finished_at" : "2026-09-11T21:11:56.057371100Z",
+    "duration_ms" : 597,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "SCP-003",
+    "sequence" : 3,
+    "name" : "Publish the graph diff and scope report",
+    "purpose" : "Structural change is separated from behavioural change",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:11:55.555586800Z",
+    "finished_at" : "2026-09-11T21:11:55.565980100Z",
+    "duration_ms" : 10,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "application-graph-current.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-211155-459\\application-graph-current.json",
+    "hash" : "d972472c65ea38d51db08ef16297e7ab19841a80f983903cfd702fb04571fd38"
+  }, {
+    "name" : "graph-diff.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-211155-459\\graph-diff.json",
+    "hash" : "8897cc8a091e0583b602fc5f54f29ff709a38443a855e2d78d6e3a14e9d9e57e"
+  }, {
+    "name" : "scope-assertion.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-211155-459\\scope-assertion.json",
+    "hash" : "ec5a61d71265656d6cdb76dfa9b841426b23479a68e0e74709dcdb0727df7056"
+  }, {
+    "name" : "last-good-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-211155-459\\last-good-graph.json",
+    "hash" : "c5c1964bf24691a85bd156b4250f7890adbd79c0c4deece9c7db682572307be7"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\14-graph-diff\\20260911-211155-459\\manifest.json",
+    "hash" : "7bb3e2dc328bab9931f252486d8610f831c1f83d83ce26cd735ee820131a9955"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "1887175783",
+  "next_action" : "Run: bootshift validate --edge <edge>",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

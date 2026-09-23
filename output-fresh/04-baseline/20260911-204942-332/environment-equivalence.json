@@ -1,0 +1,98 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:42.610424400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "provider_mode" : "MANAGED",
+  "provider_implementation" : "bootshift-managed-jvm",
+  "provider_version" : "1.0.0",
+  "fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0",
+  "attributes" : [ {
+    "name" : "locale",
+    "value" : "C",
+    "constraint" : "MUST_MATCH",
+    "source" : "harness-forced"
+  }, {
+    "name" : "timezone",
+    "value" : "UTC",
+    "constraint" : "MUST_MATCH",
+    "source" : "harness-forced"
+  }, {
+    "name" : "clock.strategy",
+    "value" : "system-utc",
+    "constraint" : "MUST_MATCH",
+    "source" : "harness-forced"
+  }, {
+    "name" : "file.encoding",
+    "value" : "UTF-8",
+    "constraint" : "MUST_MATCH",
+    "source" : "harness-forced"
+  }, {
+    "name" : "network.egress.harness",
+    "value" : "allowlist",
+    "constraint" : "MUST_MATCH",
+    "source" : "harness-http-client"
+  }, {
+    "name" : "network.egress.child.processes",
+    "value" : "UNRESTRICTED",
+    "constraint" : "MUST_MATCH",
+    "source" : "no mechanism in this deployment restricts egress from build tools or from the application under analysis"
+  }, {
+    "name" : "java.version",
+    "value" : "21.0.11",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "source" : "jvm"
+  }, {
+    "name" : "java.vendor",
+    "value" : "Microsoft",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "source" : "jvm"
+  }, {
+    "name" : "spring.boot.version",
+    "value" : "2.7.12",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "source" : "build-model"
+  }, {
+    "name" : "servlet.container",
+    "value" : "unknown",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "source" : "build-model"
+  }, {
+    "name" : "os.name",
+    "value" : "Windows 11",
+    "constraint" : "UNCONSTRAINED",
+    "source" : "host"
+  }, {
+    "name" : "available.processors",
+    "value" : "22",
+    "constraint" : "UNCONSTRAINED",
+    "source" : "host"
+  }, {
+    "name" : "container.runtime",
+    "value" : "none",
+    "constraint" : "MUST_MATCH",
+    "source" : "daemon-probe"
+  } ],
+  "equivalence_gaps" : [ "NO_OCI_RUNTIME: no rootless OCI runtime daemon (podman/docker/nerdctl) answered, so infrastructure dependencies cannot be provisioned by the harness. Any dimension requiring a database, broker or cache is recorded as NOT_COMPARED rather than assumed equivalent.", "UNPROVISIONED: scheduler is required by this module but no container runtime is available to supply it", "UNPROVISIONED: mongodb is required by this module but no container runtime is available to supply it" ],
+  "endpoints" : { },
+  "requested_infrastructure" : {
+    "spring.boot.version" : "2.7.12",
+    "infrastructure.scheduler" : "required",
+    "infrastructure.mongodb" : "required"
+  },
+  "usable" : true
+}

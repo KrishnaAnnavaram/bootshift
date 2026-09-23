@@ -1,0 +1,422 @@
+{
+  "pipeline_stage" : "03-graph",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:41.913309900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "view" : "ConfigurationGraph",
+  "node_count" : 20,
+  "edge_count" : 21,
+  "nodes" : [ {
+    "id" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "configuaration-server/src/main/resources/application.properties",
+    "module" : "configuaration-server",
+    "fileId" : "FILE-01M293KMFRB15PGDGWNFE830H0",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "68c6ff604d68f5cfcd40cf0425a84439d06037765c08a6ae262fa5c95c8993f9"
+    }
+  }, {
+    "id" : "PROPERTY:server.port",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "server.port",
+    "fqn" : "server.port",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:spring.cloud.config.server.git.uri",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "spring.cloud.config.server.git.uri",
+    "fqn" : "spring.cloud.config.server.git.uri",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:spring.cloud.config.server.git.search-paths",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "spring.cloud.config.server.git.search-paths",
+    "fqn" : "spring.cloud.config.server.git.search-paths",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:eureka.client.serviceUrl.defaultZone",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "eureka.client.serviceUrl.defaultZone",
+    "fqn" : "eureka.client.serviceUrl.defaultZone",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:eureka.client.register-with-eureka",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "eureka.client.register-with-eureka",
+    "fqn" : "eureka.client.register-with-eureka",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:eureka.client.fetch-registry",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "eureka.client.fetch-registry",
+    "fqn" : "eureka.client.fetch-registry",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:spring.application.name",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "spring.application.name",
+    "fqn" : "spring.application.name",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "PROPERTY:eureka.instance.hostname",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "eureka.instance.hostname",
+    "fqn" : "eureka.instance.hostname",
+    "module" : "configuaration-server",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "configuaration-server/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "department-service/src/main/resources/application.properties",
+    "module" : "department-service",
+    "fileId" : "FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "183db43ae6ff1dff1c0de8727cd84961e7a9efeb273c587d602e64f3ef2d72b8"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "type" : "FILE",
+    "name" : "bootstrap.properties",
+    "fqn" : "department-service/src/main/resources/bootstrap.properties",
+    "module" : "department-service",
+    "fileId" : "FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1"
+    }
+  }, {
+    "id" : "PROPERTY:spring.cloud.config.uri",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "spring.cloud.config.uri",
+    "fqn" : "spring.cloud.config.uri",
+    "module" : "department-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "department-service/src/main/resources/bootstrap.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "discovery-service/src/main/resources/application.properties",
+    "module" : "discovery-service",
+    "fileId" : "FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "5e4faf47de05729e0659338fd0510019d803355d247205faef3a1105afbd4183"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "employee-service/src/main/resources/application.properties",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "5f2cf520a9b2060a2a5b98e93f8c5cdaf3705b187358cffc97e0d1275697250c"
+    }
+  }, {
+    "id" : "PROPERTY:logging.level.com.aura.vihanga.employeeservice.controller",
+    "type" : "CONFIG_PROPERTY",
+    "name" : "logging.level.com.aura.vihanga.employeeservice.controller",
+    "fqn" : "logging.level.com.aura.vihanga.employeeservice.controller",
+    "module" : "employee-service",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "source_file" : "employee-service/src/main/resources/application.properties",
+      "sensitive" : false
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "type" : "FILE",
+    "name" : "bootstrap.properties",
+    "fqn" : "employee-service/src/main/resources/bootstrap.properties",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "report-service/src/main/resources/application.properties",
+    "module" : "report-service",
+    "fileId" : "FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "8410931684ac13602966f2ef5c9b3fd53a452fd1f2ffb5712b4082664c22611e"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "type" : "FILE",
+    "name" : "bootstrap.properties",
+    "fqn" : "report-service/src/main/resources/bootstrap.properties",
+    "module" : "report-service",
+    "fileId" : "FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMMD7JG7F96V8H119FM3",
+    "type" : "FILE",
+    "name" : "application.properties",
+    "fqn" : "sheduler-service/src/main/resources/application.properties",
+    "module" : "sheduler-service",
+    "fileId" : "FILE-01M293KMMD7JG7F96V8H119FM3",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "cbb704ee18f943d62f55b4bc627d43f20d06ec6a6a8cb1dc1f8b2c5d83a41a89"
+    }
+  }, {
+    "id" : "FILE:FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "type" : "FILE",
+    "name" : "bootstrap.properties",
+    "fqn" : "sheduler-service/src/main/resources/bootstrap.properties",
+    "module" : "sheduler-service",
+    "fileId" : "FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "role" : "CONFIG_PROPERTIES",
+      "sha256" : "93b06373b59b6c7dddd308915dafd43c60e80623cc1f35457b73e3f5bd14bbe1"
+    }
+  } ],
+  "edges" : [ {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:server.port",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:spring.cloud.config.server.git.uri",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:spring.cloud.config.server.git.search-paths",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:eureka.client.serviceUrl.defaultZone",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:eureka.client.register-with-eureka",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:eureka.client.fetch-registry",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:spring.application.name",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMFRB15PGDGWNFE830H0",
+    "to" : "PROPERTY:eureka.instance.hostname",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "to" : "PROPERTY:spring.application.name",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "to" : "PROPERTY:spring.cloud.config.uri",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "to" : "PROPERTY:eureka.instance.hostname",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "to" : "PROPERTY:eureka.client.register-with-eureka",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "to" : "PROPERTY:eureka.client.fetch-registry",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "to" : "PROPERTY:server.port",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "to" : "PROPERTY:logging.level.com.aura.vihanga.employeeservice.controller",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "to" : "PROPERTY:spring.application.name",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "to" : "PROPERTY:spring.cloud.config.uri",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "to" : "PROPERTY:spring.application.name",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "to" : "PROPERTY:spring.cloud.config.uri",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMMD7JG7F96V8H119FM3",
+    "to" : "PROPERTY:spring.application.name",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "FILE:FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "to" : "PROPERTY:spring.cloud.config.uri",
+    "type" : "CONFIGURES",
+    "view" : "ConfigurationGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  } ]
+}

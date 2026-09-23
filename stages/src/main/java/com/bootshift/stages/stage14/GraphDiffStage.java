@@ -8,6 +8,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.GraphDiff;
 import com.bootshift.core.identity.FileRecord;
@@ -57,6 +58,11 @@ public final class GraphDiffStage implements Stage {
     }
 
     @Override
+    public String edgeId() {
+        return edgeId;
+    }
+
+    @Override
     public String id() {
         return OUTPUT_DIR;
     }
@@ -93,8 +99,21 @@ public final class GraphDiffStage implements Stage {
                 "last-good-graph.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("SCP-001", "Rebuild the application graph after mutation",
+                        "The post-migration graph is rebuilt, never patched"),
+                StepDeclaration.of("SCP-002", "Compare graphs and verify scope",
+                        "Changed files are checked against the authorized set; anything outside it is a scope violation, not an incidental edit"),
+                StepDeclaration.of("SCP-003", "Publish the graph diff and scope report",
+                        "Structural change is separated from behavioural change"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "SCP-001").begin();
         JsonNode edgePlanArtifact = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         JsonNode edgePlan = EdgeSupport.findEdge(edgePlanArtifact, edgeId);
@@ -207,6 +226,8 @@ public final class GraphDiffStage implements Stage {
 
         boolean scopeOk = violations.isEmpty();
 
+        StageSupport.step(context, "SCP-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "SCP-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId)
                 .stat("graph_status", current.status())
@@ -245,8 +266,11 @@ public final class GraphDiffStage implements Stage {
             writer.write("last-good-graph.json", lastGood.toNode());
         }
 
+        StageSupport.step(context, "SCP-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.GRAPH_VERIFIED, "published");
+        StageSupport.step(context, "SCP-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift validate --edge <edge>");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

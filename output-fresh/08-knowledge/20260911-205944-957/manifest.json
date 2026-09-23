@@ -1,0 +1,12 @@
+{
+  "stage" : "08-knowledge",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T21:06:31.592222600Z",
+  "artifacts" : {
+    "migration-knowledge.json" : "eb2230ecf64f1038ddebbe0446693d652537a4cb366f55272d3f42ffd590bf9b",
+    "artifact-channel.json" : "be599754effc0b076792ec63ddeffb2a11146d131e2fef127ab776a8d8a31a81",
+    "documentation-channel.json" : "87e77c7d4dca08ea9d89b080132aa07e3fb4d86a4caa5969053eb05e456b0450",
+    "knowledge-summary.json" : "6c6d4aca3de9d165aa3f6cf0d226f7f19acd404bed6867c6c9a6a1060bc2373a"
+  },
+  "artifact_set_hash" : "d0fff798015f8d857289ee76115709236d45142841ea00a2e149b053c36005e5"
+}

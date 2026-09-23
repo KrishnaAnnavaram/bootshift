@@ -1,0 +1,26 @@
+{
+  "pipeline_stage" : "05-compatibility",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:32.213360300Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "online" : true,
+  "published_spring_boot_versions" : 293,
+  "metadata_content_hash" : "77f98720fc7774e3888ca0fd13917e70ecee45b9d542de864546f263b9b64ec6",
+  "candidate_lines" : 9,
+  "cloud_trains_resolved" : 7,
+  "policy_note" : "Community sources are advisory only and never become hard compatibility assertions"
+}

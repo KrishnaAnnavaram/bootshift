@@ -7,6 +7,8 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
+import com.bootshift.core.journal.StepStatus;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.graph.ApplicationGraph;
 import com.bootshift.core.graph.EdgeType;
@@ -100,7 +102,27 @@ public final class ApplicationGraphStage implements Stage {
     }
 
     @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("GRF-001", "Load registry and build model",
+                        "The graph is built over identities and modules that already exist"),
+                StepDeclaration.of("GRF-002", "Select Java source roots per module",
+                        "Kotlin, Groovy and Scala roots are excluded rather than mis-parsed"),
+                StepDeclaration.of("GRF-003", "Analyse sources with symbol solving",
+                        "Type resolution is what makes an edge a fact rather than a name match"),
+                StepDeclaration.of("GRF-004", "Read configuration files",
+                        "Configuration keys become graph nodes so property impact is traceable"),
+                StepDeclaration.of("GRF-005", "Build nodes and edges",
+                        "Beans, endpoints, entities, repositories, dependencies, configuration"),
+                StepDeclaration.of("GRF-006", "Verify graph completeness and attribution",
+                        "A partial graph must be declared partial, not published as complete"),
+                StepDeclaration.of("GRF-007", "Publish the graph and verification report",
+                        "Structural and content hashes are recorded separately"));
+    }
+
+    @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "GRF-001").begin();
         JsonNode registryNode = StageSupport.requireUpstream(context, "01-inventory",
                 "file-registry.json", "Run: harness inventory --repo <path>");
         JsonNode buildNode = StageSupport.requireUpstream(context, "02-build", "build-model.json",
@@ -117,6 +139,12 @@ public final class ApplicationGraphStage implements Stage {
             root = context.run().sourceRoot();
         }
 
+        StageSupport.step(context, "GRF-001")
+                .detail("modules", buildModel.modules().size())
+                .succeed("Registry and build model loaded");
+
+        StageSupport.step(context, "GRF-002").begin();
+        StageSupport.step(context, "GRF-003").begin();
         CodeModelPort codeModel = new JavaParserCodeModelAdapter();
         Map<String, CodeModelPort.AnalysisResult> analysisByModule = new LinkedHashMap<>();
         Map<String, Integer> javaReleaseByModule = new java.util.TreeMap<>();
@@ -158,13 +186,46 @@ public final class ApplicationGraphStage implements Stage {
                             javaRelease));
         }
 
+        StageSupport.step(context, "GRF-002")
+                .detail("modules_with_java_sources", analysisByModule.size())
+                .detail("unmodelled_sources", unmodelledSources.size())
+                .finish(unmodelledSources.isEmpty() ? StepStatus.SUCCESS : StepStatus.DEGRADED,
+                        unmodelledSources.isEmpty() ? "All source roots are Java"
+                                : unmodelledSources.size() + " non-Java source(s) are unmodelled");
+        StageSupport.step(context, "GRF-003")
+                .detail("modules_analysed", analysisByModule.size())
+                .succeed("Symbol solving complete");
+        if (!unmodelledSources.isEmpty()) {
+            StageSupport.blindSpot(context, "BS-GRAPH-JVM-LANG", "APPLICATION_GRAPH",
+                    unmodelledSources.size() + " non-Java JVM source file(s) are not modelled",
+                    "Whatever those files declare is invisible to impact analysis");
+        }
+
+        StageSupport.step(context, "GRF-004").begin();
         Map<String, String> configurationFiles = readConfiguration(registry, root);
+        StageSupport.step(context, "GRF-004").detail("configuration_files", configurationFiles.size())
+                .succeed(configurationFiles.size() + " configuration file(s) read");
+
+        StageSupport.step(context, "GRF-005").begin();
 
         GraphBuilder.Result built = new GraphBuilder().build(new GraphBuilder.Input(
                 registry, buildModel, analysisByModule, configurationFiles, graphLabel));
         ApplicationGraph graph = built.graph();
 
+        StageSupport.step(context, "GRF-005")
+                .detail("nodes", graph.nodeCount())
+                .detail("edges", graph.edgeCount())
+                .detail("attribution_ratio", built.attributionRatio())
+                .succeed(graph.nodeCount() + " node(s), " + graph.edgeCount() + " edge(s)");
+
+        StageSupport.step(context, "GRF-006").begin();
         Verification verification = verify(context, graph, registry, buildModel, built);
+        StageSupport.step(context, "GRF-006")
+                .detail("passed", verification.passed())
+                .finish(verification.passed() ? StepStatus.SUCCESS : StepStatus.DEGRADED,
+                        verification.passed() ? "Graph verified as complete"
+                                : "Graph is incomplete and is published as such");
+        StageSupport.step(context, "GRF-007").begin();
 
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
@@ -270,11 +331,15 @@ public final class ApplicationGraphStage implements Stage {
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
         if (!writer.validationErrors().isEmpty()) {
+            StageSupport.step(context, "GRF-007")
+                    .fail("Artifacts failed schema validation; the pointer was not advanced", null);
             return StageResult.failure(OUTPUT_DIR, ExitCode.STAGE_FAILURE,
                     "Graph artifacts failed schema validation", writer.validationErrors());
         }
 
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "GRF-007").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift baseline");
 
         if (!verification.passed()) {
             context.stateMachine().transition(RunState.APPLICATION_GRAPH_BUILT, "graph built");

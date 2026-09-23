@@ -1,0 +1,42 @@
+{
+  "pipeline_stage" : "10-characterization",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:06:34.582759700Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed",
+    "scenarios" : 82,
+    "scenarios_frozen" : 36,
+    "scenarios_unobservable" : 46,
+    "scenarios_awaiting_old" : 0,
+    "contracts" : 506,
+    "frozen" : 0,
+    "awaiting_old_observation" : 506,
+    "mapped_to_existing_tests" : 0,
+    "unobservable" : 0
+  },
+  "contract_count" : 506,
+  "scenario_count" : 82,
+  "scenarios_by_state" : {
+    "FROZEN" : 36,
+    "UNOBSERVABLE_WITH_EXPLICIT_GAP" : 46
+  },
+  "scenarios_executed_against_old" : 48,
+  "scenario_execution_rule" : "Scenarios are executed against the ORIGINAL application here, before any migration change exists. That is what makes the observed behaviour an oracle rather than an assertion.",
+  "by_state" : {
+    "AWAITING_OLD_OBSERVATION" : 506
+  },
+  "oracle_rule" : "Expected behaviour comes from observed original behaviour, an authoritative specification, or an explicit human decision. Never from invention.",
+  "framework_neutrality" : "Contracts describe scenarios and observed outcomes rather than JUnit tests, so a test-infrastructure migration cannot destroy the oracle."
+}

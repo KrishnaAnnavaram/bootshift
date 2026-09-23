@@ -1,0 +1,275 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M293Q9B0ZHX41A7WA4JRKYRX",
+  "stage_id" : "03-graph",
+  "stage_name" : "ApplicationGraphStage",
+  "edge_id" : null,
+  "purpose" : "Build and verify the type-aware, multi-view static application graph",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T20:49:37.632729400Z",
+  "finished_at" : "2026-09-11T20:49:41.971161700Z",
+  "duration_ms" : 4338,
+  "state_before" : "BUILD_RESOLVED",
+  "state_after" : "GRAPH_VERIFIED",
+  "status" : "SUCCESS",
+  "summary" : "839 nodes / 1852 edges, 239 symbols, attribution 0.6858, content hash 5b764c29af1e",
+  "attempt_directory" : "20260911-204941-679",
+  "declared_preconditions" : [ "BUILD_RESOLVED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:BUILD_RESOLVED",
+    "satisfied" : true,
+    "detail" : "Proven by 02-build/build-model.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:01-inventory/file-registry.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/build-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:02-build/dependency-model.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "01-inventory/file-registry.json", "02-build/build-model.json", "02-build/dependency-model.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "01-inventory/file-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\file-registry.json",
+    "present" : true,
+    "hash" : "886d68b23018a84f008b52c9accb80330bd109411176538d5f7e7f3d5cba634d"
+  }, {
+    "artifact" : "02-build/build-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\build-model.json",
+    "present" : true,
+    "hash" : "13f63a0f2464ab7d99a81f55622fd6aab8f3e00c6fdd4c007075856f790f7b2d"
+  }, {
+    "artifact" : "02-build/dependency-model.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\02-build\\20260911-204937-146\\dependency-model.json",
+    "present" : true,
+    "hash" : "056a8e2147f6e3a9c99aa950ca02c8181c00822b9c499bbe754dd8aea41c06bd"
+  } ],
+  "declared_steps" : [ "GRF-001", "GRF-002", "GRF-003", "GRF-004", "GRF-005", "GRF-006", "GRF-007" ],
+  "executed_steps" : [ {
+    "step_id" : "GRF-001",
+    "sequence" : 1,
+    "name" : "Load registry and build model",
+    "purpose" : "The graph is built over identities and modules that already exist",
+    "status" : "SUCCESS",
+    "status_reason" : "Registry and build model loaded",
+    "started_at" : "2026-09-11T20:49:37.668892900Z",
+    "finished_at" : "2026-09-11T20:49:37.875573Z",
+    "duration_ms" : 206,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "modules" : 6
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-002",
+    "sequence" : 2,
+    "name" : "Select Java source roots per module",
+    "purpose" : "Kotlin, Groovy and Scala roots are excluded rather than mis-parsed",
+    "status" : "SUCCESS",
+    "status_reason" : "All source roots are Java",
+    "started_at" : "2026-09-11T20:49:37.875573Z",
+    "finished_at" : "2026-09-11T20:49:41.450712300Z",
+    "duration_ms" : 3575,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "modules_with_java_sources" : 6,
+      "unmodelled_sources" : 0
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-003",
+    "sequence" : 3,
+    "name" : "Analyse sources with symbol solving",
+    "purpose" : "Type resolution is what makes an edge a fact rather than a name match",
+    "status" : "SUCCESS",
+    "status_reason" : "Symbol solving complete",
+    "started_at" : "2026-09-11T20:49:37.875573Z",
+    "finished_at" : "2026-09-11T20:49:41.450712300Z",
+    "duration_ms" : 3575,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "modules_analysed" : 6
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-004",
+    "sequence" : 4,
+    "name" : "Read configuration files",
+    "purpose" : "Configuration keys become graph nodes so property impact is traceable",
+    "status" : "SUCCESS",
+    "status_reason" : "10 configuration file(s) read",
+    "started_at" : "2026-09-11T20:49:41.450712300Z",
+    "finished_at" : "2026-09-11T20:49:41.457245300Z",
+    "duration_ms" : 6,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "configuration_files" : 10
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-005",
+    "sequence" : 5,
+    "name" : "Build nodes and edges",
+    "purpose" : "Beans, endpoints, entities, repositories, dependencies, configuration",
+    "status" : "SUCCESS",
+    "status_reason" : "839 node(s), 1852 edge(s)",
+    "started_at" : "2026-09-11T20:49:41.457245300Z",
+    "finished_at" : "2026-09-11T20:49:41.658217400Z",
+    "duration_ms" : 200,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "nodes" : 839,
+      "edges" : 1852,
+      "attribution_ratio" : 0.6857907863849766
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-006",
+    "sequence" : 6,
+    "name" : "Verify graph completeness and attribution",
+    "purpose" : "A partial graph must be declared partial, not published as complete",
+    "status" : "SUCCESS",
+    "status_reason" : "Graph verified as complete",
+    "started_at" : "2026-09-11T20:49:41.658217400Z",
+    "finished_at" : "2026-09-11T20:49:41.679217700Z",
+    "duration_ms" : 21,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : {
+      "passed" : true
+    },
+    "error" : null
+  }, {
+    "step_id" : "GRF-007",
+    "sequence" : 7,
+    "name" : "Publish the graph and verification report",
+    "purpose" : "Structural and content hashes are recorded separately",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T20:49:41.679217700Z",
+    "finished_at" : "2026-09-11T20:49:41.954453800Z",
+    "duration_ms" : 275,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "application-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\application-graph.json",
+    "hash" : "f7a223fda7e0102926c19bb22f4dc1e9d6df5de8d908cfe717a90aed56b4f7d3"
+  }, {
+    "name" : "file-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\file-registry.json",
+    "hash" : "74125cbe332c476cdfd48469633345b35ed9f6e093ebdfc0a0939a606bb40c1e"
+  }, {
+    "name" : "symbol-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\symbol-registry.json",
+    "hash" : "360e63f5b9169ad4d641d251eb5b844865fa76b485af052b3a0cd9eb359951ea"
+  }, {
+    "name" : "module-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\module-graph.json",
+    "hash" : "c60ef5d70ac6bfcb78252fb7e3e501adeb27ead0ea8cd95f85f74e70f38dfd00"
+  }, {
+    "name" : "file-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\file-graph.json",
+    "hash" : "1cadab052da945ef1ae0e4bf66ef3f1653a1f0b98b079bd7eb43b8209377401f"
+  }, {
+    "name" : "symbol-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\symbol-graph.json",
+    "hash" : "8359ff6a4a0f9c26a1ea89c53f989dd6faf3c65781a5a6d6ff0f74263a48b928"
+  }, {
+    "name" : "dependency-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\dependency-graph.json",
+    "hash" : "20d6dff47d583aef111f8d337d0ed2f0bd178505e4d91149db7b8f1ed0ce61f7"
+  }, {
+    "name" : "spring-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\spring-graph.json",
+    "hash" : "df9f2cc42ca167fad83f237de610e58420ed36ed35f8df9151a397135f9f4c5b"
+  }, {
+    "name" : "configuration-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\configuration-graph.json",
+    "hash" : "6fd9c79f94df7983f0cdedb5d70e2ee74a3e09d9009271d1bd53b289d2b7255b"
+  }, {
+    "name" : "persistence-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\persistence-graph.json",
+    "hash" : "7db6f51f0e9f04779fd1073e489c26b62637261f6c52f20dcf4ee8b7b45d3e54"
+  }, {
+    "name" : "endpoint-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\endpoint-graph.json",
+    "hash" : "2d0772eec66fa5640ac9f01720cb4c0a62771d13c515fdfba333edaefef94f8f"
+  }, {
+    "name" : "test-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\test-graph.json",
+    "hash" : "026b07d4317c4206f6deefdddbb06a9542e38d2887f29b8dfcedb09d7b40535e"
+  }, {
+    "name" : "integration-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\integration-graph.json",
+    "hash" : "34c843991cc9fede292777f158a8ff6b3a941a8b55edadb080edec77b1b88394"
+  }, {
+    "name" : "graph-summary.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\graph-summary.json",
+    "hash" : "cbd6ec30fd9a77ceeb5ee0a7075c8fbac0f8e4d30d95c1c631de0cf240238c90"
+  }, {
+    "name" : "graph-issues.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\graph-issues.json",
+    "hash" : "59340da0b3d643893ab5d00aa8fd3cde57a0b81cc60926bfacd6e6266d610a19"
+  }, {
+    "name" : "graph-verification-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\graph-verification-report.json",
+    "hash" : "fa9af077b5444582d7ae4f41c9bf442a880831148d737cab68f329a6a9f63639"
+  }, {
+    "name" : "graph-verification-report.md",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\graph-verification-report.md",
+    "hash" : "d0117c5c7498cb730480efc506766b0800b777fbaa251295dd1cb14d4418e194"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\manifest.json",
+    "hash" : "d7d63e36e2cae31d0c4967fdc349f8e7f6ad8c774fd2d54edda5cf53eae96d49"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-1830851390",
+  "next_action" : "Run: bootshift baseline",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

@@ -7,6 +7,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
@@ -55,6 +56,11 @@ public final class DifferentialStage implements Stage {
     }
 
     @Override
+    public String edgeId() {
+        return edgeId;
+    }
+
+    @Override
     public String id() {
         return OUTPUT_DIR;
     }
@@ -91,8 +97,21 @@ public final class DifferentialStage implements Stage {
                 "environment-equivalence-check.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("DIF-001", "Load frozen observations from both sides",
+                        "A comparison needs a successful observation on OLD and on NEW"),
+                StepDeclaration.of("DIF-002", "Normalise and compare",
+                        "Normalisation is policy-driven and hashed, so a difference cannot be explained away by changing the rules afterwards"),
+                StepDeclaration.of("DIF-003", "Publish the differential report",
+                        "An unexplained difference blocks; that is the point of the stage"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "DIF-001").begin();
         JsonNode edgePlanArtifact = StageSupport.requireUpstream(context, "11-plan", "edge-plan.json",
                 "Run: harness plan");
         JsonNode edgePlan = EdgeSupport.findEdge(edgePlanArtifact, edgeId);
@@ -114,6 +133,8 @@ public final class DifferentialStage implements Stage {
         // it was filed for until the whole run was repeated.
         DecisionStore decisionStore = context.decisions();
 
+        StageSupport.step(context, "DIF-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "DIF-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR).edgeId(edgeId);
 
@@ -129,8 +150,11 @@ public final class DifferentialStage implements Stage {
                         policyArtifact));
 
         if (!edgePlan.path("differential_required").asBoolean(false)) {
+            StageSupport.step(context, "DIF-003").begin();
             String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.DIFFERENTIAL_VALIDATED, "published");
+            StageSupport.step(context, "DIF-003").succeed("Published and pointer advanced");
+            StageSupport.nextAction(context, "Run: bootshift approve");
             context.stateMachine().transition(RunState.EDGE_DIFFERENTIAL_VALIDATED, "not required");
             return new StageResult(OUTPUT_DIR, ExitCode.SUCCESS,
                     "Differential validation not required at depth "
@@ -267,8 +291,11 @@ public final class DifferentialStage implements Stage {
         StageSupport.toEvidence(context, "differential-report", reportArtifact,
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
+        StageSupport.step(context, "DIF-003").begin();
         String hash = StageSupport.publishForEdge(context, writer, edgeId, OUTPUT_DIR,
                 com.bootshift.stages.EdgeIndex.Phase.DIFFERENTIAL_VALIDATED, "published");
+        StageSupport.step(context, "DIF-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift approve");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

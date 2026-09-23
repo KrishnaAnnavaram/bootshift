@@ -1,0 +1,235 @@
+{
+  "pipeline_stage" : "15-test",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:11:56.424098600Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ {
+    "id" : "GAP-COV-employee-service",
+    "dimension" : "COVERAGE",
+    "description" : "Coverage comparison unavailable for employee-service",
+    "impact" : "Coverage instrumentation could not attach: Corrupted STDOUT by directly writing to native stream in forked JVM 1. Stream 'FATAL ERROR in native method: processing of -javaagent failed, processJavaStart failed'.. Tests were re-run without the agent so the test outcome is still observed, but no coverage number exists for this module."
+  } ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed",
+    "tests" : 12,
+    "unexplained" : 0,
+    "regressions" : 0
+  },
+  "toolchain" : {
+    "frozen_java_major" : 17,
+    "java_home" : "C:/Users/annav/tools/jdk-17",
+    "java_executable" : "C:/Users/annav/tools/jdk-17/bin/java.exe",
+    "java_version_planned" : "17.0.20.1",
+    "java_vendor" : "OpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)",
+    "selection_reason" : "LTS_PREFERRED: Java 17 is the highest long-term-support release that the target Spring Boot line supports and that an installed JDK provides",
+    "available" : true,
+    "unavailable_reason" : null,
+    "executed_version_verified" : true,
+    "executed_java_version" : "17.0.20.1",
+    "executed_java_major" : 17,
+    "verification_detail" : "The executed toolchain is the one the edge froze",
+    "build_kind" : "MAVEN",
+    "build_tool_version" : "Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)",
+    "build_tool_invocation" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\original\\configuaration-server\\mvnw.cmd -B",
+    "build_wrapper_used" : true,
+    "rule" : "Compile, test, package and run all execute on the JDK this edge froze. A mismatch between the frozen target and the executed toolchain is a validation failure, because the observation would describe a toolchain nobody selected."
+  },
+  "total_tests" : 12,
+  "classification_counts" : {
+    "PASSED" : 10,
+    "PRE_EXISTING_FAILURE" : 2
+  },
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "executed" : true,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "retried_without_coverage" : false,
+    "flaky_rerun_performed" : false,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.configuarationserver.ConfiguarationServerApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 1.536,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  }, {
+    "module" : "department-service",
+    "executed" : true,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "retried_without_coverage" : false,
+    "flaky_rerun_performed" : false,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.departmentservice.DepartmentServiceApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 1.714,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  }, {
+    "module" : "discovery-service",
+    "executed" : true,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "retried_without_coverage" : false,
+    "flaky_rerun_performed" : false,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.discoveryservice.DiscoveryServiceApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.935,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  }, {
+    "module" : "employee-service",
+    "executed" : true,
+    "tests" : 7,
+    "passed" : 5,
+    "failed" : 0,
+    "errors" : 2,
+    "skipped" : 0,
+    "retried_without_coverage" : true,
+    "flaky_rerun_performed" : true,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#getEmployee",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.172,
+      "detail" : null,
+      "probable_cause" : null
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.controller.EmployeeControllerTest#createEmployee",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.018,
+      "detail" : null,
+      "probable_cause" : null
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.EmployeeServiceApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.011,
+      "detail" : null,
+      "probable_cause" : null
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest#employeeSaveMethodTest",
+      "outcome" : "ERROR",
+      "baseline_outcome" : "ERROR",
+      "previous_edge_outcome" : null,
+      "classification" : "PRE_EXISTING_FAILURE",
+      "duration_seconds" : 30.139,
+      "detail" : "<error message=\"Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]\" type=\"org.springframework.dao.DataAccessResourceFailureException\">org.springframework.dao.DataAccessResourceFailureException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]",
+      "probable_cause" : "INFRASTRUCTURE_UNAVAILABLE: MongoDB"
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest#getEmployeeById",
+      "outcome" : "ERROR",
+      "baseline_outcome" : "ERROR",
+      "previous_edge_outcome" : null,
+      "classification" : "PRE_EXISTING_FAILURE",
+      "duration_seconds" : 30.049,
+      "detail" : "<error message=\"Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]\" type=\"org.springframework.dao.DataAccessResourceFailureException\">org.springframework.dao.DataAccessResourceFailureException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]",
+      "probable_cause" : "INFRASTRUCTURE_UNAVAILABLE: MongoDB"
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.service.EmployeeServiceTest#getEmployee",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.008,
+      "detail" : null,
+      "probable_cause" : null
+    }, {
+      "test" : "com.aura.vihanga.employeeservice.service.EmployeeServiceTest#createEmployee",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.002,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  }, {
+    "module" : "report-service",
+    "executed" : true,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "retried_without_coverage" : false,
+    "flaky_rerun_performed" : false,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.reportservice.ReportServiceApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.872,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  }, {
+    "module" : "sheduler-service",
+    "executed" : true,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "retried_without_coverage" : false,
+    "flaky_rerun_performed" : false,
+    "flaky_tests" : [ ],
+    "cases" : [ {
+      "test" : "com.aura.vihanga.shedulerservice.ShedulerServiceApplicationTests#contextLoads",
+      "outcome" : "PASSED",
+      "baseline_outcome" : "PASSED",
+      "previous_edge_outcome" : null,
+      "classification" : "PASSED",
+      "duration_seconds" : 0.885,
+      "detail" : null,
+      "probable_cause" : null
+    } ]
+  } ],
+  "comparison_rule" : "Every result is classified against both the sealed original baseline and the previous successful edge",
+  "forbidden_actions" : "The harness never disables tests, deletes tests, weakens assertions, excludes modules or alters coverage scope to make a result pass"
+}

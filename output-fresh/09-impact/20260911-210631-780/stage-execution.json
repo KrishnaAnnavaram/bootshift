@@ -1,0 +1,154 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M294P7M45YF96F39PCPF37CT",
+  "stage_id" : "09-impact",
+  "stage_name" : "ImpactStage",
+  "edge_id" : null,
+  "purpose" : "Determine which parts of this repository the verified migration facts affect",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:06:31.684254Z",
+  "finished_at" : "2026-09-11T21:06:34.503357700Z",
+  "duration_ms" : 2819,
+  "state_before" : "KNOWLEDGE_VERIFIED",
+  "state_after" : "IMPACT_ANALYZED",
+  "status" : "SUCCESS",
+  "summary" : "2072 impact finding(s) across 27 file(s); {DEFINITELY_AFFECTED=502, POSSIBLY_AFFECTED=4, UNAFFECTED_WITHIN_OBSERVED_COVERAGE=1566}",
+  "attempt_directory" : "20260911-210631-780",
+  "declared_preconditions" : [ "KNOWLEDGE_VERIFIED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:KNOWLEDGE_VERIFIED",
+    "satisfied" : true,
+    "detail" : "Proven by 08-knowledge/migration-knowledge.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:08-knowledge/migration-knowledge.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:03-graph/application-graph.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:03-graph/file-registry.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:01-inventory/inventory-signals.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "08-knowledge/migration-knowledge.json", "03-graph/application-graph.json", "03-graph/file-registry.json", "01-inventory/inventory-signals.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "08-knowledge/migration-knowledge.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\08-knowledge\\20260911-205944-957\\migration-knowledge.json",
+    "present" : true,
+    "hash" : "eb2230ecf64f1038ddebbe0446693d652537a4cb366f55272d3f42ffd590bf9b"
+  }, {
+    "artifact" : "03-graph/application-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\application-graph.json",
+    "present" : true,
+    "hash" : "f7a223fda7e0102926c19bb22f4dc1e9d6df5de8d908cfe717a90aed56b4f7d3"
+  }, {
+    "artifact" : "03-graph/file-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\file-registry.json",
+    "present" : true,
+    "hash" : "74125cbe332c476cdfd48469633345b35ed9f6e093ebdfc0a0939a606bb40c1e"
+  }, {
+    "artifact" : "01-inventory/inventory-signals.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\01-inventory\\20260911-204738-128\\inventory-signals.json",
+    "present" : true,
+    "hash" : "eae4b4cf049f8114e7bdc1e313b2f767a245b602e3d860fa4c961455727cda46"
+  } ],
+  "declared_steps" : [ "IMP-001", "IMP-002", "IMP-003" ],
+  "executed_steps" : [ {
+    "step_id" : "IMP-001",
+    "sequence" : 1,
+    "name" : "Load verified facts and the application graph",
+    "purpose" : "Impact is resolved against this repository, not against a generic upgrade guide",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:06:31.715395600Z",
+    "finished_at" : "2026-09-11T21:06:31.780235900Z",
+    "duration_ms" : 64,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "IMP-002",
+    "sequence" : 2,
+    "name" : "Bind facts to files and symbols",
+    "purpose" : "Graph lookup first, source scanning as a declared fallback, then classification by certainty so a guess is never presented as a match",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:06:31.780235900Z",
+    "finished_at" : "2026-09-11T21:06:34.503357700Z",
+    "duration_ms" : 2723,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "IMP-003",
+    "sequence" : 3,
+    "name" : "Publish the impact report",
+    "purpose" : "Every finding is traceable from fact to symbol to FILE_ID",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:06:34.489818800Z",
+    "finished_at" : "2026-09-11T21:06:34.489818800Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "impact-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\impact-report.json",
+    "hash" : "d4d1e5f89b22ba43f6a52180e2e366672291c32c5cd3f35507b901c99aab086f"
+  }, {
+    "name" : "impact-summary.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\impact-summary.json",
+    "hash" : "9f18ffaf255cd72bd729ec59c6f95f0a8d30aefc15387c6e1e27c4aaa6d8344d"
+  }, {
+    "name" : "blast-radius.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\blast-radius.json",
+    "hash" : "996dc0163433cac5cfd440fe09f10ba1d47afb24da6413099db20f1cf0737297"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\manifest.json",
+    "hash" : "f940b8fd1525a08394ae48e669d64cf5717c7d63dbfc4d6d0fddd0c61810fd73"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "1317236347",
+  "next_action" : "Run: bootshift characterize",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

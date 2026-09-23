@@ -1,0 +1,158 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:55:11.961807400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "executed" : true,
+  "total_tests" : 12,
+  "failing_tests" : 2,
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "executed" : true,
+    "exit_code" : 0,
+    "duration_ms" : 24736,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.configuarationserver.ConfiguarationServerApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 1.633
+    } ],
+    "retried_without_coverage" : false
+  }, {
+    "module" : "department-service",
+    "executed" : true,
+    "exit_code" : 0,
+    "duration_ms" : 32165,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.departmentservice.DepartmentServiceApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 1.362
+    } ],
+    "retried_without_coverage" : false
+  }, {
+    "module" : "discovery-service",
+    "executed" : true,
+    "exit_code" : 0,
+    "duration_ms" : 28206,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.discoveryservice.DiscoveryServiceApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 1.441
+    } ],
+    "retried_without_coverage" : false
+  }, {
+    "module" : "employee-service",
+    "executed" : false,
+    "exit_code" : 1,
+    "duration_ms" : 115084,
+    "tests" : 7,
+    "passed" : 5,
+    "failed" : 0,
+    "errors" : 2,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+      "name" : "getEmployee",
+      "outcome" : "PASSED",
+      "durationSeconds" : 0.18
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.controller.EmployeeControllerTest",
+      "name" : "createEmployee",
+      "outcome" : "PASSED",
+      "durationSeconds" : 0.026
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.EmployeeServiceApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 0.011
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+      "name" : "employeeSaveMethodTest",
+      "outcome" : "ERROR",
+      "durationSeconds" : 30.186,
+      "detail" : "<error message=\"Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]\" type=\"org.springframework.dao.DataAccessResourceFailureException\">org.springframework.dao.DataAccessResourceFailureException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]"
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.repository.EmployeeRepositoryTest",
+      "name" : "getEmployeeById",
+      "outcome" : "ERROR",
+      "durationSeconds" : 30.057,
+      "detail" : "<error message=\"Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]\" type=\"org.springframework.dao.DataAccessResourceFailureException\">org.springframework.dao.DataAccessResourceFailureException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]; nested exception is com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]"
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+      "name" : "getEmployee",
+      "outcome" : "PASSED",
+      "durationSeconds" : 0.018
+    }, {
+      "className" : "com.aura.vihanga.employeeservice.service.EmployeeServiceTest",
+      "name" : "createEmployee",
+      "outcome" : "PASSED",
+      "durationSeconds" : 0.002
+    } ],
+    "retried_without_coverage" : true
+  }, {
+    "module" : "report-service",
+    "executed" : true,
+    "exit_code" : 0,
+    "duration_ms" : 32399,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.reportservice.ReportServiceApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 1.172
+    } ],
+    "retried_without_coverage" : false
+  }, {
+    "module" : "sheduler-service",
+    "executed" : true,
+    "exit_code" : 0,
+    "duration_ms" : 32197,
+    "tests" : 1,
+    "passed" : 1,
+    "failed" : 0,
+    "errors" : 0,
+    "skipped" : 0,
+    "cases" : [ {
+      "className" : "com.aura.vihanga.shedulerservice.ShedulerServiceApplicationTests",
+      "name" : "contextLoads",
+      "outcome" : "PASSED",
+      "durationSeconds" : 1.496
+    } ],
+    "retried_without_coverage" : false
+  } ]
+}

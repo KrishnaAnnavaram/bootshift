@@ -1,0 +1,2775 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:08.625668400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "attempted" : true,
+  "modules_started" : 4,
+  "modules_attempted" : 6,
+  "modules" : [ {
+    "module" : "configuaration-server",
+    "started" : false,
+    "failure_reason" : "PROCESS_EXITED: APPLICATION FAILED TO START",
+    "duration_ms" : 4216,
+    "observation_count" : 0,
+    "bound_property_count" : 0,
+    "observations" : [ ],
+    "bound_properties" : [ ],
+    "unobservable" : [ "CONTEXT: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "BEANS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "CONDITIONS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "PROFILES: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "REQUEST_MAPPINGS: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "HEALTH: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "CONFIG_BINDING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SECURITY_FILTER_CHAIN: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "PERSISTENCE: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "MESSAGING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SCHEDULING: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "BATCH: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "EXTERNAL_CLIENT: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START", "SERIALIZATION: Application did not reach readiness: PROCESS_EXITED: APPLICATION FAILED TO START" ]
+  }, {
+    "module" : "department-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 14820,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "department-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:59867",
+      "data" : {
+        "base_url" : "http://127.0.0.1:59867",
+        "artifact" : "department-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "b91b2cf592c9ffe2a7526a7bc406cc151086358d0f7d13292a4b1ebe3e49a327",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17/bin/java.exe",
+        "java_home" : "C:\\Users\\annav\\tools\\jdk-17",
+        "port" : 59867,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "department-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "cfa2aad1bcf7cff44b72952bdfdcf7d27d8c1cf356a886ea14b0cc58dac8bca3"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "department-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "62b9a649b52b288f3823ba7bb9ea873324f7f815484f8e8c5ae9617355c967f5"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "department-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "89003bccf4bd42cef6361842f286f58462519acdc1b0e2a169b557d7168b7446"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "department-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "8791a98f9c48ec9d0135360d7ee9e946a68726fd77d0da5583c647b9f344ff67"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "department-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "a573d91b9fd302ff802ec852e83752c1bd34d3d0443778def1bba86944e202e8"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "department-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "bound_properties" : [ ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "discovery-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 19325,
+    "observation_count" : 7,
+    "bound_property_count" : 267,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "discovery-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:63454",
+      "data" : {
+        "base_url" : "http://127.0.0.1:63454",
+        "artifact" : "discovery-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "7f523a1583c02bd08fa35c79060ef5d96ab0ee0d41e447781ba8e6a89c709ce7",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17/bin/java.exe",
+        "java_home" : "C:\\Users\\annav\\tools\\jdk-17",
+        "port" : 63454,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_UP",
+        "health_status" : "UP",
+        "readiness_detail" : "/actuator/health reported status UP",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "eureka.client.enabled=true", "eureka.server.wait-time-in-ms-when-sync-empty=0" ],
+        "environment_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=UP",
+        "raw_hash" : "02df35f046ae30f64ba1fe64efb3ae9087109fb3c9ae601aa070bbf96b1bf7b2"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "cb46e8a4161aae366e716ed4999630e43b7cf83bc7438e5fa01708d91e9111e8"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "8eb50b78ca24ff8ad3c70ee580bc874c80b98f0861480e69e13ced8157256c99"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=2",
+        "raw_hash" : "01500b9366366b3418eb9ccbf0c179d1a1cb550161bc91ebd5de9223d89c1f40"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=1",
+        "raw_hash" : "8e1ddc4ff3c4aed060e0b392d2aabafccb317f7ba5cdce0d5bd5622d6d6e3972"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "discovery-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 267
+      },
+      "successful" : true
+    } ],
+    "bound_properties" : [ {
+      "canonicalKey" : "spring.cloud.loadbalancer.clients",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "clients",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.hintHeaderName",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "hintHeaderName",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.healthCheck",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "healthCheck",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.hint",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "hint",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.XForwarded",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "XForwarded",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.useRawStatusCodeInResponseData",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "useRawStatusCodeInResponseData",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.stickySession",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "stickySession",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.retry",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer",
+      "targetField" : "retry",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.ignoredInterfaces",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "ignoredInterfaces",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.preferredNetworks",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "preferredNetworks",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.defaultIpAddress",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "defaultIpAddress",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.timeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "timeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.defaultHostname",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "defaultHostname",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.inetutils.useOnlySiteLocalInterfaces",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.inetutils",
+      "targetField" : "useOnlySiteLocalInterfaces",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.pathMapping",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web",
+      "targetField" : "pathMapping",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.exposure",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web",
+      "targetField" : "exposure",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.basePath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web",
+      "targetField" : "basePath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.discovery",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web",
+      "targetField" : "discovery",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.charset",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "charset",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.exposeSpringMacroHelpers",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "exposeSpringMacroHelpers",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.settings",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "settings",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.cache",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "cache",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.exposeSessionAttributes",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "exposeSessionAttributes",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.prefix",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "prefix",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.suffix",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "suffix",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.preferFileSystemAccess",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "preferFileSystemAccess",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.checkTemplateLocation",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "checkTemplateLocation",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.allowSessionOverride",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "allowSessionOverride",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.templateLoaderPath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "templateLoaderPath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.contentType",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "contentType",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.allowRequestOverride",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "allowRequestOverride",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.freemarker.exposeRequestAttributes",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.freemarker",
+      "targetField" : "exposeRequestAttributes",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.registry.expectedNumberOfClientsSendingRenews",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance.registry",
+      "targetField" : "expectedNumberOfClientsSendingRenews",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.registry.defaultOpenForTrafficCount",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance.registry",
+      "targetField" : "defaultOpenForTrafficCount",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.serialization",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "serialization",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.visibility",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "visibility",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.parser",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "parser",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.deserialization",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "deserialization",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.generator",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "generator",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.jackson.mapper",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.jackson",
+      "targetField" : "mapper",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.info.build",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.info",
+      "targetField" : "build",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.info.git",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.info",
+      "targetField" : "git",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoint.health.logging",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoint.health",
+      "targetField" : "logging",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoint.health.showDetails",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoint.health",
+      "targetField" : "showDetails",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoint.health.status",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoint.health",
+      "targetField" : "status",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoint.health.roles",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoint.health",
+      "targetField" : "roles",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoint.health.group",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoint.health",
+      "targetField" : "group",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.rest-template-timeout.connectTimeout",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.rest-template-timeout",
+      "targetField" : "connectTimeout",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.rest-template-timeout.socketTimeout",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.rest-template-timeout",
+      "targetField" : "socketTimeout",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.rest-template-timeout.connectRequestTimeout",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.rest-template-timeout",
+      "targetField" : "connectRequestTimeout",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.lifecycle.timeoutPerShutdownPhase",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.lifecycle",
+      "targetField" : "timeoutPerShutdownPhase",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.fetchRegistry",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "fetchRegistry",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.gZipContent",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "gZipContent",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.registryFetchIntervalSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "registryFetchIntervalSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.initialInstanceInfoReplicationIntervalSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "initialInstanceInfoReplicationIntervalSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.serviceUrl",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "serviceUrl",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaServerReadTimeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaServerReadTimeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.disableDelta",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "disableDelta",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.availabilityZones",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "availabilityZones",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.cacheRefreshExecutorExponentialBackOffBound",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "cacheRefreshExecutorExponentialBackOffBound",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaConnectionIdleTimeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaConnectionIdleTimeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.logDeltaDiff",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "logDeltaDiff",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaServerTotalConnectionsPerHost",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaServerTotalConnectionsPerHost",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.order",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "order",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaServerConnectTimeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaServerConnectTimeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.dollarReplacement",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "dollarReplacement",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.useDnsForFetchingServiceUrls",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "useDnsForFetchingServiceUrls",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.shouldUnregisterOnShutdown",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "shouldUnregisterOnShutdown",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.heartbeatExecutorExponentialBackOffBound",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "heartbeatExecutorExponentialBackOffBound",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.clientDataAccept",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "clientDataAccept",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.propertyResolver",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "propertyResolver",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.cacheRefreshExecutorThreadPoolSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "cacheRefreshExecutorThreadPoolSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.shouldEnforceRegistrationAtInit",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "shouldEnforceRegistrationAtInit",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.transport",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "transport",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.preferSameZoneEureka",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "preferSameZoneEureka",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.allowRedirects",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "allowRedirects",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.escapeCharReplacement",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "escapeCharReplacement",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.onDemandUpdateStatusChange",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "onDemandUpdateStatusChange",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaServerTotalConnections",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaServerTotalConnections",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.instanceInfoReplicationIntervalSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "instanceInfoReplicationIntervalSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.registerWithEureka",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "registerWithEureka",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.filterOnlyUpInstances",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "filterOnlyUpInstances",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.eurekaServiceUrlPollIntervalSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "eurekaServiceUrlPollIntervalSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.region",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "region",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.heartbeatExecutorThreadPoolSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client",
+      "targetField" : "heartbeatExecutorThreadPoolSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.eureka.approximateZoneFromHostname",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer.eureka",
+      "targetField" : "approximateZoneFromHostname",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.web.localeResolver",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.web",
+      "targetField" : "localeResolver",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.web.resources",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.web",
+      "targetField" : "resources",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.system",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "system",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.data",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "data",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.web",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "web",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.enable",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "enable",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.useGlobalRegistry",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "useGlobalRegistry",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.graphql",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "graphql",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.distribution",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "distribution",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.tags",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics",
+      "targetField" : "tags",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.service-registry.auto-registration.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.service-registry.auto-registration",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.service-registry.auto-registration.registerManagement",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.service-registry.auto-registration",
+      "targetField" : "registerManagement",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.service-registry.auto-registration.failFast",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.service-registry.auto-registration",
+      "targetField" : "failFast",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.contentnegotiation",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "contentnegotiation",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.servlet",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "servlet",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.format",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "format",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.staticPathPattern",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "staticPathPattern",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.dispatchOptionsRequest",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "dispatchOptionsRequest",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.dispatchTraceRequest",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "dispatchTraceRequest",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.ignoreDefaultModelOnRedirect",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "ignoreDefaultModelOnRedirect",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.logResolvedException",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "logResolvedException",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.async",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "async",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.view",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "view",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.publishRequestHandledEvents",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "publishRequestHandledEvents",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.logRequestDetails",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "logRequestDetails",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.pathmatch",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "pathmatch",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.mvc.throwExceptionIfNoHandlerFound",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.mvc",
+      "targetField" : "throwExceptionIfNoHandlerFound",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.info.git",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.info",
+      "targetField" : "git",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.compatibility-verifier.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.compatibility-verifier",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.compatibility-verifier.compatibleBootVersions",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.compatibility-verifier",
+      "targetField" : "compatibleBootVersions",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.cache.caffeine",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer.cache",
+      "targetField" : "caffeine",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.cache.ttl",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer.cache",
+      "targetField" : "ttl",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.loadbalancer.cache.capacity",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.loadbalancer.cache",
+      "targetField" : "capacity",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionAppWhitelist",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionAppWhitelist",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterThrottleStandardClients",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterThrottleStandardClients",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxIdleThreadAgeInMinutesForPeerReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxIdleThreadAgeInMinutesForPeerReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionTotalConnectionsPerHost",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionTotalConnectionsPerHost",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxElementsInStatusReplicationPool",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxElementsInStatusReplicationPool",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerNodeTotalConnections",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerNodeTotalConnections",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.disableDelta",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "disableDelta",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.disableTransparentFallbackToOtherRegion",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "disableTransparentFallbackToOtherRegion",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.EIPBindingRetryIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "EIPBindingRetryIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerNodeTotalConnectionsPerHost",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerNodeTotalConnectionsPerHost",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionTrustStorePassword",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionTrustStorePassword",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : true
+    }, {
+      "canonicalKey" : "eureka.server.maxThreadsForPeerReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxThreadsForPeerReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.ASGCacheExpiryTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "ASGCacheExpiryTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionTrustStore",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionTrustStore",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : true
+    }, {
+      "canonicalKey" : "eureka.server.route53DomainTTL",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "route53DomainTTL",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterEnabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterEnabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionUrlsWithName",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionUrlsWithName",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.renewalPercentThreshold",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "renewalPercentThreshold",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.useReadOnlyResponseCache",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "useReadOnlyResponseCache",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.enableReplicatedRequestCompression",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "enableReplicatedRequestCompression",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.responseCacheAutoExpirationInSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "responseCacheAutoExpirationInSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerEurekaStatusRefreshTimeIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerEurekaStatusRefreshTimeIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.deltaRetentionTimerIntervalInMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "deltaRetentionTimerIntervalInMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.registrySyncRetries",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "registrySyncRetries",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.disableDeltaForRemoteRegions",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "disableDeltaForRemoteRegions",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.route53BindRebindRetries",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "route53BindRebindRetries",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.gZipContentFromRemoteRegion",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "gZipContentFromRemoteRegion",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.EIPBindRebindRetries",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "EIPBindRebindRetries",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionConnectionIdleTimeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionConnectionIdleTimeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.numberOfReplicationRetries",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "numberOfReplicationRetries",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.retentionTimeInMSInDeltaQueue",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "retentionTimeInMSInDeltaQueue",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionReadTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionReadTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.EIPBindingRetryIntervalMsWhenUnbound",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "EIPBindingRetryIntervalMsWhenUnbound",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxThreadsForStatusReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxThreadsForStatusReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxElementsInPeerReplicationPool",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxElementsInPeerReplicationPool",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.responseCacheUpdateIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "responseCacheUpdateIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.ASGQueryTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "ASGQueryTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerNodeConnectTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerNodeConnectTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.route53BindingRetryIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "route53BindingRetryIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.minThreadsForStatusReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "minThreadsForStatusReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.batchReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "batchReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.minAvailableInstancesForPeerReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "minAvailableInstancesForPeerReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerNodeReadTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerNodeReadTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxTimeForReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxTimeForReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerEurekaNodesUpdateIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerEurekaNodesUpdateIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterRegistryFetchAverageRate",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterRegistryFetchAverageRate",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.registrySyncRetryWaitMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "registrySyncRetryWaitMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.expectedClientRenewalIntervalSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "expectedClientRenewalIntervalSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.renewalThresholdUpdateIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "renewalThresholdUpdateIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionTotalConnections",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionTotalConnections",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.primeAwsReplicaConnections",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "primeAwsReplicaConnections",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterPrivilegedClients",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterPrivilegedClients",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.listAutoScalingGroupsRoleName",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "listAutoScalingGroupsRoleName",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.propertyResolver",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "propertyResolver",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionFetchThreadPoolSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionFetchThreadPoolSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.logIdentityHeaders",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "logIdentityHeaders",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.peerNodeConnectionIdleTimeoutSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "peerNodeConnectionIdleTimeoutSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.syncWhenTimestampDiffers",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "syncWhenTimestampDiffers",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionConnectTimeoutMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionConnectTimeoutMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.remoteRegionRegistryFetchInterval",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "remoteRegionRegistryFetchInterval",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.bindingStrategy",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "bindingStrategy",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.ASGUpdateIntervalMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "ASGUpdateIntervalMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.waitTimeInMsWhenSyncEmpty",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "waitTimeInMsWhenSyncEmpty",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterFullFetchAverageRate",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterFullFetchAverageRate",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.enableSelfPreservation",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "enableSelfPreservation",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.minThreadsForPeerReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "minThreadsForPeerReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.evictionIntervalTimerInMs",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "evictionIntervalTimerInMs",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.rateLimiterBurstSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "rateLimiterBurstSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.maxIdleThreadInMinutesAgeForStatusReplication",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "maxIdleThreadInMinutesAgeForStatusReplication",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.server.initialCapacityOfResponseCache",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.server",
+      "targetField" : "initialCapacityOfResponseCache",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.execution.pool",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.execution",
+      "targetField" : "pool",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.execution.threadNamePrefix",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.execution",
+      "targetField" : "threadNamePrefix",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.execution.shutdown",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.execution",
+      "targetField" : "shutdown",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.server.basePath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.server",
+      "targetField" : "basePath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.server.port",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.server",
+      "targetField" : "port",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.tls.trustStorePassword",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.tls",
+      "targetField" : "trustStorePassword",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : true
+    }, {
+      "canonicalKey" : "eureka.client.tls.keyStorePassword",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.tls",
+      "targetField" : "keyStorePassword",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : true
+    }, {
+      "canonicalKey" : "eureka.client.tls.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.tls",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.client.tls.keyPassword",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.client.tls",
+      "targetField" : "keyPassword",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : true
+    }, {
+      "canonicalKey" : "eureka.dashboard.path",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.dashboard",
+      "targetField" : "path",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.dashboard.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.dashboard",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.nonSecurePortEnabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "nonSecurePortEnabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.statusPageUrl",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "statusPageUrl",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.initialStatus",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "initialStatus",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.instanceEnabledOnit",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "instanceEnabledOnit",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.securePort",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "securePort",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.securePortEnabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "securePortEnabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.hostname",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "hostname",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.instanceId",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "instanceId",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.dataCenterInfo",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "dataCenterInfo",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.appname",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "appname",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.healthCheckUrlPath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "healthCheckUrlPath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.leaseExpirationDurationInSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "leaseExpirationDurationInSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.metadataMap",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "metadataMap",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.preferIpAddress",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "preferIpAddress",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.healthCheckUrl",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "healthCheckUrl",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.statusPageUrlPath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "statusPageUrlPath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.virtualHostName",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "virtualHostName",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.ipAddress",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "ipAddress",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.leaseRenewalIntervalInSeconds",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "leaseRenewalIntervalInSeconds",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.homePageUrlPath",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "homePageUrlPath",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.defaultAddressResolutionOrder",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "defaultAddressResolutionOrder",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.environment",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "environment",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.nonSecurePort",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "nonSecurePort",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.namespace",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "namespace",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.instance.secureVirtualHostName",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka.instance",
+      "targetField" : "secureVirtualHostName",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.scheduling.pool",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.scheduling",
+      "targetField" : "pool",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.scheduling.threadNamePrefix",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.scheduling",
+      "targetField" : "threadNamePrefix",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.task.scheduling.shutdown",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.task.scheduling",
+      "targetField" : "shutdown",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.discovery.client.health-indicator.useServicesQuery",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.discovery.client.health-indicator",
+      "targetField" : "useServicesQuery",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.discovery.client.health-indicator.includeDescription",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.discovery.client.health-indicator",
+      "targetField" : "includeDescription",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.discovery.client.health-indicator.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.discovery.client.health-indicator",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.allowedOrigins",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "allowedOrigins",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.maxAge",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "maxAge",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.exposedHeaders",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "exposedHeaders",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.allowedOriginPatterns",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "allowedOriginPatterns",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.allowedHeaders",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "allowedHeaders",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.endpoints.web.cors.allowedMethods",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.endpoints.web.cors",
+      "targetField" : "allowedMethods",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.health.diskspace.path",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.health.diskspace",
+      "targetField" : "path",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.health.diskspace.threshold",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.health.diskspace",
+      "targetField" : "threshold",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.sql.init.mode",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.sql.init",
+      "targetField" : "mode",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.sql.init.separator",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.sql.init",
+      "targetField" : "separator",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.sql.init.platform",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.sql.init",
+      "targetField" : "platform",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.sql.init.continueOnError",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.sql.init",
+      "targetField" : "continueOnError",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.export.simple.mode",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics.export.simple",
+      "targetField" : "mode",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.export.simple.step",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics.export.simple",
+      "targetField" : "step",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "management.metrics.export.simple.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "management.metrics.export.simple",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.discovery.client.simple.instances",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.discovery.client.simple",
+      "targetField" : "instances",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.cloud.discovery.client.simple.order",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.cloud.discovery.client.simple",
+      "targetField" : "order",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.reactive",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "reactive",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.undertow",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "undertow",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.port",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "port",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.maxHttpHeaderSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "maxHttpHeaderSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.tomcat",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "tomcat",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.servlet",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "servlet",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.jetty",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "jetty",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.error",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "error",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.shutdown",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "shutdown",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "server.netty",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "server",
+      "targetField" : "netty",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.servlet.multipart.fileSizeThreshold",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.servlet.multipart",
+      "targetField" : "fileSizeThreshold",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.servlet.multipart.maxFileSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.servlet.multipart",
+      "targetField" : "maxFileSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.servlet.multipart.maxRequestSize",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.servlet.multipart",
+      "targetField" : "maxRequestSize",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.servlet.multipart.enabled",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.servlet.multipart",
+      "targetField" : "enabled",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "spring.servlet.multipart.resolveLazily",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "spring.servlet.multipart",
+      "targetField" : "resolveLazily",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.environment",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka",
+      "targetField" : "environment",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    }, {
+      "canonicalKey" : "eureka.datacenter",
+      "sourceType" : "CONFIGURATION_PROPERTIES",
+      "targetType" : "eureka",
+      "targetField" : "datacenter",
+      "bound" : true,
+      "defaulted" : false,
+      "deprecated" : false,
+      "sensitive" : false
+    } ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "employee-service",
+    "started" : false,
+    "failure_reason" : "TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]",
+    "duration_ms" : 94854,
+    "observation_count" : 0,
+    "bound_property_count" : 0,
+    "observations" : [ ],
+    "bound_properties" : [ ],
+    "unobservable" : [ "CONTEXT: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "BEANS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "CONDITIONS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "PROFILES: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "REQUEST_MAPPINGS: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "HEALTH: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "CONFIG_BINDING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SECURITY_FILTER_CHAIN: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "PERSISTENCE: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "MESSAGING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SCHEDULING: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "BATCH: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "EXTERNAL_CLIENT: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]", "SERIALIZATION: Application did not reach readiness: TIMEOUT: Caused by: com.mongodb.MongoTimeoutException: Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=localhost:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused: getsockopt}}]" ]
+  }, {
+    "module" : "report-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 18812,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "report-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:51336",
+      "data" : {
+        "base_url" : "http://127.0.0.1:51336",
+        "artifact" : "report-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "c06a4645d7761f8d63e9adb5e7a42aaa0fb9ef8068bd66912821fe7a7c2ff9a1",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17/bin/java.exe",
+        "java_home" : "C:\\Users\\annav\\tools\\jdk-17",
+        "port" : 51336,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "report-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "c5f280e0448d906878b191b372afd0e133657ab20f75442b64df4766688e3285"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "report-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "cfa2cbcda8799ac59e0e6d9fbc759256f0b69ed8680542ef176f75073efdb33b"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "report-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "ca1be9d4bd26e65fa484be96a91647ab8fb15a20b884bbf18f4e93e8fabc689a"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "report-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "4059ad89f3ca3c532d643173241f3c1c83021d1e1c1a7e9ae1fc1074ef86cdca"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "report-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "78cc6d07fbbfc4c0adc53a78331d3c88539bea88b5bf3d950723fc937342590e"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "report-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "bound_properties" : [ ],
+    "unobservable" : [ ]
+  }, {
+    "module" : "sheduler-service",
+    "started" : true,
+    "failure_reason" : null,
+    "duration_ms" : 14785,
+    "observation_count" : 7,
+    "bound_property_count" : 0,
+    "observations" : [ {
+      "dimension" : "CONTEXT",
+      "subject" : "sheduler-service",
+      "detail" : "Spring application context started and responded on http://127.0.0.1:64126",
+      "data" : {
+        "base_url" : "http://127.0.0.1:64126",
+        "artifact" : "sheduler-service-0.0.1-SNAPSHOT.war",
+        "artifact_sha256" : "4f39d974ee2744a9ad2ab15566a2e7530c1aae921c3dafb56fd60508ac4d1974",
+        "java_executable" : "C:\\Users\\annav\\tools\\jdk-17/bin/java.exe",
+        "java_home" : "C:\\Users\\annav\\tools\\jdk-17",
+        "port" : 64126,
+        "profile" : "<none>",
+        "readiness_contract" : "ACTUATOR_HEALTH_RESPONDING_404",
+        "health_status" : "404",
+        "readiness_detail" : "/actuator/health reported status 404. The context is up and serving; the status reflects a downstream dependency and is recorded as an observation rather than treated as a startup failure.",
+        "isolation_settings_applied" : [ "spring.cloud.config.enabled=false", "spring.cloud.config.fail-fast=false", "eureka.client.enabled=false", "eureka.client.register-with-eureka=false", "eureka.client.fetch-registry=false", "spring.cloud.discovery.enabled=false" ],
+        "environment_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "HEALTH",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/health",
+      "data" : {
+        "summary" : "status=404",
+        "raw_hash" : "4cf9b7b3b261f95340c29bca49570afa2b165e82498f888be19e23e84dee2568"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "BEANS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/beans",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "463e7acef76409d7900c98c238118660cc63a889944972b57dc000323e3b677b"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONDITIONS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/conditions",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "32b3c8608a8ff52470b2b25e35ff42e8111882f6d60121cd716b8c7c22f100c3"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/env",
+      "data" : {
+        "summary" : "fields=4",
+        "raw_hash" : "e1d1a9a84c3719d048155b55e22e8dd1594ac512df4c7355af98c2fe516a1015"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "REQUEST_MAPPINGS",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/mappings",
+      "data" : {
+        "summary" : "contexts=0",
+        "raw_hash" : "aeb651d038ce6f0d6737684a00658ee7e5725796a0482eb4494b6c6aed64001c"
+      },
+      "successful" : true
+    }, {
+      "dimension" : "CONFIG_BINDING",
+      "subject" : "sheduler-service",
+      "detail" : "/actuator/configprops",
+      "data" : {
+        "bound_property_count" : 0
+      },
+      "successful" : true
+    } ],
+    "bound_properties" : [ ],
+    "unobservable" : [ ]
+  } ]
+}

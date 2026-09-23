@@ -1,0 +1,11 @@
+{
+  "stage" : "06-target",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:59:32.660423900Z",
+  "artifacts" : {
+    "target-state.json" : "93b39e231b7ae4b4f3c27ed1d68307dd60e63ba2b017ddebabd418a77b64b245",
+    "migration-path.json" : "513d19c5ddd7089efb6deed239aba6c9bf5a5b5766d58f7a027e48d0f434ee6d",
+    "target-resolution-report.json" : "03882e561054d6204ed46034ee4b12a13d314fda43c2bf96618338d8d9b6a156"
+  },
+  "artifact_set_hash" : "b99a7b2f2b5614856ae1526aad1f9a089772883887c94182fdf63ff511252596"
+}

@@ -1,0 +1,120 @@
+{
+  "pipeline_stage" : "17-differential",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:21:55.187469100Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "provider_mode" : "MANAGED",
+  "provider_implementation" : "bootshift-managed-jvm",
+  "provider_version" : "1.0.0",
+  "old_fingerprint" : "5797432fa228704eba720ef40e387ced59f0ffc95de549b1b49097714c921e69",
+  "new_fingerprint" : "b8eaa9ba16d2e3a816f970187301e2da680e6dfbc04144024dd148df53b9dbf8",
+  "baseline_fingerprint" : "0ba36a18b28dc8c47229281d0dd1a101ec7d77dbdd4e4ce35e2fccc54b4ad3e0",
+  "checks" : [ {
+    "attribute" : "locale",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "C",
+    "newValue" : "C",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "timezone",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "UTC",
+    "newValue" : "UTC",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "clock.strategy",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "system-utc",
+    "newValue" : "system-utc",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "file.encoding",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "UTF-8",
+    "newValue" : "UTF-8",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "network.egress.harness",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "allowlist",
+    "newValue" : "allowlist",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "network.egress.child.processes",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "UNRESTRICTED",
+    "newValue" : "UNRESTRICTED",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  }, {
+    "attribute" : "java.version",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "oldValue" : "21.0.11",
+    "newValue" : "21.0.11",
+    "satisfied" : true,
+    "detail" : "difference is expected and does not invalidate comparison"
+  }, {
+    "attribute" : "java.vendor",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "oldValue" : "Microsoft",
+    "newValue" : "Microsoft",
+    "satisfied" : true,
+    "detail" : "difference is expected and does not invalidate comparison"
+  }, {
+    "attribute" : "spring.boot.version",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "oldValue" : "unknown",
+    "newValue" : "unknown",
+    "satisfied" : true,
+    "detail" : "difference is expected and does not invalidate comparison"
+  }, {
+    "attribute" : "servlet.container",
+    "constraint" : "EXPECTED_TO_DIFFER",
+    "oldValue" : "unknown",
+    "newValue" : "unknown",
+    "satisfied" : true,
+    "detail" : "difference is expected and does not invalidate comparison"
+  }, {
+    "attribute" : "os.name",
+    "constraint" : "UNCONSTRAINED",
+    "oldValue" : "Windows 11",
+    "newValue" : "Windows 11",
+    "satisfied" : true,
+    "detail" : "not part of the equivalence contract"
+  }, {
+    "attribute" : "available.processors",
+    "constraint" : "UNCONSTRAINED",
+    "oldValue" : "22",
+    "newValue" : "22",
+    "satisfied" : true,
+    "detail" : "not part of the equivalence contract"
+  }, {
+    "attribute" : "container.runtime",
+    "constraint" : "MUST_MATCH",
+    "oldValue" : "none",
+    "newValue" : "none",
+    "satisfied" : true,
+    "detail" : "identical on both sides"
+  } ],
+  "unsatisfied" : [ ],
+  "provider_gaps" : [ "NO_OCI_RUNTIME: no rootless OCI runtime daemon (podman/docker/nerdctl) answered, so infrastructure dependencies cannot be provisioned by the harness. Any dimension requiring a database, broker or cache is recorded as NOT_COMPARED rather than assumed equivalent." ]
+}

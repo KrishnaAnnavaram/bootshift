@@ -7,10 +7,12 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.Claim;
 import com.bootshift.core.evidence.CoverageStatement;
 import com.bootshift.core.evidence.EvidenceLevel;
 import com.bootshift.core.evidence.EvidenceManifest;
+import com.bootshift.core.journal.DocumentationIndex;
 import com.bootshift.core.identity.FileRecord;
 import com.bootshift.core.identity.FileRegistry;
 import com.bootshift.core.ledger.ChangeLedger;
@@ -88,12 +90,28 @@ public final class EvidenceStage implements Stage {
     @Override
     public List<String> outputArtifacts() {
         return List.of("migration-report.md", "migration-result.json", "evidence-manifest.json",
+                "documentation-index.json",
                 "file-lineage.json", "symbol-lineage.json", "claims.json", "edge-evidence.json",
                 "coverage-statement.json", "MIGRATION_DOCUMENT.md", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("EVD-001", "Aggregate every edge attempt",
+                        "Resolved through the edge index so all edges are included, not only the one the stage pointer names"),
+                StepDeclaration.of("EVD-002", "Verify the ledger and compute coverage",
+                        "Evidence levels, claims, shortfalls and blind spots are derived, never asserted"),
+                StepDeclaration.of("EVD-003", "Seal the evidence manifest and write the migration document",
+                        "An incomplete run is reported as incomplete rather than presented as a migration"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "EVD-001").begin();
+        StageSupport.step(context, "EVD-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "EVD-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -357,7 +375,32 @@ public final class EvidenceStage implements Stage {
         // in which order, and on whose authority. It is generated on every run, from the artifacts.
         writer.writeText("MIGRATION_DOCUMENT.md", new MigrationDocument(context).render());
 
+        // The documentation index catalogues every stage, edge and run document this run produced,
+        // and - the half that makes it worth having - every one it should have produced and did not.
+        // A documentation defect is reported as a gap in the evidence rather than being invisible
+        // because the thing that would have reported it is the thing that failed.
+        ObjectNode documentationIndex = DocumentationIndex.build(context.run().output(),
+                context.run().runId(), context.journal().timeline(),
+                context.journal().journalFailures());
+        writer.write("documentation-index.json", StageSupport.compose(
+                StageSupport.envelope(context, OUTPUT_DIR), documentationIndex));
+        int documentationGaps = documentationIndex.path("documentation_gap_count").asInt();
+        if (documentationGaps > 0) {
+            StageSupport.blindSpot(context, "GAP-DOC-001", "DOCUMENTATION",
+                    documentationGaps + " runtime document(s) are missing or failed to render",
+                    "Those stage attempts have no human-readable account; their structured "
+                            + "execution records remain authoritative");
+        }
+        StageSupport.validationMeasure(context, "documentation_gaps", documentationGaps);
+        StageSupport.validationMeasure(context, "stage_documents",
+                documentationIndex.path("stage_document_count").asInt());
+        StageSupport.validationMeasure(context, "edge_documents",
+                documentationIndex.path("edge_document_count").asInt());
+
+        StageSupport.step(context, "EVD-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "EVD-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift lineage");
 
         Map<String, Path> artifacts = new LinkedHashMap<>();
         outputArtifacts().forEach(name -> artifacts.put(name, writer.dir().resolve(name)));

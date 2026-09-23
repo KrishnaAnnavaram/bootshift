@@ -1,0 +1,10 @@
+{
+  "stage" : "07-documentation",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:59:44.901932800Z",
+  "artifacts" : {
+    "document-registry.json" : "73948ebbee7aba31ef9fc49e3a555d488ee57d700da8f7c95a695406dfbedd09",
+    "document-coverage.json" : "a743cbb119a78bbe2425b93d215d670741d69874aedbdb98979c7f18dd1f8064"
+  },
+  "artifact_set_hash" : "a460fbf00421ba0bd7fd4e567fcc7241f30bbd83e7280e0a69e8805a8a546188"
+}

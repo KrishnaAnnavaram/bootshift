@@ -1,0 +1,1379 @@
+{
+  "pipeline_stage" : "04-baseline",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:59:08.709352200Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "edge_count" : 271,
+  "layer" : "RUNTIME_OBSERVATION",
+  "note" : "Runtime edges never overwrite static relationships; both layers coexist so a report can say whether a relationship was inferred or observed.",
+  "edges" : [ {
+    "from" : "MODULE:department-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME:department-service",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-330e1d4e278a79c25ee53a90bee559ceee468a28b057a0432e46f73057604f45"
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME:discovery-service",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-43a998507bf7ef2843e306c7e369ffdc2ff54d1968a67cb63e41fc19d2e23ca3"
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.clients",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.hintHeaderName",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.healthCheck",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.hint",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.XForwarded",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.useRawStatusCodeInResponseData",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.stickySession",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.retry",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.ignoredInterfaces",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.preferredNetworks",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.defaultIpAddress",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.timeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.defaultHostname",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.inetutils.useOnlySiteLocalInterfaces",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.pathMapping",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.exposure",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.basePath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.discovery",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.charset",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.exposeSpringMacroHelpers",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.settings",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.cache",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.exposeSessionAttributes",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.prefix",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.suffix",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.preferFileSystemAccess",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.checkTemplateLocation",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.allowSessionOverride",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.templateLoaderPath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.contentType",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.allowRequestOverride",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.freemarker.exposeRequestAttributes",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.registry.expectedNumberOfClientsSendingRenews",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.registry.defaultOpenForTrafficCount",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.serialization",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.visibility",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.parser",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.deserialization",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.generator",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.jackson.mapper",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.info.build",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.info.git",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoint.health.logging",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoint.health.showDetails",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoint.health.status",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoint.health.roles",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoint.health.group",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.rest-template-timeout.connectTimeout",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.rest-template-timeout.socketTimeout",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.rest-template-timeout.connectRequestTimeout",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.lifecycle.timeoutPerShutdownPhase",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.fetchRegistry",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.gZipContent",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.registryFetchIntervalSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.initialInstanceInfoReplicationIntervalSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.serviceUrl",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaServerReadTimeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.disableDelta",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.availabilityZones",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.cacheRefreshExecutorExponentialBackOffBound",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaConnectionIdleTimeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.logDeltaDiff",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaServerTotalConnectionsPerHost",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.order",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaServerConnectTimeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.dollarReplacement",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.useDnsForFetchingServiceUrls",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.shouldUnregisterOnShutdown",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.heartbeatExecutorExponentialBackOffBound",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.clientDataAccept",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.propertyResolver",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.cacheRefreshExecutorThreadPoolSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.shouldEnforceRegistrationAtInit",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.transport",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.preferSameZoneEureka",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.allowRedirects",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.escapeCharReplacement",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.onDemandUpdateStatusChange",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaServerTotalConnections",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.instanceInfoReplicationIntervalSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.registerWithEureka",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.filterOnlyUpInstances",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.eurekaServiceUrlPollIntervalSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.region",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.heartbeatExecutorThreadPoolSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.eureka.approximateZoneFromHostname",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.web.localeResolver",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.web.resources",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.system",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.data",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.web",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.enable",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.useGlobalRegistry",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.graphql",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.distribution",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.tags",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.service-registry.auto-registration.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.service-registry.auto-registration.registerManagement",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.service-registry.auto-registration.failFast",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.contentnegotiation",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.servlet",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.format",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.staticPathPattern",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.dispatchOptionsRequest",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.dispatchTraceRequest",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.ignoreDefaultModelOnRedirect",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.logResolvedException",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.async",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.view",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.publishRequestHandledEvents",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.logRequestDetails",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.pathmatch",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.mvc.throwExceptionIfNoHandlerFound",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.info.git",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.compatibility-verifier.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.compatibility-verifier.compatibleBootVersions",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.cache.caffeine",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.cache.ttl",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.loadbalancer.cache.capacity",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionAppWhitelist",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterThrottleStandardClients",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxIdleThreadAgeInMinutesForPeerReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionTotalConnectionsPerHost",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxElementsInStatusReplicationPool",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerNodeTotalConnections",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.disableDelta",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.disableTransparentFallbackToOtherRegion",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.EIPBindingRetryIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerNodeTotalConnectionsPerHost",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionTrustStorePassword",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxThreadsForPeerReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.ASGCacheExpiryTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionTrustStore",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.route53DomainTTL",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterEnabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionUrlsWithName",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.renewalPercentThreshold",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.useReadOnlyResponseCache",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.enableReplicatedRequestCompression",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.responseCacheAutoExpirationInSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerEurekaStatusRefreshTimeIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.deltaRetentionTimerIntervalInMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.registrySyncRetries",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.disableDeltaForRemoteRegions",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.route53BindRebindRetries",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.gZipContentFromRemoteRegion",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.EIPBindRebindRetries",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionConnectionIdleTimeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.numberOfReplicationRetries",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.retentionTimeInMSInDeltaQueue",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionReadTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.EIPBindingRetryIntervalMsWhenUnbound",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxThreadsForStatusReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxElementsInPeerReplicationPool",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.responseCacheUpdateIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.ASGQueryTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerNodeConnectTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.route53BindingRetryIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.minThreadsForStatusReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.batchReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.minAvailableInstancesForPeerReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerNodeReadTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxTimeForReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerEurekaNodesUpdateIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterRegistryFetchAverageRate",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.registrySyncRetryWaitMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.expectedClientRenewalIntervalSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.renewalThresholdUpdateIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionTotalConnections",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.primeAwsReplicaConnections",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterPrivilegedClients",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.listAutoScalingGroupsRoleName",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.propertyResolver",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionFetchThreadPoolSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.logIdentityHeaders",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.peerNodeConnectionIdleTimeoutSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.syncWhenTimestampDiffers",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionConnectTimeoutMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.remoteRegionRegistryFetchInterval",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.bindingStrategy",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.ASGUpdateIntervalMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.waitTimeInMsWhenSyncEmpty",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterFullFetchAverageRate",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.enableSelfPreservation",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.minThreadsForPeerReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.evictionIntervalTimerInMs",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.rateLimiterBurstSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.maxIdleThreadInMinutesAgeForStatusReplication",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.server.initialCapacityOfResponseCache",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.execution.pool",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.execution.threadNamePrefix",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.execution.shutdown",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.server.basePath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.server.port",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.tls.trustStorePassword",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.tls.keyStorePassword",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.tls.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.client.tls.keyPassword",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.dashboard.path",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.dashboard.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.nonSecurePortEnabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.statusPageUrl",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.initialStatus",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.instanceEnabledOnit",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.securePort",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.securePortEnabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.hostname",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.instanceId",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.dataCenterInfo",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.appname",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.healthCheckUrlPath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.leaseExpirationDurationInSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.metadataMap",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.preferIpAddress",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.healthCheckUrl",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.statusPageUrlPath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.virtualHostName",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.ipAddress",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.leaseRenewalIntervalInSeconds",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.homePageUrlPath",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.defaultAddressResolutionOrder",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.environment",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.nonSecurePort",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.namespace",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.instance.secureVirtualHostName",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.scheduling.pool",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.scheduling.threadNamePrefix",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.task.scheduling.shutdown",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.discovery.client.health-indicator.useServicesQuery",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.discovery.client.health-indicator.includeDescription",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.discovery.client.health-indicator.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.allowedOrigins",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.maxAge",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.exposedHeaders",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.allowedOriginPatterns",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.allowedHeaders",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.endpoints.web.cors.allowedMethods",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.health.diskspace.path",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.health.diskspace.threshold",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.sql.init.mode",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.sql.init.separator",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.sql.init.platform",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.sql.init.continueOnError",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.export.simple.mode",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.export.simple.step",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:management.metrics.export.simple.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.discovery.client.simple.instances",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.cloud.discovery.client.simple.order",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.reactive",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.undertow",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.port",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.maxHttpHeaderSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.tomcat",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.servlet",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.jetty",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.error",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.shutdown",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:server.netty",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.servlet.multipart.fileSizeThreshold",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.servlet.multipart.maxFileSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.servlet.multipart.maxRequestSize",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.servlet.multipart.enabled",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:spring.servlet.multipart.resolveLazily",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.environment",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:discovery-service",
+    "type" : "ACTUALLY_BINDS_PROPERTY",
+    "to" : "PROPERTY:eureka.datacenter",
+    "evidence_ref" : null
+  }, {
+    "from" : "MODULE:report-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME:report-service",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-e48428eb3bac48f86f6685b016f744cad6dd8e2448856628a8faf3dbedbd2524"
+  }, {
+    "from" : "MODULE:sheduler-service",
+    "type" : "ACTIVE_UNDER_PROFILE",
+    "to" : "RUNTIME:sheduler-service",
+    "evidence_ref" : "EV-RUNTIME-CONTEXT-75cf2760f5307600dd4a1f2517a93147b96b9c152e132077946bb5a847059582"
+  } ]
+}

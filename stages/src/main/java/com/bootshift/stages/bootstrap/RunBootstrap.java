@@ -7,6 +7,8 @@ import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.HarnessException;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
+import com.bootshift.core.journal.StepStatus;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.policy.LicensePolicy;
 import com.bootshift.core.state.RunState;
@@ -37,6 +39,40 @@ import java.util.Map;
 public final class RunBootstrap {
 
     public static final String OUTPUT_DIR = "00-bootstrap";
+
+    public static final String PURPOSE =
+            "Infrastructure preflight: validate the input path, gate the harness bill of materials "
+            + "against OSS policy, create the run identity and workspaces, snapshot the source and "
+            + "initialise the artifact, evidence and state planes. Makes no migration decision.";
+
+    /**
+     * The steps bootstrap declares, in order.
+     *
+     * <p>Declared rather than derived, so a bootstrap that dies half way through leaves a record
+     * showing exactly how far it got - which for the stage that creates the workspaces is usually the
+     * whole diagnosis.
+     */
+    public static final List<StepDeclaration> STEPS = List.of(
+            StepDeclaration.of("BOOT-001", "Resolve and validate source root",
+                    "Refuse a path that is not a directory before anything is created"),
+            StepDeclaration.of("BOOT-002", "Gate the harness bill of materials",
+                    "Every component the harness itself loads is checked against the OSS policy"),
+            StepDeclaration.of("BOOT-003", "Probe for forbidden recipe estates on the classpath",
+                    "A declared coordinate list cannot see what arrived transitively"),
+            StepDeclaration.of("BOOT-004", "Create run workspaces",
+                    "original, migration, runtime-old, runtime-new, checkpoint, evidence and state"),
+            StepDeclaration.of("BOOT-005", "Capture source provenance",
+                    "Records what was handed to the harness, independently of what it becomes"),
+            StepDeclaration.of("BOOT-006", "Snapshot source into original and migration workspaces",
+                    "Both snapshots must hash identically or the run cannot be trusted"),
+            StepDeclaration.of("BOOT-007", "Initialise the internal checkpoint repository",
+                    "Checkpoint history lives in the external workspace, never in the user input"),
+            StepDeclaration.of("BOOT-008", "Mark the original workspace read-only",
+                    "The immutable side of the differential must not be writable"),
+            StepDeclaration.of("BOOT-009", "Initialise the run state store",
+                    "Creates the run record the state machine writes to"),
+            StepDeclaration.of("BOOT-010", "Publish the bootstrap artifact and OSS licence gate",
+                    "Proves WORKSPACE_READY and OSS_POLICY_VERIFIED to every later precondition"));
 
     /** Third-party components the harness itself loads, checked against the license gate. */
     public record HarnessComponent(String coordinate, String version, String license, String role) {
@@ -95,15 +131,21 @@ public final class RunBootstrap {
         List<String> messages = new ArrayList<>();
 
         // 1. validate the requested repository path
+        StageSupport.step(context, "BOOT-001").begin();
         if (!Files.isDirectory(sourceRoot)) {
+            StageSupport.step(context, "BOOT-001")
+                    .fail("Input path is not a directory: " + sourceRoot, null);
             throw HarnessException.refusal("Input path is not a directory: " + sourceRoot);
         }
+        StageSupport.step(context, "BOOT-001").detail("source_root", sourceRoot.toString())
+                .succeed("Input path accepted");
         if (isInsideHarness(sourceRoot)) {
             messages.add("Input path is inside the harness repository; harness modules are excluded "
                     + "from analysis by the module filter.");
         }
 
         // 2. OSS policy gate for the tools being loaded
+        StageSupport.step(context, "BOOT-002").begin();
         LicensePolicy licensePolicy = context.policy().license();
         List<LicensePolicy.Finding> findings = new ArrayList<>();
         for (HarnessComponent component : HARNESS_COMPONENTS) {
@@ -112,8 +154,16 @@ public final class RunBootstrap {
         }
         List<LicensePolicy.Finding> blocking = new ArrayList<>(LicensePolicy.blocking(findings));
 
+        StageSupport.step(context, "BOOT-002")
+                .detail("components_checked", HARNESS_COMPONENTS.size())
+                .detail("blocking_findings", blocking.size())
+                .finish(blocking.isEmpty() ? StepStatus.SUCCESS : StepStatus.REFUSED,
+                        blocking.isEmpty() ? "Every declared component passes the OSS gate"
+                                : blocking.size() + " component(s) are blocked by policy");
+
         // A coordinate list says what the build declares. It cannot see a forbidden estate that
         // arrived transitively or was dropped onto the classpath, so the gate also asks the runtime.
+        StageSupport.step(context, "BOOT-003").begin();
         List<String> forbiddenLoadable = new ArrayList<>();
         for (String marker : LicensePolicy.forbiddenRecipeMarkerClasses()) {
             try {
@@ -128,36 +178,70 @@ public final class RunBootstrap {
                 "A forbidden source-available recipe estate is loadable at runtime even though no "
                         + "declared coordinate names it", "runtime-classpath-probe")));
 
+        StageSupport.step(context, "BOOT-003")
+                .detail("markers_probed",
+                        LicensePolicy.forbiddenRecipeMarkerClasses().size())
+                .detail("loadable", forbiddenLoadable.size())
+                .finish(forbiddenLoadable.isEmpty() ? StepStatus.SUCCESS : StepStatus.REFUSED,
+                        forbiddenLoadable.isEmpty()
+                                ? "No forbidden recipe estate is loadable"
+                                : "A forbidden estate is on the classpath");
+
         // 3-6. workspaces, snapshots, provenance
+        StageSupport.step(context, "BOOT-004").begin();
         Path runWorkspace = context.run().runWorkspace();
         createDirectories(runWorkspace, context.run().originalWorkspace(),
                 context.run().migrationWorkspace(), context.run().runtimeOldWorkspace(),
                 context.run().runtimeNewWorkspace(), context.run().checkpointGit(),
                 context.run().evidenceStore(), context.run().stateStore());
 
+        StageSupport.step(context, "BOOT-004").detail("workspace_root", runWorkspace.toString())
+                .succeed("Run workspaces created");
+
+        StageSupport.step(context, "BOOT-005").begin();
         ScmPort.SourceProvenance provenance = context.scm().captureProvenance(sourceRoot);
+        StageSupport.step(context, "BOOT-005").detail("kind", provenance.kind())
+                .succeed("Source provenance captured");
+
+        StageSupport.step(context, "BOOT-006").begin();
         String originalHash = context.scm().snapshot(sourceRoot, context.run().originalWorkspace(),
                 SNAPSHOT_EXCLUDES);
         String migrationHash = context.scm().snapshot(sourceRoot, context.run().migrationWorkspace(),
                 SNAPSHOT_EXCLUDES);
         if (!originalHash.equals(migrationHash)) {
+            // Two snapshots of one tree that do not agree means the tree changed while it was being
+            // read. Every hash taken afterwards would be a hash of nothing in particular.
+            StageSupport.step(context, "BOOT-006").fail(
+                    "The original and migration snapshots diverged: " + originalHash + " vs "
+                            + migrationHash, null);
             throw HarnessException.stageFailure(
                     "Original and migration snapshots diverged during bootstrap: " + originalHash
                             + " vs " + migrationHash, null);
         }
+        StageSupport.step(context, "BOOT-006").detail("snapshot_hash", originalHash)
+                .succeed("Original and migration snapshots agree");
 
         // The internal checkpoint history lives in the external workspace, never in the user input.
+        StageSupport.step(context, "BOOT-007").begin();
         context.scm().initCheckpointRepository(context.run().migrationWorkspace(),
                 context.run().checkpointGit(),
                 "bootshift baseline snapshot for run " + context.run().runId());
-        markOriginalReadOnly(context.run().originalWorkspace(), messages);
+        StageSupport.step(context, "BOOT-007").succeed("Checkpoint repository initialised");
 
+        StageSupport.step(context, "BOOT-008").begin();
+        markOriginalReadOnly(context.run().originalWorkspace(), messages);
+        StageSupport.step(context, "BOOT-008").succeed("Original workspace marked read-only");
+
+        StageSupport.step(context, "BOOT-009").begin();
         context.runStateStore().createRun(context.run().runId(), Map.of(
                 "source_root", sourceRoot.toString(),
                 "workspace_root", context.run().workspaceRoot().toString(),
                 "policy", context.policy().name()));
 
+        StageSupport.step(context, "BOOT-009").succeed("Run state store initialised");
+
         // 7. initialize output and evidence locations
+        StageSupport.step(context, "BOOT-010").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
 
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR)
@@ -219,6 +303,8 @@ public final class RunBootstrap {
         }
 
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "BOOT-010").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift inventory --repo <path>");
         context.stateMachine().transition(RunState.WORKSPACE_READY, "bootstrap created workspaces");
         context.stateMachine().transition(RunState.OSS_POLICY_VERIFIED, "license gate passed");
         context.runStateStore().updateState(context.run().runId(), RunState.OSS_POLICY_VERIFIED,

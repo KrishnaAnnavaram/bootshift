@@ -8,6 +8,7 @@ import com.bootshift.core.domain.Envelope;
 import com.bootshift.core.domain.ExitCode;
 import com.bootshift.core.domain.OutputLayout;
 import com.bootshift.core.domain.StageResult;
+import com.bootshift.core.journal.StepDeclaration;
 import com.bootshift.core.evidence.EvidenceManifest;
 import com.bootshift.core.state.RunState;
 import com.bootshift.core.util.Json;
@@ -98,8 +99,21 @@ public final class CompatibilityStage implements Stage {
                 "internal-components.json", "manifest.json");
     }
 
+
+    @Override
+    public List<StepDeclaration> declaredSteps() {
+        return List.of(
+                StepDeclaration.of("CMP-001", "Load the build model",
+                        "Current Spring Boot, Spring Cloud and Java levels come from the resolved build model"),
+                StepDeclaration.of("CMP-002", "Resolve version space and lifecycle facts",
+                        "Published versions, support horizons and Spring Cloud trains, from their own sources"),
+                StepDeclaration.of("CMP-003", "Publish the compatibility registry",
+                        "UNKNOWN is preserved as UNKNOWN rather than being resolved to compatible"));
+    }
+
     @Override
     public StageResult execute(StageContext context) {
+        StageSupport.step(context, "CMP-001").begin();
         JsonNode buildNode = StageSupport.requireUpstream(context, "02-build", "build-model.json",
                 "Run: harness resolve-build --repo <path>");
         JsonNode dependencyNode = StageSupport.requireUpstream(context, "02-build",
@@ -111,6 +125,8 @@ public final class CompatibilityStage implements Stage {
         LifecycleSource lifecycleSource = new LifecycleSource(context.http());
         LocalDate today = LocalDate.now();
 
+        StageSupport.step(context, "CMP-001").succeed("Upstream inputs resolved");
+        StageSupport.step(context, "CMP-002").begin();
         OutputLayout.StageWriter writer = context.run().output().open(OUTPUT_DIR);
         Envelope envelope = StageSupport.envelope(context, OUTPUT_DIR);
 
@@ -288,7 +304,10 @@ public final class CompatibilityStage implements Stage {
         StageSupport.toEvidence(context, "compatibility-registry", compatibility,
                 EvidenceManifest.Classification.INTERNAL, "SEALED_EVIDENCE", OUTPUT_DIR);
 
+        StageSupport.step(context, "CMP-003").begin();
         String hash = StageSupport.publish(context, writer);
+        StageSupport.step(context, "CMP-003").succeed("Published and pointer advanced");
+        StageSupport.nextAction(context, "Run: bootshift resolve-target --target auto");
         context.stateMachine().transition(RunState.COMPATIBILITY_REGISTRY_READY,
                 candidateLines.size() + " candidate line(s)");
         context.runStateStore().updateState(context.run().runId(),

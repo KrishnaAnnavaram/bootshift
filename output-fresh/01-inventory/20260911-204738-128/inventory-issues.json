@@ -1,0 +1,58 @@
+{
+  "pipeline_stage" : "01-inventory",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:47:38.238462700Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "issue_count" : 4,
+  "issues" : [ {
+    "kind" : "CREDENTIAL_IN_SOURCE",
+    "path" : "department-service/src/main/resources/application.properties",
+    "detail" : "Line 2 contains what looks like an embedded credential",
+    "handling" : "Value is never stored in artifacts; only its presence and location are recorded",
+    "file_id" : "FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "line" : 2,
+    "redacted_sample" : "#spring.data.mongodb.uri=mongodb+srv://REDACTED:REDACTED@<cluster>.mongodb.net/?retryWrites=true&w=majority",
+    "evidence_policy" : "NEVER_STORE_PLAINTEXT"
+  }, {
+    "kind" : "CREDENTIAL_IN_SOURCE",
+    "path" : "employee-service/src/main/resources/application.properties",
+    "detail" : "Line 3 contains what looks like an embedded credential",
+    "handling" : "Value is never stored in artifacts; only its presence and location are recorded",
+    "file_id" : "FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "line" : 3,
+    "redacted_sample" : "#spring.data.mongodb.uri=mongodb+srv://REDACTED:REDACTED@<cluster>.mongodb.net/?retryWrites=true&w=majority",
+    "evidence_policy" : "NEVER_STORE_PLAINTEXT"
+  }, {
+    "kind" : "CREDENTIAL_IN_SOURCE",
+    "path" : "report-service/src/main/resources/application.properties",
+    "detail" : "Line 1 contains what looks like an embedded credential",
+    "handling" : "Value is never stored in artifacts; only its presence and location are recorded",
+    "file_id" : "FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "line" : 1,
+    "redacted_sample" : "#spring.data.mongodb.uri=mongodb+srv://REDACTED:REDACTED@<cluster>.mongodb.net/?retryWrites=true&w=majority",
+    "evidence_policy" : "NEVER_STORE_PLAINTEXT"
+  }, {
+    "kind" : "CREDENTIAL_IN_SOURCE",
+    "path" : "sheduler-service/src/main/resources/application.properties",
+    "detail" : "Line 1 contains what looks like an embedded credential",
+    "handling" : "Value is never stored in artifacts; only its presence and location are recorded",
+    "file_id" : "FILE-01M293KMMD7JG7F96V8H119FM3",
+    "line" : 1,
+    "redacted_sample" : "#spring.data.mongodb.uri=mongodb+srv://REDACTED:REDACTED@<cluster>.mongodb.net/?retryWrites=true&w=majority",
+    "evidence_policy" : "NEVER_STORE_PLAINTEXT"
+  } ]
+}

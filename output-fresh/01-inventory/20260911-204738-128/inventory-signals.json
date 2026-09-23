@@ -1,0 +1,1171 @@
+{
+  "pipeline_stage" : "01-inventory",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:47:38.233300900Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "signal_count" : 104,
+  "definitions" : [ {
+    "note" : "Jakarta EE relocation candidate",
+    "category" : "NAMESPACE",
+    "id" : "JAVAX_NAMESPACE"
+  }, {
+    "note" : "Already on the Jakarta namespace",
+    "category" : "NAMESPACE",
+    "id" : "JAKARTA_NAMESPACE"
+  }, {
+    "note" : "Removed in Spring Security 6",
+    "category" : "SECURITY",
+    "id" : "SPRING_SECURITY_LEGACY"
+  }, {
+    "note" : "Deprecated in Spring Boot 3.4 in favour of the bean-override annotations",
+    "category" : "TEST",
+    "id" : "MOCK_BEAN"
+  }, {
+    "note" : "JUnit 4 constructs; test-infrastructure migration edge",
+    "category" : "TEST",
+    "id" : "JUNIT4"
+  }, {
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "category" : "CLOUD",
+    "id" : "SPRING_CLOUD"
+  }, {
+    "note" : "External configuration source affects binding observations",
+    "category" : "CLOUD",
+    "id" : "CONFIG_SERVER"
+  }, {
+    "note" : "Service discovery participation",
+    "category" : "CLOUD",
+    "id" : "EUREKA"
+  }, {
+    "note" : "Legacy bootstrap context; removed by default in Spring Cloud 2020+",
+    "category" : "CLOUD",
+    "id" : "BOOTSTRAP_PROPERTIES"
+  }, {
+    "note" : "Servlet container substitution",
+    "category" : "RUNTIME",
+    "id" : "UNDERTOW"
+  }, {
+    "note" : "Custom serialization is a differential dimension",
+    "category" : "SERIALIZATION",
+    "id" : "JACKSON_CUSTOM"
+  }, {
+    "note" : "ORM behaviour is a differential dimension",
+    "category" : "PERSISTENCE",
+    "id" : "HIBERNATE_JPA"
+  }, {
+    "note" : "Document store semantics",
+    "category" : "PERSISTENCE",
+    "id" : "MONGODB"
+  }, {
+    "note" : "Schema migration tooling",
+    "category" : "PERSISTENCE",
+    "id" : "FLYWAY_LIQUIBASE"
+  }, {
+    "note" : "Message broker participation",
+    "category" : "MESSAGING",
+    "id" : "KAFKA_RABBIT"
+  }, {
+    "note" : "Cache semantics",
+    "category" : "CACHE",
+    "id" : "REDIS"
+  }, {
+    "note" : "Batch job semantics",
+    "category" : "BATCH",
+    "id" : "SPRING_BATCH"
+  }, {
+    "note" : "Scheduled behaviour",
+    "category" : "SCHEDULING",
+    "id" : "SCHEDULING"
+  }, {
+    "note" : "Replaced by AutoConfiguration.imports in Boot 3",
+    "category" : "AUTOCONFIG",
+    "id" : "SPRING_FACTORIES"
+  }, {
+    "note" : "Boot 2.7+ auto-configuration registration",
+    "category" : "AUTOCONFIG",
+    "id" : "AUTOCONFIGURATION_IMPORTS"
+  }, {
+    "note" : "Dynamic behaviour that static analysis cannot fully resolve",
+    "category" : "REFLECTION",
+    "id" : "REFLECTION"
+  }, {
+    "note" : "Circuit breaker configuration is version-sensitive",
+    "category" : "RESILIENCE",
+    "id" : "RESILIENCE4J"
+  }, {
+    "note" : "Reactive stack present",
+    "category" : "RUNTIME",
+    "id" : "WEBFLUX"
+  }, {
+    "note" : "Annotation processor with JDK-version coupling",
+    "category" : "BUILD",
+    "id" : "LOMBOK"
+  }, {
+    "note" : "WAR packaging changes the deployment and startup model",
+    "category" : "BUILD",
+    "id" : "WAR_PACKAGING"
+  }, {
+    "note" : "BDD test infrastructure",
+    "category" : "TEST",
+    "id" : "CUCUMBER"
+  }, {
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "category" : "INTERNAL",
+    "id" : "INTERNAL_STARTER"
+  } ],
+  "signals" : [ {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMF7CFD35TD13PQVETBP",
+    "path" : "configuaration-server/mvnw.cmd",
+    "module" : "configuaration-server",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMFHTGV1TKC7SBHF4YM3",
+    "path" : "configuaration-server/pom.xml",
+    "module" : "configuaration-server",
+    "occurrences" : 3,
+    "first_line" : 27,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMFHTGV1TKC7SBHF4YM3",
+    "path" : "configuaration-server/pom.xml",
+    "module" : "configuaration-server",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMFHTGV1TKC7SBHF4YM3",
+    "path" : "configuaration-server/pom.xml",
+    "module" : "configuaration-server",
+    "occurrences" : 1,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMFR9RCD69ZD3CZBFBME",
+    "path" : "configuaration-server/src/main/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplication.java",
+    "module" : "configuaration-server",
+    "occurrences" : 2,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMFR9RCD69ZD3CZBFBME",
+    "path" : "configuaration-server/src/main/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplication.java",
+    "module" : "configuaration-server",
+    "occurrences" : 1,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMFR9RCD69ZD3CZBFBME",
+    "path" : "configuaration-server/src/main/java/com/aura/vihanga/configuarationserver/ConfiguarationServerApplication.java",
+    "module" : "configuaration-server",
+    "occurrences" : 1,
+    "first_line" : 9,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMFRB15PGDGWNFE830H0",
+    "path" : "configuaration-server/src/main/resources/application.properties",
+    "module" : "configuaration-server",
+    "occurrences" : 2,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMFRB15PGDGWNFE830H0",
+    "path" : "configuaration-server/src/main/resources/application.properties",
+    "module" : "configuaration-server",
+    "occurrences" : 3,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMG3JT029NYAY2FTD6W7",
+    "path" : "department-service/mvnw.cmd",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "module" : "department-service",
+    "occurrences" : 4,
+    "first_line" : 31,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "module" : "department-service",
+    "occurrences" : 4,
+    "first_line" : 43,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CUCUMBER",
+    "category" : "TEST",
+    "note" : "BDD test infrastructure",
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "module" : "department-service",
+    "occurrences" : 3,
+    "first_line" : 53,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMG7BGNJX207Q7C4RAC1",
+    "path" : "department-service/pom.xml",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/controller/DepartmentController.java",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMGDNXYE4A6RTBK3FTS2",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/DepartmentServiceApplication.java",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMGDNXYE4A6RTBK3FTS2",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/DepartmentServiceApplication.java",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 8,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMGEFW8KXW7ASJ1GBZ1P",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/dto/DepartmentResponse.java",
+    "module" : "department-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMGEP2KGNZEPR9B230QP",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/model/Department.java",
+    "module" : "department-service",
+    "occurrences" : 2,
+    "first_line" : 8,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMGEP2KGNZEPR9B230QP",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/model/Department.java",
+    "module" : "department-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMGEWWB67S32RY5XQZAQ",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/repository/DepartmentRepository.java",
+    "module" : "department-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMGN4T35429VFBJ4G69X",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/service/implementation/DepartmentServiceImpl.java",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMGQK20GSF5Z86TK38N3",
+    "path" : "department-service/src/main/java/com/aura/vihanga/departmentservice/utill/StandardResponse.java",
+    "module" : "department-service",
+    "occurrences" : 3,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMGQ49MA3YDFXCAVYT25",
+    "path" : "department-service/src/main/resources/application.properties",
+    "module" : "department-service",
+    "occurrences" : 3,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "path" : "department-service/src/main/resources/bootstrap.properties",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "BOOTSTRAP_PROPERTIES",
+    "category" : "CLOUD",
+    "note" : "Legacy bootstrap context; removed by default in Spring Cloud 2020+",
+    "file_id" : "FILE-01M293KMGVDGH26BHW0A4TEQX3",
+    "path" : "department-service/src/main/resources/bootstrap.properties",
+    "module" : "department-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMH69QPJTP4FND9N1Z08",
+    "path" : "discovery-service/mvnw.cmd",
+    "module" : "discovery-service",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMHCA19Y0Z6WYWMB1ZHP",
+    "path" : "discovery-service/pom.xml",
+    "module" : "discovery-service",
+    "occurrences" : 2,
+    "first_line" : 27,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMHCA19Y0Z6WYWMB1ZHP",
+    "path" : "discovery-service/pom.xml",
+    "module" : "discovery-service",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMHCA19Y0Z6WYWMB1ZHP",
+    "path" : "discovery-service/pom.xml",
+    "module" : "discovery-service",
+    "occurrences" : 1,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMHCBZAHRT6EP02269G2",
+    "path" : "discovery-service/src/main/java/com/aura/vihanga/discoveryservice/DiscoveryServiceApplication.java",
+    "module" : "discovery-service",
+    "occurrences" : 1,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMHCBZAHRT6EP02269G2",
+    "path" : "discovery-service/src/main/java/com/aura/vihanga/discoveryservice/DiscoveryServiceApplication.java",
+    "module" : "discovery-service",
+    "occurrences" : 1,
+    "first_line" : 8,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMHH0Q3JJF455SZE2KMV",
+    "path" : "discovery-service/src/main/resources/application.properties",
+    "module" : "discovery-service",
+    "occurrences" : 2,
+    "first_line" : 2,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMHS3EPWTNQZEJQYW26W",
+    "path" : "employee-service/mvnw.cmd",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "module" : "employee-service",
+    "occurrences" : 5,
+    "first_line" : 31,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 47,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CUCUMBER",
+    "category" : "TEST",
+    "note" : "BDD test infrastructure",
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 74,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMHWFYFN50AEECQ5253T",
+    "path" : "employee-service/pom.xml",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMHW2XHC86DNARV80H2F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/config/WebClientConfig.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMHW2XHC86DNARV80H2F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/config/WebClientConfig.java",
+    "module" : "employee-service",
+    "occurrences" : 5,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "RESILIENCE4J",
+    "category" : "RESILIENCE",
+    "note" : "Circuit breaker configuration is version-sensitive",
+    "file_id" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/controller/EmployeeController.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 9,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/controller/EmployeeController.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 12,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJ4RA08EW4B19ZMVT4F",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/DepartmentResponse.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJ47NRKYW0F0AWSNQKP",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/EmployeeResponse.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJ4TRNPRVRZV8RK1YQX",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/dto/EmployeeSalaryResponse.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/EmployeeServiceApplication.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMJ4SSS0CN1Q53RK5M5S",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/EmployeeServiceApplication.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMJA1HAWMKYGWH5CT0CR",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/model/Employee.java",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJA1HAWMKYGWH5CT0CR",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/model/Employee.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMJBW0GEZ4Y5CSGJEZSQ",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/repository/EmployeeRepository.java",
+    "module" : "employee-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMJCX1TPVP8Y69T22FNH",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/repository/EmployeeSearchRepository.java",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJCX1TPVP8Y69T22FNH",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/repository/EmployeeSearchRepository.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMJDY2BQ44TD7SRYR25Q",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/implementation/EmployeeServiceImpl.java",
+    "module" : "employee-service",
+    "occurrences" : 3,
+    "first_line" : 17,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJDY2BQ44TD7SRYR25Q",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/implementation/EmployeeServiceImpl.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 12,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJDY1YK8ESJ4ZH30K3R",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/service/implementation/ExcelUploadImpl.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMJJN57E79Z3BJJCKM3H",
+    "path" : "employee-service/src/main/java/com/aura/vihanga/employeeservice/utill/StandardResponse.java",
+    "module" : "employee-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMJJF8H1R8T6CYJ28CC6",
+    "path" : "employee-service/src/main/resources/application.properties",
+    "module" : "employee-service",
+    "occurrences" : 3,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "path" : "employee-service/src/main/resources/bootstrap.properties",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "BOOTSTRAP_PROPERTIES",
+    "category" : "CLOUD",
+    "note" : "Legacy bootstrap context; removed by default in Spring Cloud 2020+",
+    "file_id" : "FILE-01M293KMJJKRA5CM7XFDCQW0T1",
+    "path" : "employee-service/src/main/resources/bootstrap.properties",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MOCK_BEAN",
+    "category" : "TEST",
+    "note" : "Deprecated in Spring Boot 3.4 in favour of the bean-override annotations",
+    "file_id" : "FILE-01M293KMJP44A4PRCW42ZXF930",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/controller/EmployeeControllerTest.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 28,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "JAVAX_NAMESPACE",
+    "category" : "NAMESPACE",
+    "note" : "Jakarta EE relocation candidate",
+    "file_id" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberConfig.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 13,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "JUNIT4",
+    "category" : "TEST",
+    "note" : "JUnit 4 constructs; test-infrastructure migration edge",
+    "file_id" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberConfig.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CUCUMBER",
+    "category" : "TEST",
+    "note" : "BDD test infrastructure",
+    "file_id" : "FILE-01M293KMJRRWQPBWR38A0WPHTM",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberSteps.java",
+    "module" : "employee-service",
+    "occurrences" : 3,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "JUNIT4",
+    "category" : "TEST",
+    "note" : "JUnit 4 constructs; test-infrastructure migration edge",
+    "file_id" : "FILE-01M293KMJW6EDT7SY36W8TM6VH",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/CucumberIntegrationTest.java",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CUCUMBER",
+    "category" : "TEST",
+    "note" : "BDD test infrastructure",
+    "file_id" : "FILE-01M293KMJW6EDT7SY36W8TM6VH",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/CucumberIntegrationTest.java",
+    "module" : "employee-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "JUNIT4",
+    "category" : "TEST",
+    "note" : "JUnit 4 constructs; test-infrastructure migration edge",
+    "file_id" : "FILE-01M293KMJYE7A9HQ01QSSJMCP4",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/repository/EmployeeRepositoryTest.java",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 9,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MOCK_BEAN",
+    "category" : "TEST",
+    "note" : "Deprecated in Spring Boot 3.4 in favour of the bean-override annotations",
+    "file_id" : "FILE-01M293KMJYW9DQ7J350WHQZR8T",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/service/EmployeeServiceTest.java",
+    "module" : "employee-service",
+    "occurrences" : 1,
+    "first_line" : 30,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMJYW9DQ7J350WHQZR8T",
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/service/EmployeeServiceTest.java",
+    "module" : "employee-service",
+    "occurrences" : 2,
+    "first_line" : 18,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMK7CFTXQ2T7SBBH1Z3X",
+    "path" : "report-service/mvnw.cmd",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "module" : "report-service",
+    "occurrences" : 4,
+    "first_line" : 35,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "module" : "report-service",
+    "occurrences" : 4,
+    "first_line" : 48,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMK784P6G5ZE3R6WF0Q6",
+    "path" : "report-service/pom.xml",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMKEJSA2EMYE246XXSB0",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/config/WebClientConfig.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMKEJSA2EMYE246XXSB0",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/config/WebClientConfig.java",
+    "module" : "report-service",
+    "occurrences" : 5,
+    "first_line" : 7,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "JAVAX_NAMESPACE",
+    "category" : "NAMESPACE",
+    "note" : "Jakarta EE relocation candidate",
+    "file_id" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/controller/EmployeeReportController.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 12,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/controller/EmployeeReportController.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 6,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMKES019390KSZC93XMK",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/dto/DepartmentResponse.java",
+    "module" : "report-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMKEQRR7XGRZ8RGDSFPM",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/dto/EmployeeSalaryResponse.java",
+    "module" : "report-service",
+    "occurrences" : 4,
+    "first_line" : 3,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMKEMN9VJ9Z2AXX6Y42F",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/entity/Employee.java",
+    "module" : "report-service",
+    "occurrences" : 2,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMKEMN9VJ9Z2AXX6Y42F",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/entity/Employee.java",
+    "module" : "report-service",
+    "occurrences" : 4,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMKEQV3WG8EBWP8NZ59P",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/ReportServiceApplication.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMKEQV3WG8EBWP8NZ59P",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/ReportServiceApplication.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 8,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMKMMCA8QVSNK7A01R1H",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/repository/EmployeeReportRepository.java",
+    "module" : "report-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMKN2B7XXN0FV37WC2GW",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/service/implementation/EmployeeReportServiceImpl.java",
+    "module" : "report-service",
+    "occurrences" : 3,
+    "first_line" : 18,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMKN2B7XXN0FV37WC2GW",
+    "path" : "report-service/src/main/java/com/aura/vihanga/reportservice/service/implementation/EmployeeReportServiceImpl.java",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMKP3K1M4JGNTZRQ1ZWV",
+    "path" : "report-service/src/main/resources/application.properties",
+    "module" : "report-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "path" : "report-service/src/main/resources/bootstrap.properties",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "BOOTSTRAP_PROPERTIES",
+    "category" : "CLOUD",
+    "note" : "Legacy bootstrap context; removed by default in Spring Cloud 2020+",
+    "file_id" : "FILE-01M293KMKP12YK5RY6WZZE0GP5",
+    "path" : "report-service/src/main/resources/bootstrap.properties",
+    "module" : "report-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WEBFLUX",
+    "category" : "RUNTIME",
+    "note" : "Reactive stack present",
+    "file_id" : "FILE-01M293KMKZM9MR6B5T5JACMV24",
+    "path" : "sheduler-service/mvnw.cmd",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 145,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SPRING_CLOUD",
+    "category" : "CLOUD",
+    "note" : "Spring Cloud release train is version-locked to Spring Boot",
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "module" : "sheduler-service",
+    "occurrences" : 4,
+    "first_line" : 31,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "module" : "sheduler-service",
+    "occurrences" : 4,
+    "first_line" : 44,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "WAR_PACKAGING",
+    "category" : "BUILD",
+    "note" : "WAR packaging changes the deployment and startup model",
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 14,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "INTERNAL_STARTER",
+    "category" : "INTERNAL",
+    "note" : "Possible organization-owned dependency requiring a compatibility profile",
+    "file_id" : "FILE-01M293KMM4K57HZ35K8A6JH3SX",
+    "path" : "sheduler-service/pom.xml",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 11,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMM49AG28CGFAAZM820B",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/entity/Employee.java",
+    "module" : "sheduler-service",
+    "occurrences" : 2,
+    "first_line" : 10,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "LOMBOK",
+    "category" : "BUILD",
+    "note" : "Annotation processor with JDK-version coupling",
+    "file_id" : "FILE-01M293KMM49AG28CGFAAZM820B",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/entity/Employee.java",
+    "module" : "sheduler-service",
+    "occurrences" : 4,
+    "first_line" : 5,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "MONGODB",
+    "category" : "PERSISTENCE",
+    "note" : "Document store semantics",
+    "file_id" : "FILE-01M293KMM8EYSKH3AZ40XJWNQF",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/repository/EmployeeSchedulerRepository.java",
+    "module" : "sheduler-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SCHEDULING",
+    "category" : "SCHEDULING",
+    "note" : "Scheduled behaviour",
+    "file_id" : "FILE-01M293KMMAB58HW0EGKJT7HDN2",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/service/implementation/WomenDaySchedulerImpl.java",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 19,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "SCHEDULING",
+    "category" : "SCHEDULING",
+    "note" : "Scheduled behaviour",
+    "file_id" : "FILE-01M293KMMASBHGDXCHV15B3YYT",
+    "path" : "sheduler-service/src/main/java/com/aura/vihanga/shedulerservice/ShedulerServiceApplication.java",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 8,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "EUREKA",
+    "category" : "CLOUD",
+    "note" : "Service discovery participation",
+    "file_id" : "FILE-01M293KMMD7JG7F96V8H119FM3",
+    "path" : "sheduler-service/src/main/resources/application.properties",
+    "module" : "sheduler-service",
+    "occurrences" : 3,
+    "first_line" : 4,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "CONFIG_SERVER",
+    "category" : "CLOUD",
+    "note" : "External configuration source affects binding observations",
+    "file_id" : "FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "path" : "sheduler-service/src/main/resources/bootstrap.properties",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  }, {
+    "signal_id" : "BOOTSTRAP_PROPERTIES",
+    "category" : "CLOUD",
+    "note" : "Legacy bootstrap context; removed by default in Spring Cloud 2020+",
+    "file_id" : "FILE-01M293KMMDQDGXKDXYKSRPFNHZ",
+    "path" : "sheduler-service/src/main/resources/bootstrap.properties",
+    "module" : "sheduler-service",
+    "occurrences" : 1,
+    "first_line" : 1,
+    "classification" : "SIGNAL_NOT_CONCLUSION"
+  } ]
+}

@@ -1,0 +1,162 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M294PAD5FG2YMJ1M6W52P4DT",
+  "stage_id" : "10-characterization",
+  "stage_name" : "CharacterizationStage",
+  "edge_id" : null,
+  "purpose" : "Establish behavioural contracts for migration-sensitive impacts before they change",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:06:34.533091200Z",
+  "finished_at" : "2026-09-11T21:10:21.862695400Z",
+  "duration_ms" : 227329,
+  "state_before" : "IMPACT_ANALYZED",
+  "state_after" : "CHARACTERIZATION_COMPLETE",
+  "status" : "SUCCESS",
+  "summary" : "82 executable scenario(s): 36 frozen against OLD, 46 unobservable, 0 unexecuted; 506 characterization contract(s): 0 frozen, 0 mapped to existing tests, 506 awaiting OLD, 0 unobservable",
+  "attempt_directory" : "20260911-210634-575",
+  "declared_preconditions" : [ "IMPACT_ANALYZED" ],
+  "precondition_results" : [ {
+    "precondition" : "state:IMPACT_ANALYZED",
+    "satisfied" : true,
+    "detail" : "Proven by 09-impact/impact-report.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:09-impact/impact-report.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:03-graph/application-graph.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:04-baseline/baseline-runtime.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:04-baseline/baseline-tests.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "09-impact/impact-report.json", "03-graph/application-graph.json", "04-baseline/baseline-runtime.json", "04-baseline/baseline-tests.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "09-impact/impact-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\09-impact\\20260911-210631-780\\impact-report.json",
+    "present" : true,
+    "hash" : "d4d1e5f89b22ba43f6a52180e2e366672291c32c5cd3f35507b901c99aab086f"
+  }, {
+    "artifact" : "03-graph/application-graph.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\application-graph.json",
+    "present" : true,
+    "hash" : "f7a223fda7e0102926c19bb22f4dc1e9d6df5de8d908cfe717a90aed56b4f7d3"
+  }, {
+    "artifact" : "04-baseline/baseline-runtime.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\04-baseline\\20260911-204942-332\\baseline-runtime.json",
+    "present" : true,
+    "hash" : "66cd94939775ab08390a81eb66710a99e84eb63fa3bdfab3e685b5dfe8db23d8"
+  }, {
+    "artifact" : "04-baseline/baseline-tests.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\04-baseline\\20260911-204942-332\\baseline-tests.json",
+    "present" : true,
+    "hash" : "c1daa4e5ef91958719c13ee4bff86f934d1c16ab9a46744ec23197779b0a63e3"
+  } ],
+  "declared_steps" : [ "CHR-001", "CHR-002", "CHR-003" ],
+  "executed_steps" : [ {
+    "step_id" : "CHR-001",
+    "sequence" : 1,
+    "name" : "Identify unprotected behaviour",
+    "purpose" : "Behaviour with no test covering it is what a differential later has to speak for",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:06:34.553000200Z",
+    "finished_at" : "2026-09-11T21:06:34.575514900Z",
+    "duration_ms" : 22,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "CHR-002",
+    "sequence" : 2,
+    "name" : "Execute scenarios against the pre-migration application",
+    "purpose" : "A scenario is frozen only when it actually ran on OLD; anything else is NOT_EXECUTED",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:06:34.575514900Z",
+    "finished_at" : "2026-09-11T21:10:21.862695400Z",
+    "duration_ms" : 227287,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "CHR-003",
+    "sequence" : 3,
+    "name" : "Publish characterization scenarios",
+    "purpose" : "The frozen observations become the oracle the migration is compared against",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:10:21.851587400Z",
+    "finished_at" : "2026-09-11T21:10:21.853601400Z",
+    "duration_ms" : 2,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ "46 scenario(s) are unobservable in this environment and are recorded as explicit gaps", "506 probe(s) await execution against the original application; they cannot act as an oracle until then" ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "characterization-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-report.json",
+    "hash" : "cb0ad5b597be2f0a6754ad2ce0a7a1d62d15e7f5be9f3c1c9ee4acfeccbe8847"
+  }, {
+    "name" : "characterization-contracts.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-contracts.json",
+    "hash" : "30475cb8381d558f8dd1c84b5c5525bc256d1a350ea41d530bb59633b9558fc9"
+  }, {
+    "name" : "characterization-scenarios.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-scenarios.json",
+    "hash" : "841e790982dcf9d7c75fc0d5cab829112a434f8fbcc1126fbd8da7c045c27944"
+  }, {
+    "name" : "characterization-old-observations.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-old-observations.json",
+    "hash" : "d4d76e8830472e66792ff5edb1939e0ed31f4fcd03b85bb11c444d0f0886c4b3"
+  }, {
+    "name" : "characterization-gaps.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\characterization-gaps.json",
+    "hash" : "bcb29f4815338f06896d7eb1f25d1f9de948092ea4d01ee3301c31628c20f435"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\10-characterization\\20260911-210634-575\\manifest.json",
+    "hash" : "cd0202d4b1748cc9f514288defcad15aeac06e25a97be2a71aa8b8708d0a9f64"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "673705365",
+  "next_action" : "Run: bootshift plan",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

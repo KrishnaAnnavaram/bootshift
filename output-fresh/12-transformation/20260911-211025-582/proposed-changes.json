@@ -1,0 +1,83 @@
+{
+  "pipeline_stage" : "12-transformation",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:10:26.367622700Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "count" : 3,
+  "proposals" : [ {
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberConfig.java",
+    "new_path" : null,
+    "operation" : "MODIFY",
+    "recipe_id" : "test.junit4-to-jupiter",
+    "rationale" : "Applied 2 test-infrastructure replacement(s)",
+    "content_length" : 1196,
+    "attributes" : {
+      "transformer" : "BOOTSHIFT_TEST_FRAMEWORK",
+      "base_hash" : "75454aa7c8376f7c7b5abb23dc9dc6c8b82f86319a898e85b4d64b048c1e4981",
+      "replacements" : "2"
+    }
+  }, {
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/cucumberglue/CucumberSteps.java",
+    "new_path" : null,
+    "operation" : "MODIFY",
+    "recipe_id" : "test.junit4-to-jupiter",
+    "rationale" : "Applied 1 test-infrastructure replacement(s)",
+    "content_length" : 5637,
+    "attributes" : {
+      "transformer" : "BOOTSHIFT_TEST_FRAMEWORK",
+      "base_hash" : "f63fa6b9047bbae0a1bdafaa656fa99f9f6227a342804cef9de3e4107a5cd128",
+      "replacements" : "1"
+    }
+  }, {
+    "path" : "employee-service/src/test/java/com/aura/vihanga/employeeservice/repository/EmployeeRepositoryTest.java",
+    "new_path" : null,
+    "operation" : "MODIFY",
+    "recipe_id" : "test.junit4-to-jupiter",
+    "rationale" : "Applied 1 test-infrastructure replacement(s)",
+    "content_length" : 1844,
+    "attributes" : {
+      "transformer" : "BOOTSHIFT_TEST_FRAMEWORK",
+      "base_hash" : "703f881573e6f527c547dde37fec452aa7c46de3019a08ef68deda460fb83211",
+      "replacements" : "1"
+    }
+  } ],
+  "outcomes" : [ {
+    "change_id" : "CHANGE-000001",
+    "file_id" : "FILE-01M293KMJR8VBAWEK2Y479H2JT",
+    "status" : "APPLIED",
+    "reason" : null,
+    "before_sha256" : "75454aa7c8376f7c7b5abb23dc9dc6c8b82f86319a898e85b4d64b048c1e4981",
+    "after_sha256" : "7d6b7c84a0a3fc55643a6deddd69a965a731adbdac165244ec52d8d22445ac3a",
+    "patch_ref" : "CHANGE-000001.patch"
+  }, {
+    "change_id" : "CHANGE-000002",
+    "file_id" : "FILE-01M293KMJRRWQPBWR38A0WPHTM",
+    "status" : "APPLIED",
+    "reason" : null,
+    "before_sha256" : "f63fa6b9047bbae0a1bdafaa656fa99f9f6227a342804cef9de3e4107a5cd128",
+    "after_sha256" : "4323dec5d8d14a9d875744d1456c630c54bebd2b798dc2c0a22e62b6e8248f38",
+    "patch_ref" : "CHANGE-000002.patch"
+  }, {
+    "change_id" : "CHANGE-000003",
+    "file_id" : "FILE-01M293KMJYE7A9HQ01QSSJMCP4",
+    "status" : "APPLIED",
+    "reason" : null,
+    "before_sha256" : "703f881573e6f527c547dde37fec452aa7c46de3019a08ef68deda460fb83211",
+    "after_sha256" : "12b7af034354937433f7f7b7a894bdaefd7bf6efa44176532f4d911ff5b39a60",
+    "patch_ref" : "CHANGE-000003.patch"
+  } ]
+}

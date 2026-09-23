@@ -1,0 +1,140 @@
+{
+  "schema_version" : "1.0.0",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "attempt_id" : "01M295JDYYP49E1QNGJ48ZJ5FZ",
+  "stage_id" : "12-transformation",
+  "stage_name" : "TransformationStage",
+  "edge_id" : "EDGE-2-PATCH",
+  "purpose" : "Apply authorized deterministic transformations for the current migration edge",
+  "trigger" : "PIPELINE",
+  "trigger_detail" : null,
+  "started_at" : "2026-09-11T21:21:55.686362400Z",
+  "finished_at" : "2026-09-11T21:21:57.178951100Z",
+  "duration_ms" : 1492,
+  "state_before" : "EDGE_COMPLETE",
+  "state_after" : "EDGE_COMPLETE",
+  "status" : "SUCCESS",
+  "summary" : "Edge EDGE-2-PATCH: 16 applied, 0 rejected, 0 failed; ledger head 90eb766c9357",
+  "attempt_directory" : "20260911-212155-953",
+  "declared_preconditions" : [ "PLAN_FROZEN" ],
+  "precondition_results" : [ {
+    "precondition" : "state:PLAN_FROZEN",
+    "satisfied" : true,
+    "detail" : "Proven by 11-plan/edge-plan.json",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:11-plan/edge-plan.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:06-target/target-state.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  }, {
+    "precondition" : "artifact:03-graph/file-registry.json",
+    "satisfied" : true,
+    "detail" : "Published and readable",
+    "remediation" : null
+  } ],
+  "declared_inputs" : [ "11-plan/edge-plan.json", "06-target/target-state.json", "03-graph/file-registry.json" ],
+  "resolved_inputs" : [ {
+    "artifact" : "11-plan/edge-plan.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\11-plan\\20260911-211022-294\\edge-plan.json",
+    "present" : true,
+    "hash" : "0d78110cfed9c131c6a734d89115a3f8171e97840273e88ce5322daf5dede225"
+  }, {
+    "artifact" : "06-target/target-state.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\06-target\\20260911-205932-627\\target-state.json",
+    "present" : true,
+    "hash" : "93b39e231b7ae4b4f3c27ed1d68307dd60e63ba2b017ddebabd418a77b64b245"
+  }, {
+    "artifact" : "03-graph/file-registry.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\03-graph\\20260911-204941-679\\file-registry.json",
+    "present" : true,
+    "hash" : "74125cbe332c476cdfd48469633345b35ed9f6e093ebdfc0a0939a606bb40c1e"
+  } ],
+  "declared_steps" : [ "TRF-001", "TRF-002", "TRF-003" ],
+  "executed_steps" : [ {
+    "step_id" : "TRF-001",
+    "sequence" : 1,
+    "name" : "Load the frozen plan and open the mutation gateway",
+    "purpose" : "Only recipes the plan scheduled may run, and only through the gateway",
+    "status" : "SUCCESS",
+    "status_reason" : "Upstream inputs resolved",
+    "started_at" : "2026-09-11T21:21:55.693508500Z",
+    "finished_at" : "2026-09-11T21:21:55.953079900Z",
+    "duration_ms" : 259,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "TRF-002",
+    "sequence" : 2,
+    "name" : "Apply scheduled recipes",
+    "purpose" : "Every proposal is hashed before and after; the gateway decides, the recipe does not",
+    "status" : "SUCCESS",
+    "status_reason" : "Completed; the stage reported SUCCESS",
+    "started_at" : "2026-09-11T21:21:55.953079900Z",
+    "finished_at" : "2026-09-11T21:21:57.178951100Z",
+    "duration_ms" : 1225,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  }, {
+    "step_id" : "TRF-003",
+    "sequence" : 3,
+    "name" : "Publish the transformation record",
+    "purpose" : "Applied, rejected and residual are recorded separately",
+    "status" : "SUCCESS",
+    "status_reason" : "Published and pointer advanced",
+    "started_at" : "2026-09-11T21:21:57.178951100Z",
+    "finished_at" : "2026-09-11T21:21:57.178951100Z",
+    "duration_ms" : 0,
+    "inputs" : [ ],
+    "outputs" : [ ],
+    "evidence_refs" : [ ],
+    "details" : { },
+    "error" : null
+  } ],
+  "unexecuted_steps" : [ ],
+  "commands" : [ ],
+  "tool_invocations" : [ ],
+  "decisions" : [ ],
+  "evidence_references" : [ ],
+  "document_references" : [ ],
+  "migration_fact_references" : [ ],
+  "impact_references" : [ ],
+  "mutation_summary" : { },
+  "validation_summary" : { },
+  "retries" : [ ],
+  "fallbacks" : [ ],
+  "warnings" : [ ],
+  "errors" : [ ],
+  "blind_spots" : [ ],
+  "outputs" : [ {
+    "name" : "transformation-report.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\12-transformation\\20260911-212155-953\\transformation-report.json",
+    "hash" : "34f8c726c0dafe3d80be9446cc9e8c7db11336afb6380cb310c30d601003e0ac"
+  }, {
+    "name" : "proposed-changes.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\12-transformation\\20260911-212155-953\\proposed-changes.json",
+    "hash" : "accc07ac69527193e859eeee5317c90f910ca09ed565b895ef1bbcd7729c6c9e"
+  }, {
+    "name" : "manifest.json",
+    "path" : "E:\\Virtusa Projects\\bootshift\\output-fresh\\12-transformation\\20260911-212155-953\\manifest.json",
+    "hash" : "f2d5199d4b512aa152c9302e3b60ef0b709d1506654ce5ab0c81b2de360be8ee"
+  } ],
+  "metrics" : { },
+  "primary_artifact_hash" : "-2061051739",
+  "next_action" : "Run: bootshift validate --edge <edge>",
+  "stop_reason" : null,
+  "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+  "tool_version" : "1.0.0",
+  "rendering_error" : null
+}

@@ -1,0 +1,385 @@
+{
+  "pipeline_stage" : "03-graph",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T20:49:41.916585800Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "view" : "EndpointGraph",
+  "node_count" : 20,
+  "edge_count" : 10,
+  "nodes" : [ {
+    "id" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#createDepartment(Department)",
+    "type" : "METHOD",
+    "name" : "createDepartment",
+    "fqn" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment",
+    "module" : "department-service",
+    "packageName" : "com.aura.vihanga.departmentservice.controller",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "symbolId" : "SYM-01M293QD3JP7XSNQ9XYQRCGFGJ",
+    "signature" : "ResponseEntity<StandardResponse> createDepartment(@RequestBody Department department)",
+    "lineStart" : 23,
+    "lineEnd" : 32,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "PostMapping(\"department\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:POST /api/v1/department",
+    "type" : "ENDPOINT",
+    "name" : "POST /api/v1/department",
+    "fqn" : "/api/v1/department",
+    "module" : "department-service",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "POST",
+      "path" : "/api/v1/department",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#getDepartment(String)",
+    "type" : "METHOD",
+    "name" : "getDepartment",
+    "fqn" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment",
+    "module" : "department-service",
+    "packageName" : "com.aura.vihanga.departmentservice.controller",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "symbolId" : "SYM-01M293QD3KS86EDCAWMR3ZC62A",
+    "signature" : "DepartmentResponse getDepartment(@PathVariable(\"id\") String departmentId)",
+    "lineStart" : 34,
+    "lineEnd" : 37,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "GetMapping(\"department/{id}\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/department/{id}",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/department/{id}",
+    "fqn" : "/api/v1/department/{id}",
+    "module" : "department-service",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/department/{id}",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#getAllDepartments(double)",
+    "type" : "METHOD",
+    "name" : "getAllDepartments",
+    "fqn" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments",
+    "module" : "department-service",
+    "packageName" : "com.aura.vihanga.departmentservice.controller",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "symbolId" : "SYM-01M293QD3KWZ3R0A8JXFW034TX",
+    "signature" : "List<DepartmentResponse> getAllDepartments(@PathVariable(\"minSalary\") double minSalary)",
+    "lineStart" : 39,
+    "lineEnd" : 44,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "GetMapping(\"department/salary/{minSalary}\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/department/salary/{minSalary}",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/department/salary/{minSalary}",
+    "fqn" : "/api/v1/department/salary/{minSalary}",
+    "module" : "department-service",
+    "fileId" : "FILE-01M293KMG7QDRR1WZKFEEKQSF5",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/department/salary/{minSalary}",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#createEmployee(Employee)",
+    "type" : "METHOD",
+    "name" : "createEmployee",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3PQVQCWVQTBP5DNHVK",
+    "signature" : "ResponseEntity<StandardResponse> createEmployee(@RequestBody Employee employee)",
+    "lineStart" : 31,
+    "lineEnd" : 39,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "PostMapping(\"employee\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:POST /api/v1/employee",
+    "type" : "ENDPOINT",
+    "name" : "POST /api/v1/employee",
+    "fqn" : "/api/v1/employee",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "POST",
+      "path" : "/api/v1/employee",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#uploadEmployee(MultipartFile)",
+    "type" : "METHOD",
+    "name" : "uploadEmployee",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3P2H1HNE9BPZT95RG6",
+    "signature" : "ResponseEntity<StandardResponse> uploadEmployee(@RequestParam(\"file\") MultipartFile multipartFile)",
+    "lineStart" : 41,
+    "lineEnd" : 48,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "PostMapping(\"employee/excelUpload\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:POST /api/v1/employee/excelUpload",
+    "type" : "ENDPOINT",
+    "name" : "POST /api/v1/employee/excelUpload",
+    "fqn" : "/api/v1/employee/excelUpload",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "POST",
+      "path" : "/api/v1/employee/excelUpload",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#searchEmployees(String,String)",
+    "type" : "METHOD",
+    "name" : "searchEmployees",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3P8E8CFJ59GJNY37K2",
+    "signature" : "ResponseEntity<StandardResponse> searchEmployees(@RequestParam(\"name\") String name, @RequestParam(value = \"department\", required = false) String department)",
+    "lineStart" : 50,
+    "lineEnd" : 59,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "GetMapping(\"employee/search\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/employee/search",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/employee/search",
+    "fqn" : "/api/v1/employee/search",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/employee/search",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployee(String)",
+    "type" : "METHOD",
+    "name" : "getEmployee",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3PX5GSQP1SE97K5HMV",
+    "signature" : "ResponseEntity<StandardResponse> getEmployee(@PathVariable(\"id\") String employeeId)",
+    "lineStart" : 61,
+    "lineEnd" : 69,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "GetMapping(\"employee/{id}\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/employee/{id}",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/employee/{id}",
+    "fqn" : "/api/v1/employee/{id}",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/employee/{id}",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployeeSalary(String)",
+    "type" : "METHOD",
+    "name" : "getEmployeeSalary",
+    "fqn" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary",
+    "module" : "employee-service",
+    "packageName" : "com.aura.vihanga.employeeservice.controller",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "symbolId" : "SYM-01M293QD3PJR7D3BV93ANNM2TZ",
+    "signature" : "CompletableFuture<ResponseEntity<StandardResponse>> getEmployeeSalary(@PathVariable(\"id\") String employeeId)",
+    "lineStart" : 71,
+    "lineEnd" : 82,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "GetMapping(\"employee/salary/{id}\")", "CircuitBreaker(name = \"employee\",fallbackMethod = \"fallBackMethodEmployee\")", "TimeLimiter(name = \"employee\")", "Retry(name = \"employee\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/employee/salary/{id}",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/employee/salary/{id}",
+    "fqn" : "/api/v1/employee/salary/{id}",
+    "module" : "employee-service",
+    "fileId" : "FILE-01M293KMHWHPP6EQGSEK8QSGK9",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/employee/salary/{id}",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController#exportToExcel(HttpServletResponse)",
+    "type" : "METHOD",
+    "name" : "exportToExcel",
+    "fqn" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel",
+    "module" : "report-service",
+    "packageName" : "com.aura.vihanga.reportservice.controller",
+    "fileId" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "symbolId" : "SYM-01M293QD49KDSBDG1V7VP1Q9CP",
+    "signature" : "void exportToExcel(HttpServletResponse response)",
+    "lineStart" : 25,
+    "lineEnd" : 39,
+    "attribution" : "AMBIGUOUS",
+    "annotations" : [ "GetMapping(\"export\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/export",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/export",
+    "fqn" : "/api/v1/export",
+    "module" : "report-service",
+    "fileId" : "FILE-01M293KMKEQ1R9SRZHCZP5VZ6R",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/export",
+      "handler" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel"
+    }
+  }, {
+    "id" : "TYPE:com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController#getAllEmployees()",
+    "type" : "METHOD",
+    "name" : "getAllEmployees",
+    "fqn" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees",
+    "module" : "sheduler-service",
+    "packageName" : "com.aura.vihanga.shedulerservice.controller",
+    "fileId" : "FILE-01M293KMM45PH83FZ7Y1F3KXE3",
+    "symbolId" : "SYM-01M293QD4J7EJSTNJQWFH6GQZ6",
+    "signature" : "List<Employee> getAllEmployees()",
+    "lineStart" : 18,
+    "lineEnd" : 21,
+    "attribution" : "RESOLVED",
+    "annotations" : [ "GetMapping(\"employee\")" ],
+    "properties" : { }
+  }, {
+    "id" : "ENDPOINT:GET /api/v1/employee",
+    "type" : "ENDPOINT",
+    "name" : "GET /api/v1/employee",
+    "fqn" : "/api/v1/employee",
+    "module" : "sheduler-service",
+    "fileId" : "FILE-01M293KMM45PH83FZ7Y1F3KXE3",
+    "attribution" : "RESOLVED",
+    "annotations" : [ ],
+    "properties" : {
+      "http_method" : "GET",
+      "path" : "/api/v1/employee",
+      "handler" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees"
+    }
+  } ],
+  "edges" : [ {
+    "from" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#createDepartment(Department)",
+    "to" : "ENDPOINT:POST /api/v1/department",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#getDepartment(String)",
+    "to" : "ENDPOINT:GET /api/v1/department/{id}",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.departmentservice.controller.DepartmentController#getAllDepartments(double)",
+    "to" : "ENDPOINT:GET /api/v1/department/salary/{minSalary}",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#createEmployee(Employee)",
+    "to" : "ENDPOINT:POST /api/v1/employee",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#uploadEmployee(MultipartFile)",
+    "to" : "ENDPOINT:POST /api/v1/employee/excelUpload",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#searchEmployees(String,String)",
+    "to" : "ENDPOINT:GET /api/v1/employee/search",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployee(String)",
+    "to" : "ENDPOINT:GET /api/v1/employee/{id}",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.employeeservice.controller.EmployeeController#getEmployeeSalary(String)",
+    "to" : "ENDPOINT:GET /api/v1/employee/salary/{id}",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.reportservice.controller.EmployeeReportController#exportToExcel(HttpServletResponse)",
+    "to" : "ENDPOINT:GET /api/v1/export",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  }, {
+    "from" : "TYPE:com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController#getAllEmployees()",
+    "to" : "ENDPOINT:GET /api/v1/employee",
+    "type" : "HANDLES_ENDPOINT",
+    "view" : "EndpointGraph",
+    "confidence" : 1.0,
+    "properties" : { }
+  } ]
+}

@@ -1,0 +1,52 @@
+{
+  "pipeline_stage" : "13-build-repair",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:10:26.741957Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-1-PREP-TEST",
+  "upstream" : { },
+  "mutating" : true,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed",
+    "compiled" : true,
+    "repair_rounds" : 1,
+    "ai_attempts" : 0
+  },
+  "compiled" : true,
+  "rounds" : 1,
+  "selected_jdk" : "C:/Users/annav/tools/jdk-17",
+  "toolchain" : {
+    "frozen_java_major" : 17,
+    "java_home" : "C:/Users/annav/tools/jdk-17",
+    "java_executable" : "C:/Users/annav/tools/jdk-17/bin/java.exe",
+    "java_version_planned" : "17.0.20.1",
+    "java_vendor" : "OpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)",
+    "selection_reason" : "LTS_PREFERRED: Java 17 is the highest long-term-support release that the target Spring Boot line supports and that an installed JDK provides",
+    "available" : true,
+    "unavailable_reason" : null,
+    "executed_version_verified" : true,
+    "executed_java_version" : "17.0.20.1",
+    "executed_java_major" : 17,
+    "verification_detail" : "The executed toolchain is the one the edge froze",
+    "build_kind" : "MAVEN",
+    "build_tool_version" : "Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)",
+    "build_tool_invocation" : "C:\\Users\\annav\\AppData\\Local\\Temp\\bootshift-workspaces\\RUN-01M293KJ0RYV603B3JB0CCJJN9\\original\\configuaration-server\\mvnw.cmd -B",
+    "build_wrapper_used" : true,
+    "rule" : "Compile, test, package and run all execute on the JDK this edge froze. A mismatch between the frozen target and the executed toolchain is a validation failure, because the observation would describe a toolchain nobody selected."
+  },
+  "required_java_major" : 17,
+  "round_details" : [ {
+    "round" : 1,
+    "failed_modules" : 0,
+    "diagnostic_count" : 0,
+    "outcome" : "COMPILED"
+  } ]
+}

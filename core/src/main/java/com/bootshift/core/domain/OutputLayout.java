@@ -34,9 +34,32 @@ public final class OutputLayout {
             DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS").withZone(ZoneOffset.UTC);
 
     private final Path outputRoot;
+    private volatile OpenListener openListener;
 
     public OutputLayout(Path outputRoot) {
         this.outputRoot = outputRoot;
+    }
+
+    /**
+     * Notified when a stage opens an attempt directory.
+     *
+     * <p>The execution journal needs to write {@code stage-execution.json} beside the artifacts of
+     * the attempt it describes, and only the stage knows when it opens one. Routing that through a
+     * listener keeps the knowledge in the one place that already has it - {@link #open} - instead of
+     * requiring twenty-one stages to hand their writer to a recorder, which is a change every future
+     * stage would also have to remember to make.
+     */
+    @FunctionalInterface
+    public interface OpenListener {
+        void opened(String stageDir, Path directory);
+    }
+
+    /**
+     * Registers the listener for this run. Run-scoped, not static: an {@code OutputLayout} belongs
+     * to exactly one {@code RunContext}.
+     */
+    public void openListener(OpenListener listener) {
+        this.openListener = listener;
     }
 
     public Path root() {
@@ -80,6 +103,15 @@ public final class OutputLayout {
             Files.createDirectories(dir);
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot create stage output directory " + dir, e);
+        }
+        OpenListener listener = this.openListener;
+        if (listener != null) {
+            // Never let a journalling listener break the stage whose directory it is observing.
+            try {
+                listener.opened(stageDir, dir);
+            } catch (RuntimeException ignored) {
+                // The recorder falls back to its own directory when it learns nothing here.
+            }
         }
         return new StageWriter(stageDir, dir);
     }

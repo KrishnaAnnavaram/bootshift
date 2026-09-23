@@ -1,0 +1,39 @@
+{
+  "pipeline_stage" : "14-graph-diff",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:22:46.120041200Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : "EDGE-2-PATCH",
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "before_label" : "G_EDGE_STATIC:EDGE-1-PREP-TEST",
+  "after_label" : "G_EDGE_STATIC:EDGE-2-PATCH",
+  "before_structural_hash" : "f1a0c6a5322831aecd2af14263cb05e4068471fe2030edb3418870621381f5df",
+  "after_structural_hash" : "f1a0c6a5322831aecd2af14263cb05e4068471fe2030edb3418870621381f5df",
+  "partial" : false,
+  "counts" : {
+    "nodes_added" : 0,
+    "nodes_removed" : 0,
+    "nodes_changed" : 0,
+    "edges_added" : 0,
+    "edges_removed" : 0
+  },
+  "nodes_added" : [ ],
+  "nodes_removed" : [ ],
+  "nodes_changed" : [ ],
+  "edges_added" : [ ],
+  "edges_removed" : [ ],
+  "changed_file_ids" : [ ],
+  "changed_symbol_ids" : [ ]
+}

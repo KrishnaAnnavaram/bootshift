@@ -86,7 +86,11 @@ public final class PipelineOrchestrator {
     public RunOutcome runAnalysis(String requestedTarget) {
         List<StageResult> results = new ArrayList<>();
         if (context.run().output().resolveLatestDir(RunBootstrap.OUTPUT_DIR) == null) {
-            StageResult bootstrap = new RunBootstrap(context).execute();
+            StageResult bootstrap = StageExecutionRecorder.record(
+                    RunBootstrap.OUTPUT_DIR, "RunBootstrap", RunBootstrap.PURPOSE,
+                    RunBootstrap.OUTPUT_DIR, RunBootstrap.STEPS, context,
+                    com.bootshift.core.journal.StageExecutionRecord.Trigger.PIPELINE,
+                    () -> new RunBootstrap(context).execute());
             results.add(bootstrap);
             reporter.accept(bootstrap);
             if (!bootstrap.succeeded()) {

@@ -1,5 +1,5 @@
 {
-  "measured_at" : "2026-09-10T20:02:19.095827500Z",
+  "measured_at" : "2026-09-10T23:41:35.337384300Z",
   "method" : "ImpactStage's own matcher is executed over each held-out fixture tree; the fixture supplies the input and the ground truth, never the prediction",
   "evaluated" : true,
   "held_out_fixtures" : 11,

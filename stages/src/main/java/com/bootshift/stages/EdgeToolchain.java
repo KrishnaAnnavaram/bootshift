@@ -52,12 +52,14 @@ public final class EdgeToolchain {
     private final Resolved resolved;
     private final BuildSystemResolver builds;
     private final BuildSystemPort.BuildModel buildModel;
+    private final ProcessRunner runner;
 
     private EdgeToolchain(Resolved resolved, BuildSystemResolver builds,
-                          BuildSystemPort.BuildModel buildModel) {
+                          BuildSystemPort.BuildModel buildModel, ProcessRunner runner) {
         this.resolved = resolved;
         this.builds = builds;
         this.buildModel = buildModel;
+        this.runner = runner;
     }
 
     /**
@@ -69,6 +71,23 @@ public final class EdgeToolchain {
      * and says so.
      */
     public static EdgeToolchain forEdge(JsonNode edgePlan, BuildSystemPort.BuildModel buildModel) {
+        return forEdge(edgePlan, buildModel, new ProcessRunner());
+    }
+
+    /** The runner every build and probe from this toolchain uses. */
+    public ProcessRunner runner() {
+        return runner;
+    }
+
+    /**
+     * Resolves the frozen toolchain, journalling every process the resulting builds launch.
+     *
+     * <p>The runner is passed in rather than created here because attribution belongs to the stage:
+     * an edge builds under stage 13, tests under stage 15 and starts an application under stage 16,
+     * and a command record that could not tell those apart would be of little use.
+     */
+    public static EdgeToolchain forEdge(JsonNode edgePlan, BuildSystemPort.BuildModel buildModel,
+                                        ProcessRunner runner) {
         int frozenMajor = parseInt(edgePlan.path("edge_java").asText(null),
                 parseInt(edgePlan.path("current_java").asText(null), 17));
         String plannedHome = edgePlan.path("edge_java_home").asText(null);
@@ -84,11 +103,11 @@ public final class EdgeToolchain {
                     reason, executable.isPresent(),
                     executable.isPresent() ? null
                             : "The frozen JDK home exists but contains no java executable"),
-                    new BuildSystemResolver(), buildModel);
+                    new BuildSystemResolver(runner), buildModel, runner);
         }
 
         // The frozen home is gone. Re-select the same major rather than silently using another.
-        ToolchainProbe probe = new ToolchainProbe();
+        ToolchainProbe probe = new ToolchainProbe(runner);
         Optional<ToolchainProbe.Jdk> jdk = probe.discover().stream()
                 .filter(candidate -> candidate.major() == frozenMajor)
                 .findFirst();
@@ -97,7 +116,7 @@ public final class EdgeToolchain {
                     "No installed JDK provides Java " + frozenMajor + ", which this edge froze. "
                             + "Compiling or running on a different major would produce evidence about "
                             + "a toolchain the plan did not select."),
-                    new BuildSystemResolver(), buildModel);
+                    new BuildSystemResolver(runner), buildModel, runner);
         }
         String home = jdk.get().home().toString();
         Optional<Path> executable = JavaTargetSelector.javaExecutable(home);
@@ -105,7 +124,7 @@ public final class EdgeToolchain {
                 executable.map(Path::toString).orElse(null), jdk.get().version(), jdk.get().vendor(),
                 reason + " (re-resolved: the planned home was no longer present)",
                 executable.isPresent(), null),
-                new BuildSystemResolver(), buildModel);
+                new BuildSystemResolver(runner), buildModel, runner);
     }
 
     public Resolved resolved() {
@@ -154,7 +173,7 @@ public final class EdgeToolchain {
                     resolved.unavailableReason() == null
                             ? "No JDK was resolved for this edge" : resolved.unavailableReason());
         }
-        ProcessRunner.Result result = new ProcessRunner().run(
+        ProcessRunner.Result result = runner.run(
                 List.of(resolved.javaExecutable(), "-version"),
                 Path.of(resolved.javaHome()), Duration.ofSeconds(60), Map.of());
         List<String> lines = new ArrayList<>(result.stderr());

@@ -1,0 +1,17 @@
+{
+  "stage" : "04-baseline",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "generated_at" : "2026-09-11T20:59:08.786220900Z",
+  "artifacts" : {
+    "environment-equivalence.json" : "6fa9c18e3e3e1e4701c82c6a251a1e2468786fd0ae877c006723167c9c053161",
+    "baseline-build.json" : "f633e7bb7ff5287b9accedeb89e54b63ee0e78015bd24169290c945884088e76",
+    "baseline-tests.json" : "c1daa4e5ef91958719c13ee4bff86f934d1c16ab9a46744ec23197779b0a63e3",
+    "baseline-coverage.json" : "a2cd30a501343e38ca532364d5ad873a8ece12ee9e0abcb004aea72bedfc1ef0",
+    "baseline-configuration.json" : "77f24a3fe727a56b4c3edb8dc9933b5675b13373680df6dd6df6410969535eb0",
+    "baseline-runtime.json" : "66cd94939775ab08390a81eb66710a99e84eb63fa3bdfab3e685b5dfe8db23d8",
+    "runtime-graph-baseline.json" : "9feab404b93035f649b4b1fe1d2d034ebe8451bc7086b051d55527b75621280c",
+    "application-graph-baseline-enriched.json" : "329be53cb2348c67e660f880a9116a23984e9c5a3e12234edbff5a9a99635598",
+    "baseline-manifest.json" : "273f3255e4981e6da129f4f3cecccc8ff446589009a411e3f83183f16c50f7bd"
+  },
+  "artifact_set_hash" : "914d3fd94a91228cb1cfec8c78c44b8ef75cd692c356b0794fe76e4bcedef57b"
+}

@@ -1,0 +1,2124 @@
+{
+  "pipeline_stage" : "10-characterization",
+  "schema_version" : "1.0.0",
+  "generated_at" : "2026-09-11T21:10:21.834138400Z",
+  "run_id" : "RUN-01M293KJ0RYV603B3JB0CCJJN9",
+  "edge_id" : null,
+  "upstream" : { },
+  "mutating" : false,
+  "repo_state" : { },
+  "baseline_binding" : { },
+  "environment_fingerprint" : null,
+  "blind_spots" : [ ],
+  "gaps" : [ ],
+  "stats" : {
+    "policy" : "production",
+    "policy_hash" : "401ab5afe78e1845245b5095d6ca38f6f383d9e270e2744a090d8b0e885f40db",
+    "ai_enabled" : false,
+    "environment_mode" : "managed"
+  },
+  "count" : 82,
+  "by_state" : {
+    "FROZEN" : 36,
+    "UNOBSERVABLE_WITH_EXPLICIT_GAP" : 46
+  },
+  "frozen" : 36,
+  "unobservable" : 46,
+  "awaiting_old_observation" : 0,
+  "rejected" : 0,
+  "external_infrastructure_available" : false,
+  "oracle_rule" : "A scenario becomes an oracle by being EXECUTED against the original application. Expected values are never derived by reading migrated code, and AWAITING_OLD_OBSERVATION is not a protected state.",
+  "scenarios" : [ {
+    "scenario_id" : "SCN-00001",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "department-service",
+    "target" : "POST /api/v1/department",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment",
+      "declared_path" : "/api/v1/department"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/department"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "1c6159108c1e21c800f3526e9bea15524b2acfec50176b1b547b2a5f7a955f05",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00002",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "POST /api/v1/department",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment",
+      "declared_path" : "/api/v1/department"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/department",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "062782e6a6454366e3bd69ebfcf5b5f9f993646451fe2f9be6b17e12367c546f",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00003",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "POST /api/v1/department",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment",
+      "declared_path" : "/api/v1/department"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/department",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "5c4f4fd54a87543b98effdcc90d9030dc4abb796d495c8f7ee7fb33a2632aade",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00004",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "department-service",
+    "target" : "POST /api/v1/department",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.createDepartment",
+      "declared_path" : "/api/v1/department"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/department"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "d8fce8d89b4dc696d7206de0d39e8c676092a63c806e4ec6c0a13deecd764c37",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00005",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment",
+      "declared_path" : "/api/v1/department/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/bootshift-characterization-id"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00006",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment",
+      "declared_path" : "/api/v1/department/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/bootshift-characterization-id",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00007",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment",
+      "declared_path" : "/api/v1/department/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/bootshift-characterization-id",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00008",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getDepartment",
+      "declared_path" : "/api/v1/department/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/bootshift-characterization-id"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00009",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/salary/bootshift-characterization-value",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments",
+      "declared_path" : "/api/v1/department/salary/{minSalary}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/salary/bootshift-characterization-value"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "1c6159108c1e21c800f3526e9bea15524b2acfec50176b1b547b2a5f7a955f05",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00010",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/salary/bootshift-characterization-value",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments",
+      "declared_path" : "/api/v1/department/salary/{minSalary}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/salary/bootshift-characterization-value",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "062782e6a6454366e3bd69ebfcf5b5f9f993646451fe2f9be6b17e12367c546f",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00011",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/salary/bootshift-characterization-value",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments",
+      "declared_path" : "/api/v1/department/salary/{minSalary}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/salary/bootshift-characterization-value",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "5c4f4fd54a87543b98effdcc90d9030dc4abb796d495c8f7ee7fb33a2632aade",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00012",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "department-service",
+    "target" : "GET /api/v1/department/salary/bootshift-characterization-value",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.departmentservice.controller.DepartmentController.getAllDepartments",
+      "declared_path" : "/api/v1/department/salary/{minSalary}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/department/salary/bootshift-characterization-value"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "d8fce8d89b4dc696d7206de0d39e8c676092a63c806e4ec6c0a13deecd764c37",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00013",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00014",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00015",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00016",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.createEmployee",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00017",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee/excelUpload",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee",
+      "declared_path" : "/api/v1/employee/excelUpload"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee/excelUpload"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00018",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee/excelUpload",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee",
+      "declared_path" : "/api/v1/employee/excelUpload"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee/excelUpload",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00019",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee/excelUpload",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee",
+      "declared_path" : "/api/v1/employee/excelUpload"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee/excelUpload",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00020",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "employee-service",
+    "target" : "POST /api/v1/employee/excelUpload",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.uploadEmployee",
+      "declared_path" : "/api/v1/employee/excelUpload"
+    },
+    "input" : {
+      "method" : "POST",
+      "path" : "/api/v1/employee/excelUpload"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00021",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/search",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees",
+      "declared_path" : "/api/v1/employee/search"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/search"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00022",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/search",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees",
+      "declared_path" : "/api/v1/employee/search"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/search",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00023",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/search",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees",
+      "declared_path" : "/api/v1/employee/search"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/search",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00024",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/search",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.searchEmployees",
+      "declared_path" : "/api/v1/employee/search"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/search"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00025",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee",
+      "declared_path" : "/api/v1/employee/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/bootshift-characterization-id"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00026",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee",
+      "declared_path" : "/api/v1/employee/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/bootshift-characterization-id",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00027",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee",
+      "declared_path" : "/api/v1/employee/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/bootshift-characterization-id",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00028",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployee",
+      "declared_path" : "/api/v1/employee/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/bootshift-characterization-id"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00029",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/salary/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary",
+      "declared_path" : "/api/v1/employee/salary/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/salary/bootshift-characterization-id"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00030",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/salary/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary",
+      "declared_path" : "/api/v1/employee/salary/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/salary/bootshift-characterization-id",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00031",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/salary/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary",
+      "declared_path" : "/api/v1/employee/salary/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/salary/bootshift-characterization-id",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00032",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "employee-service",
+    "target" : "GET /api/v1/employee/salary/bootshift-characterization-id",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.employeeservice.controller.EmployeeController.getEmployeeSalary",
+      "declared_path" : "/api/v1/employee/salary/{id}"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee/salary/bootshift-characterization-id"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture, so this endpoint has no observable original behaviour to freeze",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00033",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "report-service",
+    "target" : "GET /api/v1/export",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel",
+      "declared_path" : "/api/v1/export"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/export"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00034",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "report-service",
+    "target" : "GET /api/v1/export",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel",
+      "declared_path" : "/api/v1/export"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/export",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00035",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "report-service",
+    "target" : "GET /api/v1/export",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel",
+      "declared_path" : "/api/v1/export"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/export",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00036",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "report-service",
+    "target" : "GET /api/v1/export",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.reportservice.controller.EmployeeReportController.exportToExcel",
+      "declared_path" : "/api/v1/export"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/export"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00037",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "sheduler-service",
+    "target" : "GET /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape", "error_payload_shape", "body_length_class", "location" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00038",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "sheduler-service",
+    "target" : "GET /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee",
+      "authorization" : ""
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers", "location", "header_names" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00039",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SECURITY_AUTHORIZATION",
+    "module" : "sheduler-service",
+    "target" : "GET /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee",
+      "authorization" : "Bearer bootshift-invalid-token"
+    },
+    "capture" : [ "status_code", "www_authenticate", "security_headers" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00040",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SERIALIZATION",
+    "module" : "sheduler-service",
+    "target" : "GET /api/v1/employee",
+    "setup" : {
+      "origin" : "endpoint-graph",
+      "handler" : "com.aura.vihanga.shedulerservice.controller.EmployeeSchedulerController.getAllEmployees",
+      "declared_path" : "/api/v1/employee"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/api/v1/employee"
+    },
+    "capture" : [ "content_type", "body_field_paths", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Execution against the original application did not succeed, so this behaviour is unobserved and is declared as a gap rather than left pending: HttpTimeoutException: request timed out",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00041",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "department-service",
+    "target" : "/actuator/configprops",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which configuration properties the application actually binds, by canonical key"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/configprops"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00042",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "department-service",
+    "target" : "/actuator/env",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Property sources and their precedence as the application resolved them"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/env"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00043",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "department-service",
+    "target" : "/actuator/beans",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The bean definitions the context actually created"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00044",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "department-service",
+    "target" : "/actuator/conditions",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which auto-configurations matched and which did not"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/conditions"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00045",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "department-service",
+    "target" : "/actuator/mappings",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The request mappings the running application registered"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/mappings"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00046",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "department-service",
+    "target" : "/actuator/health",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Health contributors and their reported shape"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "9322828f877446b5a371a63dd53ec735f2fd19b3640e63aae2384550bb075b83",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00047",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "discovery-service",
+    "target" : "/actuator/configprops",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which configuration properties the application actually binds, by canonical key"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/configprops"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "aa71f0c86053894cd6dd0c8600837908a6f4d58a0ce3098873d4fa1da738666e",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00048",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "discovery-service",
+    "target" : "/actuator/env",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Property sources and their precedence as the application resolved them"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/env"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "a3275cffd553d98a5ade280937b39bdae87a685ac510bdad77c3a7863c553b9e",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00049",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "discovery-service",
+    "target" : "/actuator/beans",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The bean definitions the context actually created"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "65cf20793e84472ea2fa918616a87660b7b9bb1549ab439bb5d140bd1f946b92",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00050",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "discovery-service",
+    "target" : "/actuator/conditions",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which auto-configurations matched and which did not"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/conditions"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "45014b347ce3d0168560c662de81489c5187ae730f26a4b52fa784b2ac3636c8",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00051",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "discovery-service",
+    "target" : "/actuator/mappings",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The request mappings the running application registered"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/mappings"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "37bc826a23dc91ce8f60803145870e078130c6ff53acd2c01b2311ce472d2237",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00052",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "discovery-service",
+    "target" : "/actuator/health",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Health contributors and their reported shape"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "0502c7b925e40213ad0247eac74c3b6717bc66dbf387c6d873f9d99b128a051d",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00053",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "report-service",
+    "target" : "/actuator/configprops",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which configuration properties the application actually binds, by canonical key"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/configprops"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00054",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "report-service",
+    "target" : "/actuator/env",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Property sources and their precedence as the application resolved them"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/env"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00055",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "report-service",
+    "target" : "/actuator/beans",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The bean definitions the context actually created"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00056",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "report-service",
+    "target" : "/actuator/conditions",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which auto-configurations matched and which did not"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/conditions"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00057",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "report-service",
+    "target" : "/actuator/mappings",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The request mappings the running application registered"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/mappings"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00058",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "report-service",
+    "target" : "/actuator/health",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Health contributors and their reported shape"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "9322828f877446b5a371a63dd53ec735f2fd19b3640e63aae2384550bb075b83",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00059",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "sheduler-service",
+    "target" : "/actuator/configprops",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which configuration properties the application actually binds, by canonical key"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/configprops"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00060",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "CONFIGURATION_BINDING",
+    "module" : "sheduler-service",
+    "target" : "/actuator/env",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Property sources and their precedence as the application resolved them"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/env"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00061",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "sheduler-service",
+    "target" : "/actuator/beans",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The bean definitions the context actually created"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00062",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "sheduler-service",
+    "target" : "/actuator/conditions",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Which auto-configurations matched and which did not"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/conditions"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00063",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "HTTP_API",
+    "module" : "sheduler-service",
+    "target" : "/actuator/mappings",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "The request mappings the running application registered"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/mappings"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00064",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "sheduler-service",
+    "target" : "/actuator/health",
+    "setup" : {
+      "origin" : "actuator",
+      "purpose" : "Health contributors and their reported shape"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "9322828f877446b5a371a63dd53ec735f2fd19b3640e63aae2384550bb075b83",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00065",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "PERSISTENCE_STATE",
+    "module" : "department-service",
+    "target" : "PERSISTENCE_STATE",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00066",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "QUERY_RESULT",
+    "module" : "department-service",
+    "target" : "QUERY_RESULT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00067",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "TRANSACTION_EFFECT",
+    "module" : "department-service",
+    "target" : "TRANSACTION_EFFECT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00068",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "PERSISTENCE_STATE",
+    "module" : "discovery-service",
+    "target" : "PERSISTENCE_STATE",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00069",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "QUERY_RESULT",
+    "module" : "discovery-service",
+    "target" : "QUERY_RESULT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00070",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "TRANSACTION_EFFECT",
+    "module" : "discovery-service",
+    "target" : "TRANSACTION_EFFECT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00071",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "PERSISTENCE_STATE",
+    "module" : "report-service",
+    "target" : "PERSISTENCE_STATE",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00072",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "QUERY_RESULT",
+    "module" : "report-service",
+    "target" : "QUERY_RESULT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00073",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "TRANSACTION_EFFECT",
+    "module" : "report-service",
+    "target" : "TRANSACTION_EFFECT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00074",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "PERSISTENCE_STATE",
+    "module" : "sheduler-service",
+    "target" : "PERSISTENCE_STATE",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00075",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "QUERY_RESULT",
+    "module" : "sheduler-service",
+    "target" : "QUERY_RESULT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00076",
+    "edge_id" : null,
+    "impact_id" : null,
+    "dimension" : "TRANSACTION_EFFECT",
+    "module" : "sheduler-service",
+    "target" : "TRANSACTION_EFFECT",
+    "setup" : {
+      "origin" : "infrastructure-gap"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/health"
+    },
+    "capture" : [ "status_code", "content_type", "body_shape" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "This dimension requires a provisioned datastore with equivalent data on both sides. The environment provider could not supply one, so the behaviour is NOT_COMPARED rather than assumed unchanged.",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ ],
+    "requires_external_infrastructure" : true
+  }, {
+    "scenario_id" : "SCN-00077",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00001",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "configuaration-server",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module configuaration-server did not start during baseline capture",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00078",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00002",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "department-service",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00079",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00003",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "discovery-service",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "65cf20793e84472ea2fa918616a87660b7b9bb1549ab439bb5d140bd1f946b92",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00080",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00004",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "employee-service",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : null,
+    "state" : "UNOBSERVABLE_WITH_EXPLICIT_GAP",
+    "reason" : "Module employee-service did not start during baseline capture",
+    "critical" : true,
+    "is_oracle" : false,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00081",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00005",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "report-service",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  }, {
+    "scenario_id" : "SCN-00082",
+    "edge_id" : null,
+    "impact_id" : "IMPACT-00006",
+    "dimension" : "SPRING_CONTEXT",
+    "module" : "sheduler-service",
+    "target" : "antlr:antlr",
+    "setup" : {
+      "origin" : "impact"
+    },
+    "input" : {
+      "method" : "GET",
+      "path" : "/actuator/beans"
+    },
+    "capture" : [ "status_code", "body_field_paths" ],
+    "normalizer" : "default",
+    "old_observation_ref" : "86c277cffd194c68354166aacd2247dbfa8f23fefa16565ec14107730c7b2e38",
+    "state" : "FROZEN",
+    "reason" : "Executed against the original application; the observed behaviour is the oracle",
+    "critical" : true,
+    "is_oracle" : true,
+    "accounted_for" : true,
+    "knowledge_refs" : [ "MK-00009" ],
+    "requires_external_infrastructure" : false
+  } ]
+}
