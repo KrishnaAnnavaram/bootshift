@@ -1,5 +1,7 @@
 package com.bootshift.ports.transformation;
 
+import com.bootshift.core.ledger.ChangeEvent;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -97,4 +99,24 @@ public interface TransformationPort {
     }
 
     TransformationOutcome apply(String recipeId, TransformationRequest request);
+
+    /**
+     * How a change this provider produced must be attributed in the change ledger.
+     *
+     * <p>Agent 12 used to stamp every ledger event with one hardcoded
+     * {@code BOOTSHIFT_DETERMINISTIC / bootshift-transformers / 1.0.0} descriptor, whichever
+     * provider had actually produced the change. The transformation report and the proposal record
+     * still named the real engine, but the ledger did not - and the ledger is what the evidence
+     * document and the provenance graph read. A migration performed by OpenRewrite 8.x was
+     * therefore reported, in the sealed evidence, as having been performed by Bootshift's own
+     * transformers at version 1.0.0. That is the one class of error this harness exists to prevent.
+     *
+     * <p>The default is the descriptor the harness's own deterministic transformers have always
+     * carried; the recipe id on each event already distinguishes them from one another. A provider
+     * that delegates to an external engine overrides this so the engine and its version reach the
+     * ledger.
+     */
+    default ChangeEvent.Provider ledgerIdentity() {
+        return new ChangeEvent.Provider("BOOTSHIFT_DETERMINISTIC", "bootshift-transformers", "1.0.0");
+    }
 }

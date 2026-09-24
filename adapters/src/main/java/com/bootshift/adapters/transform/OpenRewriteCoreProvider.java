@@ -115,6 +115,19 @@ public final class OpenRewriteCoreProvider implements TransformationPort {
         return PROVIDER;
     }
 
+    /**
+     * OpenRewrite, at the version actually on the classpath.
+     *
+     * <p>Not the harness's own deterministic descriptor: a change made by an external engine has to
+     * be attributable to that engine, at that version, in the tamper-evident ledger the evidence
+     * document and the provenance graph are built from.
+     */
+    @Override
+    public com.bootshift.core.ledger.ChangeEvent.Provider ledgerIdentity() {
+        return new com.bootshift.core.ledger.ChangeEvent.Provider(
+                "OPENREWRITE", PROVIDER, engineVersion());
+    }
+
     // ------------------------------------------------------------------ availability and licensing
 
     public boolean coreAvailable() {

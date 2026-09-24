@@ -107,6 +107,27 @@ public final class EvidenceStage implements Stage {
                         "An incomplete run is reported as incomplete rather than presented as a migration"));
     }
 
+    /**
+     * Strips the keys the envelope owns from a payload that already names its own run.
+     *
+     * <p>{@link EvidenceManifest#toNode()} and {@link DocumentationIndex#build} are self-describing
+     * documents: each carries {@code run_id}, and the index also carries {@code schema_version} and
+     * {@code generated_at}. {@link StageSupport#compose} refuses any payload that shadows an
+     * envelope key - correctly, because two writers of one key at one level is how an artifact ends
+     * up disagreeing with itself - so composing either of them threw {@code STRUCTURED_REFUSAL}
+     * unconditionally. This stage could therefore never publish. No run had found that, because
+     * every run so far stopped at Agent 17 on an unexplained behavioural difference and never
+     * reached Agent 19.
+     *
+     * <p>The envelope is the authority for these fields, so the duplicates are dropped here rather
+     * than in the two producers, whose nodes stand alone in other contexts. The published artifacts
+     * are unchanged: every removed key reappears, supplied by the envelope.
+     */
+    private static ObjectNode envelopeOwnedKeysRemoved(ObjectNode payload) {
+        Envelope.RESERVED_KEYS.forEach(payload::remove);
+        return payload;
+    }
+
     @Override
     public StageResult execute(StageContext context) {
         StageSupport.step(context, "EVD-001").begin();
@@ -169,7 +190,7 @@ public final class EvidenceStage implements Stage {
         int indexed = indexArtifacts(context, manifest);
 
         String manifestHash = manifest.finalizeManifest();
-        ObjectNode manifestNode = manifest.toNode();
+        ObjectNode manifestNode = envelopeOwnedKeysRemoved(manifest.toNode());
         writer.write("evidence-manifest.json", StageSupport.compose(envelope
                 .stat("evidence_entries", indexed)
                 .stat("claims", claims.size())
@@ -379,9 +400,10 @@ public final class EvidenceStage implements Stage {
         // and - the half that makes it worth having - every one it should have produced and did not.
         // A documentation defect is reported as a gap in the evidence rather than being invisible
         // because the thing that would have reported it is the thing that failed.
-        ObjectNode documentationIndex = DocumentationIndex.build(context.run().output(),
-                context.run().runId(), context.journal().timeline(),
-                context.journal().journalFailures());
+        ObjectNode documentationIndex = envelopeOwnedKeysRemoved(
+                DocumentationIndex.build(context.run().output(),
+                        context.run().runId(), context.journal().timeline(),
+                        context.journal().journalFailures()));
         writer.write("documentation-index.json", StageSupport.compose(
                 StageSupport.envelope(context, OUTPUT_DIR), documentationIndex));
         int documentationGaps = documentationIndex.path("documentation_gap_count").asInt();

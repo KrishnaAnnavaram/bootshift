@@ -299,14 +299,35 @@ public final class ApprovalStage implements Stage, ApprovalPort {
         }
 
         JsonNode target = StageSupport.optionalUpstream(context, "06-target", "target-state.json");
-        if (target != null
-                && target.path("support_horizon_months").asLong(999)
-                < context.policy().minimumSupportHorizonMonths() * 2L) {
-            raise(Gate.SHORT_HORIZON_TARGET, target.path("landing_version").asText(),
-                    "The landing target has only "
-                            + target.path("support_horizon_months").asLong()
-                            + " month(s) of open-source support remaining",
-                    List.of("06-target/target-resolution-report.json"), OUTPUT_DIR);
+        if (target != null) {
+            long horizon = target.path("support_horizon_months").asLong(999);
+            // Two independent triggers, because one of them used to disarm the other.
+            //
+            // The threshold test alone is expressed relative to the policy's own minimum, so a
+            // policy that lowers the minimum in order to PERMIT an end-of-life landing target also
+            // lowers this gate out of reach. production-eol-exception.json does exactly that: it
+            // sets minimum_support_horizon_months to -24, putting the trigger at -48 months, and
+            // its own rationale states that "Agent 18 raises a SHORT_HORIZON_TARGET approval gate
+            // for it". It did not. A target two months past end of support sailed through the one
+            // configuration that allows it there, which is the configuration that most needs a
+            // human to look.
+            //
+            // So: gate when the horizon is short relative to policy, and separately gate whenever a
+            // run has actually used the end-of-life exception to land somewhere unsupported.
+            boolean shortRelativeToPolicy =
+                    horizon < context.policy().minimumSupportHorizonMonths() * 2L;
+            boolean landedPastSupport = context.policy().allowEolLandingTarget() && horizon <= 0;
+            if (shortRelativeToPolicy || landedPastSupport) {
+                raise(Gate.SHORT_HORIZON_TARGET, target.path("landing_version").asText(),
+                        landedPastSupport
+                                ? "The landing target's open-source support window closed "
+                                + Math.abs(horizon) + " month(s) ago. The run was permitted to land "
+                                + "there only by the allow_eol_landing_target policy exception, "
+                                + "which requires an authorized human decision."
+                                : "The landing target has only " + horizon
+                                + " month(s) of open-source support remaining",
+                        List.of("06-target/target-resolution-report.json"), OUTPUT_DIR);
+            }
         }
     }
 

@@ -181,8 +181,6 @@ public final class TransformationStage implements Stage {
         int rejected = 0;
         int failed = 0;
         String lastCheckpoint = null;
-        ChangeEvent.Provider deterministicProvider =
-                new ChangeEvent.Provider("BOOTSHIFT_DETERMINISTIC", "bootshift-transformers", "1.0.0");
 
         for (JsonNode transformation : edgePlan.path("ordered_transformations")) {
             String recipeId = transformation.path("recipe_id").asText();
@@ -228,8 +226,11 @@ public final class TransformationStage implements Stage {
             // Batching every recipe and writing at the end would hand the gateway a set of
             // proposals all derived from the pre-edge tree, and the last write for a given file
             // would silently discard the others while the ledger still recorded them as applied.
+            // Attributed to the provider that actually produced these changes, not to a single
+            // descriptor covering all of them. The ledger is what the evidence document and the
+            // provenance graph read; a change OpenRewrite made has to say so there.
             MutationPort.BatchOutcome recipeBatch =
-                    gateway.apply(authorization, outcome.changes(), deterministicProvider);
+                    gateway.apply(authorization, outcome.changes(), provider.ledgerIdentity());
             allOutcomes.addAll(recipeBatch.outcomes());
             applied += recipeBatch.applied();
             rejected += recipeBatch.rejected();

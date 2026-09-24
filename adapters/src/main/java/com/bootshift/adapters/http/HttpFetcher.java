@@ -91,6 +91,16 @@ public final class HttpFetcher {
         return networkEnabled;
     }
 
+    /** True when the string is a URI at all. False means malformed, not disallowed. */
+    static boolean parses(String url) {
+        try {
+            URI.create(url);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
     public boolean hostAllowed(String url) {
         try {
             String host = URI.create(url).getHost();
@@ -125,7 +135,13 @@ public final class HttpFetcher {
             return Optional.empty();
         }
         if (!hostAllowed(url)) {
-            LOG.warn("Egress refused for {} - host is not on the allowlist", url);
+            // Distinguished, because they are different problems with different fixes and this is a
+            // security control. A URL that does not parse - typically an unresolved ${property} in a
+            // constructed artifact coordinate - was previously reported as an allowlist refusal, so
+            // an operator would go and add a host that was already on the list. Worse, a genuine
+            // allowlist refusal becomes easy to dismiss once these two look identical.
+            LOG.warn("Egress refused for {} - {}", url,
+                    parses(url) ? "host is not on the allowlist" : "the URL is malformed");
             return Optional.empty();
         }
         try {

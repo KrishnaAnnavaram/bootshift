@@ -1,5 +1,6 @@
 package com.bootshift.cli;
 
+import com.bootshift.core.domain.HarnessException;
 import com.bootshift.stages.RunFactory;
 import com.bootshift.stages.StageContext;
 import picocli.CommandLine;
@@ -62,7 +63,28 @@ public final class CommonOptions {
             "Delegated environment attribute in key=value form. Repeatable.")
     Map<String, String> environmentAttributes = new LinkedHashMap<>();
 
+    /**
+     * The identifier shape every artifact schema requires of {@code run_id}.
+     *
+     * <p>Checked here rather than left to the schemas. A {@code --run-id} the schemas reject used to
+     * survive bootstrap - which snapshots the repository into a fresh workspace - and then fail
+     * Agent 01 with a bare regex, after the operator had already paid for the copy. The run id is a
+     * CLI input, so the CLI is where an unusable one is refused.
+     */
+    private static final java.util.regex.Pattern RUN_ID =
+            java.util.regex.Pattern.compile("^RUN-[0-9A-HJKMNP-TV-Z]{26}$");
+
+    /** Refuses a run id the artifact schemas would reject, before any work is done. */
+    public static void requireUsableRunId(String runId) {
+        if (runId != null && !RUN_ID.matcher(runId).matches()) {
+            throw HarnessException.refusal("--run-id " + runId + " is not a run identifier. Runs are "
+                    + "named RUN- followed by a 26-character ULID, which is the shape every artifact "
+                    + "schema requires. Omit --run-id to continue the current run or start a new one.");
+        }
+    }
+
     public StageContext context() {
+        requireUsableRunId(runId);
         return RunFactory.create(new RunFactory.Options(repository, workspaceRoot, outputRoot,
                 harnessRoot.toAbsolutePath().normalize(), policy, policyFile, ai, environment,
                 !offline, runId, environmentAttributes));
